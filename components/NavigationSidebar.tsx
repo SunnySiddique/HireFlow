@@ -1,14 +1,21 @@
-import { sections } from "@/constants";
+import { employerSections, jobSeekerSections } from "@/constants";
 
 interface NavigationSidebarProps {
   activeSection: string;
   setActiveSection: (sectionId: string) => void;
+  role: string;
 }
 
 const NavigationSidebar = ({
   activeSection,
   setActiveSection,
+  role,
 }: NavigationSidebarProps) => {
+  const sections =
+    role === "job_seeker"
+      ? jobSeekerSections.map((section) => section)
+      : employerSections.map((emp) => emp);
+
   return (
     <>
       <div className="lg:col-span-1">

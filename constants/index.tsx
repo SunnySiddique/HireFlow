@@ -1,8 +1,12 @@
 import {
   Briefcase,
+  Building2,
   CheckCircle,
   FileText,
+  Globe,
   GraduationCap,
+  Heart,
+  MapPin,
   MessageSquare,
   Target,
   TrendingUp,
@@ -11,7 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 
-// <--- *************** HOME *************** ---> //
+// <--- HOME ---> //
 
 export const featuredJobs = [
   {
@@ -113,31 +117,25 @@ export const JOB_PLATFORM_TESTIMONIALS = [
   },
 ];
 
-// <--- *************** HOME *************** ---> //
+// <--- HOME ---> //
 
-// <--- *************** AUTH TABS *************** ---> //
+// <--- AUTH TABS ---> //
 export const AUTH_TABS = [
   { value: "job_seeker", label: "Job Seeker" },
   { value: "employer", label: "Employer" },
 ];
-// <--- *************** AUTH TABS *************** ---> //
+// <--- AUTH TABS ---> //
 
-// <--- *************** PROFILE *************** ---> //
+// <--- JOB SEEKER PROFILE ---> //
 
 export const jobSeekerLinks = [
   { label: "Profile", href: (slug: string) => `/job-seeker/${slug}` },
   { label: "My Jobs", href: "/jobs" },
 ];
 
-export const employerLinks = [
-  { label: "Profile", href: "/employer/profile" },
-  { label: "Post a Job", href: "/employer/jobs/new" },
-  { label: "Manage Jobs", href: "/employer/manage-jobs" },
-];
-
 export const jobType = ["Full-time", "Contract", "Remote"];
 
-export const sections = [
+export const jobSeekerSections = [
   { id: "about", label: "About", icon: User },
   { id: "experience", label: "Experience", icon: Briefcase },
   { id: "education", label: "Education", icon: GraduationCap },
@@ -145,6 +143,31 @@ export const sections = [
   { id: "preferences", label: "Job Preferences", icon: Target },
   { id: "documents", label: "Documents", icon: FileText },
 ];
+
+// <---  JOB SEEKER PROFILE  ---> //
+
+// <---  EMPLOYER PROFILE  ---> //
+
+export const employerLinks = [
+  { label: "Profile", href: (slug: string) => `/employer/${slug}` },
+  { label: "Post a Job", href: "/employer/jobs/new" },
+  { label: "Manage Jobs", href: "/employer/manage-jobs" },
+];
+
+export const employerSections = [
+  { id: "about", label: "About", icon: Building2 },
+  { id: "positions", label: "Open Positions", icon: Briefcase },
+  { id: "culture", label: "Culture", icon: Heart },
+  { id: "locations", label: "Locations", icon: MapPin },
+  { id: "social", label: "Social Links", icon: Globe },
+];
+
+export const employerHiringStatus = [
+  "Actively Hiring",
+  "Selective Hiring",
+  "Not Hiring",
+];
+// <--- EMPLOYER PROFILE ---> //
 
 export const notifications = [
   {
@@ -184,4 +207,3 @@ export const notifications = [
     unread: false,
   },
 ];
-// <--- *************** PROFILE *************** ---> //

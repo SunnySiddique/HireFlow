@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { employerLinks, jobSeekerLinks, notifications } from "@/constants";
+import { useEmployerProfile } from "@/hooks/useEmployer";
 import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
 import { useGetJobSeekerProfile } from "@/hooks/useJobSeeker";
 import { createClient } from "@/lib/supabase/client";
@@ -45,6 +46,7 @@ const DashboardNavbar = ({ role }: { role: "job_seeker" | "employer" }) => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { data: userProfile, isLoading: isLoadingUser } = useGetCurrentUser();
   const { data: jobSeekerProfile } = useGetJobSeekerProfile();
+  const { data: employerProfile } = useEmployerProfile();
 
   const unreadCount = notifications.filter((n) => n.unread).length;
   const links = role === "job_seeker" ? jobSeekerLinks : employerLinks;
@@ -53,9 +55,11 @@ const DashboardNavbar = ({ role }: { role: "job_seeker" | "employer" }) => {
     userProfile?.app_metadata?.provider === "google"
       ? user?.picture
       : user?.avatar_url;
-  const jobSeekerImg = jobSeekerProfile?.profile?.profile_url
-    ? jobSeekerProfile?.profile?.profile_url
-    : profileImage;
+
+  const jobSeekerImg =
+    role === "job_seeker"
+      ? jobSeekerProfile?.profile?.profile_url || profileImage
+      : employerProfile?.company_logo_url || "/profile";
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -186,11 +190,19 @@ const DashboardNavbar = ({ role }: { role: "job_seeker" | "employer" }) => {
                   {jobSeekerImg ? (
                     <AvatarImage
                       src={jobSeekerImg || "/placeholder.svg"}
-                      alt={user?.name || user?.full_name || "User"}
+                      alt={
+                        jobSeekerProfile?.profile?.full_name ||
+                        employerProfile?.company_name ||
+                        "User"
+                      }
                     />
                   ) : (
                     <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                      {getInitials(user?.name || user?.full_name || "U")}
+                      {getInitials(
+                        jobSeekerProfile?.profile?.full_name ??
+                          employerProfile?.company_name ??
+                          "User",
+                      )}
                     </AvatarFallback>
                   )}
                 </Avatar>
@@ -204,17 +216,27 @@ const DashboardNavbar = ({ role }: { role: "job_seeker" | "employer" }) => {
                   {jobSeekerImg ? (
                     <AvatarImage
                       src={jobSeekerImg || "/placeholder.svg"}
-                      alt={user?.name || user?.full_name || "User"}
+                      alt={
+                        jobSeekerProfile?.profile?.full_name ||
+                        employerProfile?.company_name ||
+                        "User"
+                      }
                     />
                   ) : (
                     <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                      {getInitials(user?.name || user?.full_name || "U")}
+                      {getInitials(
+                        jobSeekerProfile?.profile?.full_name ??
+                          employerProfile?.company_name ??
+                          "User",
+                      )}
                     </AvatarFallback>
                   )}
                 </Avatar>
                 <div className="flex flex-col gap-0.5">
                   <p className="text-sm font-semibold text-foreground">
-                    {user?.name || user?.full_name}
+                    {role === "job_seeker"
+                      ? jobSeekerProfile?.profile?.full_name
+                      : employerProfile?.company_name}
                   </p>
                 </div>
               </div>
@@ -226,7 +248,11 @@ const DashboardNavbar = ({ role }: { role: "job_seeker" | "employer" }) => {
                     <Link
                       href={
                         typeof link.href === "function"
-                          ? link.href(jobSeekerProfile?.profile?.slug || "")
+                          ? link.href(
+                              role === "job_seeker"
+                                ? jobSeekerProfile?.profile?.slug
+                                : employerProfile?.slug,
+                            )
                           : link.href
                       }
                       className="flex items-center gap-2 cursor-pointer"

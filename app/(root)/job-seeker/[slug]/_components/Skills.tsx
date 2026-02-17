@@ -51,7 +51,7 @@ const Skills = ({ skills, setSkills, editMode }: EducationProps) => {
             {skills.map((skill, idx) => (
               <div
                 key={idx}
-                className={`px-4 py-2 rounded text-sm font-medium transition-all flex items-center gap-2 pointer-events-none ${
+                className={`px-4 py-2 rounded text-sm font-medium transition-all flex items-center gap-2 ${
                   editMode
                     ? "bg-muted text-foreground cursor-pointer hover:bg-red-500/20 hover:text-red-500"
                     : "bg-secondary-foreground border"
