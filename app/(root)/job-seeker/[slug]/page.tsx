@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import NavigationSidebar from "../../../../components/NavigationSidebar";
 import About from "./_components/About";
 import Documents from "./_components/Documents";
 import Education from "./_components/Education";
 import Experience from "./_components/Experience";
 import HeroProfile from "./_components/HeroProfile";
 import JobPreferences from "./_components/JobPreferences";
-import NavigationSidebar from "./_components/NavigationSidebar";
 import Skills from "./_components/Skills";
 
 import Loader from "@/components/Loader";
@@ -280,6 +280,7 @@ const ProfilePage = () => {
           <NavigationSidebar
             activeSection={activeSection}
             setActiveSection={setActiveSection}
+            role={"job_seeker"}
           />
 
           {/* Content Area */}

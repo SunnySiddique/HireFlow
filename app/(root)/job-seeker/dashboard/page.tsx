@@ -1,5 +1,5 @@
 const JobSeekerDashbaordPage = () => {
-  return <></>;
+  return <>{/* <DashboardNavbar role="job_seeker" /> */}</>;
 };
 
 export default JobSeekerDashbaordPage;

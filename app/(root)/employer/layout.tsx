@@ -1,14 +1,13 @@
 import DashboardNavbar from "@/components/DashboardNavbar";
 import { ReactNode } from "react";
 
-const jobSeekerLayout = ({ children }: { children: ReactNode }) => {
+const EmployerLayout = ({ children }: { children: ReactNode }) => {
   return (
     <>
-      <DashboardNavbar role="job_seeker" />
-
+      <DashboardNavbar role="employer" />
       {children}
     </>
   );
 };
 
-export default jobSeekerLayout;
+export default EmployerLayout;
