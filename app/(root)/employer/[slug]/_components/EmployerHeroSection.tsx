@@ -1,9 +1,10 @@
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 
 import CustomField from "@/components/CustomField";
 import EmptyState from "@/components/EmptyState";
 import { EmployerFormData } from "@/types/employer";
 import { Building2, Upload } from "lucide-react";
+import Image from "next/image";
 import { UseFormReturn } from "react-hook-form";
 
 interface EmployerHeroSectionProps {
@@ -11,20 +12,25 @@ interface EmployerHeroSectionProps {
   setEditMode: (mode: boolean) => void;
   form: UseFormReturn<EmployerFormData>;
   employer: any;
+  setLogoFile: React.Dispatch<React.SetStateAction<File | null>>;
+  isLoading: boolean;
 }
 
 const EmployerHeroSection = ({
   editMode,
   form,
   employer,
+  setLogoFile,
+  isLoading,
 }: EmployerHeroSectionProps) => {
-  const [logoFile, setLogoFile] = useState<string | null>(null);
   const logoRef = useRef<HTMLInputElement>(null);
+  const [viewLogo, setViewLogo] = useState<string | null>(null);
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setLogoFile(file.name);
+      setLogoFile(file);
+      setViewLogo(URL.createObjectURL(file));
     }
   };
 
@@ -33,36 +39,41 @@ const EmployerHeroSection = ({
       <div className="border rounded-sm p-8 shadow-lg">
         <div className="flex items-start gap-6">
           {/* Logo */}
-          {employer?.company_logo_url && (
-            <div className="relative">
-              <div className="w-24 h-24 rounded-lg bg-muted border-2 border-border flex items-center justify-center overflow-hidden">
-                {logoFile ? (
-                  <span className="text-sm font-semibold text-muted-foreground text-center px-2">
-                    {logoFile}
-                  </span>
-                ) : (
-                  <Building2 className="w-12 h-12 text-muted-foreground" />
-                )}
-              </div>
-              {editMode && (
-                <>
-                  <button
-                    onClick={() => logoRef.current?.click()}
-                    className="absolute bottom-0 right-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all"
-                  >
-                    <Upload className="w-4 h-4" />
-                  </button>
-                  <input
-                    ref={logoRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleLogoChange}
-                    className="hidden"
-                  />
-                </>
+          <div className="relative">
+            <div className="w-24 h-24 rounded-lg bg-muted border-2 border-border flex items-center justify-center overflow-hidden">
+              {viewLogo || employer?.company_logo_url ? (
+                <Image
+                  src={viewLogo || employer?.company_logo_url}
+                  alt="Profile image"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 112px, 128px"
+                  priority
+                />
+              ) : (
+                <Building2 className="w-12 h-12 text-muted-foreground" />
               )}
             </div>
-          )}
+            {editMode && (
+              <>
+                <button
+                  onClick={() => logoRef.current?.click()}
+                  className="absolute bottom-0 right-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all"
+                  disabled={isLoading}
+                >
+                  <Upload className="w-4 h-4" />
+                </button>
+                <input
+                  ref={logoRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoChange}
+                  className="hidden"
+                />
+              </>
+            )}
+          </div>
+
           {/* Company Info */}
           <div className="flex-1">
             {editMode ? (

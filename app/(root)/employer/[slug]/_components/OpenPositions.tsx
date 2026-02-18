@@ -1,5 +1,6 @@
 import CustomField from "@/components/CustomField";
 import EmptyState from "@/components/EmptyState";
+import { employerHiringStatus } from "@/constants";
 import { EmployerFormData } from "@/types/employer";
 import { Briefcase, TrendingUp } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
@@ -48,7 +49,7 @@ const OpenPositions = ({ editMode, form, employer }: OpenPositionsProps) => {
                 />
               ) : (
                 <p className="text-3xl font-black text-primary">
-                  {employer?.openPositionsCount || "0"}
+                  {employer?.open_positions_count || "0"}
                 </p>
               )}
             </div>
@@ -65,35 +66,19 @@ const OpenPositions = ({ editMode, form, employer }: OpenPositionsProps) => {
               </div>
               {editMode ? (
                 <CustomField
+                  type="select"
                   label=""
                   control={form.control}
                   name="hiringStatus"
-                  type="select"
+                  placeholder="Select Hiring Status"
+                  options={employerHiringStatus.map((status) => ({
+                    label: status,
+                    value: status,
+                  }))}
                 />
               ) : (
-                // <FormField
-                //   control={form.control}
-                //   name="hiringStatus"
-                //   render={({ field }) => (
-                //     <FormItem>
-                //       <FormControl>
-                //         <select
-                //           {...field}
-                //           className="w-full px-4 py-2 bg-background text-foreground rounded-lg border border-border focus:border-secondary focus:outline-none"
-                //         >
-                //           <option value="actively hiring">
-                //             Actively Hiring
-                //           </option>
-                //           <option value="selective">Selective Hiring</option>
-                //           <option value="not hiring">Not Hiring</option>
-                //         </select>
-                //       </FormControl>
-                //       <FormMessage />
-                //     </FormItem>
-                //   )}
-                // />
                 <p className="text-foreground font-semibold capitalize">
-                  {form.watch("hiringStatus") || "Not specified"}
+                  {employer?.hiring_status || "Not specified"}
                 </p>
               )}
             </div>

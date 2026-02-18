@@ -8,13 +8,14 @@ interface HeaderProps {
   setEditMode: (mode: boolean) => void;
   form: UseFormReturn<EmployerFormData>;
   handleProfileSave: () => void;
+  isLoading: boolean;
 }
 
 const Header = ({
   editMode,
-  form,
   handleProfileSave,
   setEditMode,
+  isLoading,
 }: HeaderProps) => {
   return (
     <>
@@ -32,13 +33,12 @@ const Header = ({
             variant={editMode ? "outline" : "ghost"}
             className={`px-6 py-5 rounded-lg font-bold transition-all flex items-center gap-2 shadow-md hover:shadow-lg transform whitespace-nowrap disabled:bg-muted disabled:cursor-not-allowed`}
             onClick={editMode ? handleProfileSave : () => setEditMode(true)}
-            // disabled={isPending}
+            disabled={isLoading}
           >
             {editMode ? (
               <div className="flex items-center gap-2">
                 <Save className="w-4 h-4" />
-                Save Profile
-                {/* {isPending ? "Saving..." : "Save Changes"} */}
+                {isLoading ? "Saving..." : "Save Changes"}
               </div>
             ) : (
               <div className="flex items-center gap-2">

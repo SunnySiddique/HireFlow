@@ -1,7 +1,9 @@
 import { updateEmployerProfile } from "@/lib/action/employer.actions";
+import { uploadEmployerCompanyLogo } from "@/lib/action/media.actions";
 import { createClient } from "@/lib/supabase/client";
 import { EmployerType } from "@/types/employer";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 // get employer table from db
 export const useEmployerProfile = () => {
@@ -9,9 +11,16 @@ export const useEmployerProfile = () => {
     queryKey: ["employerProfile"],
     queryFn: async () => {
       const supabase = createClient();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+      if (authError || !user) throw new Error("Not authenticated");
+
       const { data, error } = await supabase
         .from("employers")
         .select("*")
+        .eq("auth_id", user.id)
         .single();
 
       if (error) throw error;
@@ -22,9 +31,9 @@ export const useEmployerProfile = () => {
 };
 
 // get employer table by id
-export const useEmployerProfileById = (slug: string) => {
+export const useEmployerProfileBySlug = (slug: string) => {
   return useQuery({
-    queryKey: ["employerProfileById"],
+    queryKey: ["employerProfileBySlug"],
     queryFn: async () => {
       const supabase = createClient();
       const { data, error } = await supabase
@@ -48,7 +57,24 @@ export const useUpdateEmployer = () => {
     mutationFn: (profileData: EmployerType) =>
       updateEmployerProfile(profileData),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employerProfileBySlug"] });
       queryClient.invalidateQueries({ queryKey: ["employerProfile"] });
     },
+  });
+};
+
+// upload logo
+export const useUploadCompanyLogo = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ file, logoPath }: { file: File; logoPath?: string }) =>
+      uploadEmployerCompanyLogo(file, logoPath),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employerProfileBySlug"] });
+    },
+    onError: () =>
+      toast.error(
+        `Something went wrong. uploading proifleImage or Resume try again`,
+      ),
   });
 };
