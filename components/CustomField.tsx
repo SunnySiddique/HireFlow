@@ -72,7 +72,10 @@ const CustomField = <T extends FieldValues>({
                 {...field}
               />
             ) : type === "select" ? (
-              <Select value={field.value} onValueChange={field.onChange}>
+              <Select
+                value={field.value ?? "actively hiring"}
+                onValueChange={field.onChange}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={placeholder} />
                 </SelectTrigger>

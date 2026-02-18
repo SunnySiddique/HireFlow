@@ -163,9 +163,9 @@ export const employerSections = [
 ];
 
 export const employerHiringStatus = [
-  "Actively Hiring",
-  "Selective Hiring",
-  "Not Hiring",
+  "actively hiring",
+  "selective",
+  "not hiring",
 ];
 // <--- EMPLOYER PROFILE ---> //
 

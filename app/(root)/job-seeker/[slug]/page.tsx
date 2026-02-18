@@ -189,8 +189,8 @@ const ProfilePage = () => {
           profileUrl || jobSeekerProfile.profile.profile_url || undefined,
         resume_url:
           resumeUrl || jobSeekerProfile.profile.resume_url || undefined,
-        profile_path: profilePath || profile?.profile_path,
-        resume_path: resumePath || profile?.resume_path,
+        profile_path: profilePath || "",
+        resume_path: resumePath || "",
         experience: experiences.length
           ? experiences.map(({ id, ...rest }) => rest)
           : null,
@@ -201,10 +201,7 @@ const ProfilePage = () => {
       };
 
       await saveProfile(payload, {
-        onSuccess: (savedProfile) => {
-          if (savedProfile?.slug && savedProfile.slug !== slug) {
-            router.replace(`/job-seeker/${savedProfile.slug}`);
-          }
+        onSuccess: () => {
           setEditMode(false);
         },
       });

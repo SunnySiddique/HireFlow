@@ -38,3 +38,34 @@ export async function uploadJobSeekerImage(
     };
   }
 }
+
+export async function uploadEmployerCompanyLogo(file: File, logoPath?: string) {
+  try {
+    const supabase = await createClient();
+    const fileNameTimestamp = `${Date.now()}-${file.name}`;
+
+    if (logoPath) {
+      const { error: removeError } = await supabase.storage
+        .from("employer_logo")
+        .remove([logoPath]);
+
+      if (removeError)
+        console.warn("Failed to remove previous file:", removeError);
+    }
+
+    const { data, error } = await supabase.storage
+      .from("employer_logo")
+      .upload(fileNameTimestamp, file);
+
+    if (error) throw error;
+
+    const {
+      data: { publicUrl },
+    } = await supabase.storage.from("employer_logo").getPublicUrl(data.path);
+
+    return { success: true, url: publicUrl, path: data.path };
+  } catch (error) {
+    console.error("Error in uploadEmployerCompanyLogo:", error);
+    throw new Error("Failed to execute uploadEmployerCompanyLogo");
+  }
+}

@@ -8,25 +8,25 @@ export async function updateEmployerProfile(profileData: EmployerType) {
     const supabase = await createClient();
     const {
       data: { user },
+      error: authError,
     } = await supabase.auth.getUser();
+    console.log("payload,", profileData);
 
-    const { data, error } = await supabase
-      .from("employers")
-      .select("id")
-      .eq("auth_id", user!.id)
-      .maybeSingle();
+    if (authError) return { success: false, message: authError.message };
 
-    if (error) {
-      return { success: false, error: error.message };
+    if (!user || user.id !== profileData.auth_id) {
+      return {
+        success: false,
+        message: "Unauthorized update profile",
+      };
     }
 
-    if (!data) {
-      return { success: false, error: "User not found" };
-    }
-
-    const { error: isEmployerError } = await supabase
+    const { data: updated, error: isEmployerError } = await supabase
       .from("employers")
-      .upsert(profileData);
+      .update(profileData)
+      .eq("auth_id", user.id)
+      .select("*");
+    console.log("Updated row:", updated, "Error:", isEmployerError);
 
     if (isEmployerError) {
       return { success: false, error: isEmployerError.message };
