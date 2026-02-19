@@ -58,8 +58,8 @@ const DashboardNavbar = ({ role }: { role: "job_seeker" | "employer" }) => {
 
   const jobSeekerImg =
     role === "job_seeker"
-      ? jobSeekerProfile?.profile?.profile_url || profileImage
-      : employerProfile?.company_logo_url || "/profile";
+      ? (jobSeekerProfile?.profile?.profile_url ?? profileImage)
+      : employerProfile?.company_logo_url;
 
   const handleLogout = async () => {
     const supabase = createClient();

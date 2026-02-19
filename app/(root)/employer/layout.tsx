@@ -5,7 +5,7 @@ const EmployerLayout = ({ children }: { children: ReactNode }) => {
   return (
     <>
       <DashboardNavbar role="employer" />
-      {children}
+      <div className="">{children}</div>
     </>
   );
 };
