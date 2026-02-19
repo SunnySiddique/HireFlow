@@ -1,5 +1,5 @@
-const EmployerDashboard = () => {
-  return <>{/* <DashboardNavbar role="employer" /> */}</>;
+const Page = () => {
+  return <>Page</>;
 };
 
-export default EmployerDashboard;
+export default Page;

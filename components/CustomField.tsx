@@ -31,12 +31,14 @@ interface CustomFieldProps<T extends FieldValues> {
     | "select"
     | "checkbox"
     | "checkbox-group"
-    | "url";
+    | "url"
+    | "date";
   options?: { label: string; value: string | number }[];
 
   isLable?: boolean;
   isCheckBox?: boolean;
   isAbout?: boolean;
+  isJob?: boolean;
 }
 
 const CustomField = <T extends FieldValues>({
@@ -49,6 +51,7 @@ const CustomField = <T extends FieldValues>({
   isLable = false,
   isCheckBox = false,
   isAbout = false,
+  isJob = false,
 }: CustomFieldProps<T>) => {
   return (
     <FormField
@@ -68,14 +71,11 @@ const CustomField = <T extends FieldValues>({
             {type === "textarea" ? (
               <Textarea
                 placeholder={placeholder}
-                className={`${isAbout ? "h-48" : "h-20"} w-full  text-base bg-muted text-foreground rounded-lg border border-border focus:border-primary focus:outline-none resize-none p-3`}
+                className={`${isAbout ? "h-48" : "h-20"} ${isJob ? "resize-y" : "resize-none"} w-full  text-base bg-muted text-foreground rounded-lg border border-border focus:border-primary focus:outline-none p-3`}
                 {...field}
               />
             ) : type === "select" ? (
-              <Select
-                value={field.value ?? "actively hiring"}
-                onValueChange={field.onChange}
-              >
+              <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={placeholder} />
                 </SelectTrigger>

@@ -24,22 +24,29 @@ import OpenPositions from "./OpenPositions";
 // Zod schemas
 const employerSchema = z.object({
   companyName: z.string().min(2, "Company name must be at least 2 characters"),
+
+  industry: z.string().min(2, "Industry is required"),
+
+  description: z.string().min(30, "Description must be at least 30 characters"),
+
+  headquartersLocation: z.string().min(2, "Headquarters location is required"),
+
   website: z.string().url("Invalid URL").optional().or(z.literal("")),
-  industry: z.string().optional().or(z.literal("")),
+
   companySize: z.string().optional().or(z.literal("")),
-  description: z
-    .string()
-    .min(10, "Description must be at least 10 characters")
-    .optional()
-    .or(z.literal("")),
-  headquartersLocation: z.string().optional().or(z.literal("")),
+
   operatingLocations: z.string().optional().default(""),
+
   openPositionsCount: z.string().optional().or(z.literal("")),
+
   hiringStatus: z
     .enum(["actively hiring", "selective", "not hiring"])
     .default("actively hiring"),
+
   foundedYear: z.string().optional().or(z.literal("")),
+
   linkedinUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+
   twitterUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
 });
 
@@ -79,7 +86,6 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
       twitterUrl: "",
     },
   });
-  console.log("employerprofile:", employerProfile);
 
   const onSubmit = async (data: EmployerFormData) => {
     try {
@@ -141,8 +147,6 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
   };
 
   const onError = (errors: any) => {
-    console.log(errors);
-
     const firstError = Object.values(errors)[0] as any;
     if (firstError?.message) {
       toast.error(firstError.message);
@@ -150,23 +154,24 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
   };
 
   const isSaving = isEmployerProfleUpdating || isLogoUploading;
+  console.log("emp:", employerProfile);
 
   useEffect(() => {
     if (employerProfile) {
       setCoreValues(employerProfile?.core_values ?? []);
       form.reset({
-        companyName: employerProfile.company_name || "",
-        website: employerProfile.website || "",
-        industry: employerProfile.industry || "",
-        companySize: employerProfile.company_size || "",
-        description: employerProfile.description || "",
-        headquartersLocation: employerProfile.headquarters_location || "",
+        companyName: employerProfile.company_name ?? "",
+        website: employerProfile.website ?? "",
+        industry: employerProfile.industry ?? "",
+        companySize: employerProfile.company_size ?? "",
+        description: employerProfile.description ?? "",
+        headquartersLocation: employerProfile.headquarters_location ?? "",
         operatingLocations: employerProfile.operating_locations || [], // ✅ array
         openPositionsCount: String(employerProfile.open_positions_count ?? "0"), // ✅ String()
-        hiringStatus: employerProfile.hiring_status || "actively hiring",
+        hiringStatus: employerProfile.hiring_status ?? "actively hiring",
         foundedYear: String(employerProfile.founded_year ?? ""), // ✅ String()
-        linkedinUrl: employerProfile.linkedin_url || "",
-        twitterUrl: employerProfile.twitter_url || "",
+        linkedinUrl: employerProfile.linkedin_url ?? "",
+        twitterUrl: employerProfile.twitter_url ?? "",
       });
     }
   }, [employerProfile, editMode, form]);
