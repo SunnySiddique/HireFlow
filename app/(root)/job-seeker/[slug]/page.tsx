@@ -28,7 +28,7 @@ import {
   ProfileFormData,
 } from "@/types/job-seeker";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
@@ -80,7 +80,6 @@ const ProfilePage = () => {
   // Job seeker profile from useJobSeeker.ts
   const { data: jobSeekerProfile, isLoading: isJobSeekerProfileLoading } =
     useGetJobSeekerProfileBySlug(slug as string);
-  const router = useRouter();
   //states
   const [editMode, setEditMode] = useState(false);
   const [activeSection, setActiveSection] = useState("about");

@@ -3,12 +3,16 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { buttonText } from "@/constants/employerData";
+import { useEmployerProfile } from "@/hooks/useEmployer";
+import { useCreateJob, useUpdateJob } from "@/hooks/useJobs";
+import { createSlug } from "@/lib/utils";
 import { JobFormValues } from "@/types/jobs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Check } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { FormProvider, Resolver, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { z } from "zod";
 import BasicInfo from "./BasicInfo";
 import JobDescription from "./JobDescription";
@@ -16,59 +20,76 @@ import SalaryAndBenefits from "./SalaryAndBenefits";
 import WorkLocation from "./WorkLocation";
 
 // Zod Validation Schema
-const jobFormSchema = z.object({
-  jobTitle: z.string().min(3, "Job title must be at least 3 characters"),
-  jobType: z.string().min(1, "Job type is required"),
-  employmentType: z.string().min(1, "Employment type is required"),
-  experienceLevel: z.string().min(1, "Experience level is required"),
-  numberOfPositions: z.coerce.number().min(1, "At least 1 position required"),
-  primaryLocation: z.string().min(2, "Location is required"),
-  workArrangement: z.string().min(1, "Work arrangement is required"),
-  minimumSalary: z.coerce.number().min(0, "Minimum salary required"),
-  maximumSalary: z.coerce.number().min(0, "Maximum salary required"),
-  currency: z.string().min(1, "Currency is required"),
-  benefits: z.string().optional(),
-  jobDescription: z
-    .string()
-    .min(10, "Job description must be at least 10 characters"),
-  requirements: z
-    .string()
-    .min(10, "Requirements must be at least 10 characters"),
-  applicationDeadline: z.string().optional(),
-  publishStatus: z.string().default("draft"),
-});
+const jobFormSchema = z
+  .object({
+    jobTitle: z.string().min(3, "Job title must be at least 3 characters"),
+    jobType: z.string().min(1, "Job type is required"),
+    employmentType: z.string().min(1, "Employment type is required"),
+    experienceLevel: z.string().min(1, "Experience level is required"),
+    numberOfPositions: z.coerce.number().min(1, "At least 1 position required"),
+    primaryLocation: z.string().min(2, "Location is required"),
+    workArrangement: z.string().min(1, "Work arrangement is required"),
+    minimumSalary: z.number().min(0, "Minimum salary cannot be negative"),
+    maximumSalary: z.number().min(0, "Maximum salary cannot be negative"),
+    currency: z.string().min(1, "Currency is required"),
+    skills: z
+      .array(z.string().min(1, "Each skill must be at least 1 character"))
+      .optional(),
+    benefits: z
+      .array(z.string().min(1, "Each benefit must be at least 1 character"))
+      .optional(),
+    jobDescription: z
+      .string()
+      .min(10, "Job description must be at least 10 characters"),
+    requirements: z
+      .array(z.string().min(1))
+      .min(1, "At least one requirement is needed"),
+    applicationDeadline: z.string().optional(),
+    publishStatus: z.string().default("draft"),
+  })
+  .refine((data) => data.maximumSalary >= data.minimumSalary, {
+    message: "Maximum salary must be greater than or equal to minimum salary",
+  });
 
-//TODO create edit job post server action to edit the  job posts
-const CreateJobForm = () => {
+interface CreateJobFormProps {
+  fromType: "create" | "edit";
+  slug?: string;
+  initialData?: JobFormValues;
+}
+
+const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
+  const { data: currentEmployerProfile } = useEmployerProfile();
+  const { mutateAsync: createJobPost, isPending: isJobCreating } =
+    useCreateJob();
+  const { mutateAsync: updateJobPost, isPending: isJobUpdating } =
+    useUpdateJob();
+
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const [skills, setSkills] = useState<string[]>([]);
 
   const form = useForm<JobFormValues, any, JobFormValues>({
     resolver: zodResolver(jobFormSchema) as Resolver<JobFormValues>,
     defaultValues: {
-      jobTitle: "",
-      jobType: "",
-      employmentType: "",
-      experienceLevel: "",
-      numberOfPositions: 1,
-      primaryLocation: "",
-      workArrangement: "",
-      minimumSalary: 0,
-      maximumSalary: 0,
-      currency: "usd",
-      benefits: "",
-      jobDescription: "",
-      requirements: "",
-      skills: [],
-      applicationDeadline: "",
-      publishStatus: "draft",
+      jobTitle: initialData?.job_title || "",
+      jobType: initialData?.job_type || "",
+      employmentType: initialData?.employment_type || "",
+      experienceLevel: initialData?.experience_level || "",
+      numberOfPositions: initialData?.open_positions || 1,
+      primaryLocation: initialData?.location || "",
+      workArrangement: initialData?.remote_option || "",
+      minimumSalary: initialData?.salary_min || 0,
+      maximumSalary: initialData?.salary_max || 0,
+      currency: initialData?.currency || "usd",
+      benefits: initialData?.benefits || [],
+      jobDescription: initialData?.job_description || "",
+      requirements: initialData?.requirements || [],
+      skills: initialData?.skills_required || [],
+      applicationDeadline: initialData?.application_deadline || "",
+      publishStatus: initialData?.status || "draft",
     },
   });
 
   const handleIncreaseCurrentStep = () => {
-    if (currentStep === 4) {
-      return onSubmit;
-    }
+    if (currentStep >= 4) return;
     setCurrentStep((prev) => prev + 1);
   };
 
@@ -78,8 +99,92 @@ const CreateJobForm = () => {
     }
   };
 
-  const onSubmit = (values: JobFormValues) => {
-    console.log("Form submitted with values:", { ...values, skills });
+  const onSubmit = async (data: JobFormValues) => {
+    if (!currentEmployerProfile) return;
+
+    if (fromType === "create") {
+      const jobSlug = createSlug(data.jobTitle);
+
+      const payload: JobFormValues = {
+        employer_id: currentEmployerProfile.id,
+        job_slug: jobSlug,
+        job_title: data.jobTitle,
+        job_type: data.jobType,
+        employment_type: data.employmentType,
+        experience_level: data.experienceLevel,
+        open_positions: data.numberOfPositions,
+        location: data.primaryLocation,
+        remote_option: data.workArrangement,
+        salary_min: data.minimumSalary,
+        salary_max: data.maximumSalary,
+        currency: data.currency,
+        benefits: data.benefits.length > 0 ? data.benefits : [],
+        job_description: data.jobDescription,
+        requirements: data.requirements.length > 0 ? data.requirements : [],
+        application_deadline: data.applicationDeadline || null,
+        status: data.publishStatus,
+        skills_required: data.skills.length > 0 ? data.skills : [],
+      };
+
+      await createJobPost(payload, {
+        onSuccess: () => {
+          toast.success("Post Created Successfully");
+
+          form.reset();
+        },
+      });
+    } else {
+      await updateJobPost(
+        {
+          job_slug: initialData.job_slug,
+          jobData: data,
+        },
+        {
+          onSuccess: () => {
+            toast.success("Job Updated successfully");
+            form.reset();
+          },
+        },
+      );
+    }
+  };
+
+  const isValid = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          form.watch("jobTitle").trim().length >= 3 &&
+          form.watch("jobType").trim() !== "" &&
+          form.watch("employmentType").trim() !== "" &&
+          form.watch("experienceLevel").trim() !== "" &&
+          form.watch("numberOfPositions") >= 1
+        );
+      case 2:
+        return (
+          form.watch("primaryLocation").trim().length >= 3 &&
+          form.watch("workArrangement").trim() !== ""
+        );
+      case 3:
+        return (
+          form.watch("minimumSalary") > 1 &&
+          form.watch("maximumSalary") > 1 &&
+          form.watch("currency").trim() !== ""
+        );
+      case 4:
+        return (
+          form.watch("jobDescription").trim().length >= 10 &&
+          (form.watch("requirements") as string[]).length >= 1
+        );
+      default:
+        return false;
+    }
+  };
+
+  const onInvalid = (errors: any) => {
+    const firstError = Object.values(errors)[0] as any;
+    if (firstError?.message) {
+      toast.error(firstError.message);
+    }
   };
 
   return (
@@ -195,7 +300,7 @@ const CreateJobForm = () => {
         {/* Form Content */}
         <div className="max-w-370 mx-auto px-4 sm:px-6 lg:px-8 pb-12">
           <FormProvider {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
               {/* Step 1: Basic Information */}
               <Card className="p-8 border-border">
                 {currentStep === 1 && <BasicInfo form={form} />}
@@ -207,13 +312,7 @@ const CreateJobForm = () => {
                 {currentStep === 3 && <SalaryAndBenefits form={form} />}
 
                 {/* Step 4: Job Description */}
-                {currentStep === 4 && (
-                  <JobDescription
-                    form={form}
-                    skills={skills}
-                    setSkills={setSkills}
-                  />
-                )}
+                {currentStep === 4 && <JobDescription form={form} />}
 
                 {/* Navigation Buttons */}
                 <div className="flex justify-between gap-3 pt-6 border-t border-border mt-8">
@@ -229,16 +328,26 @@ const CreateJobForm = () => {
                     </Button>
                   )}
                   <Button
-                    type={currentStep === 4 ? "submit" : "button"}
+                    type="button"
                     className="bg-primary text-primary-foreground hover:bg-primary/90 ml-auto"
                     onClick={
-                      currentStep < 4 ? handleIncreaseCurrentStep : undefined
+                      currentStep < 4
+                        ? handleIncreaseCurrentStep
+                        : () => form.handleSubmit(onSubmit, onInvalid)()
                     }
+                    disabled={!isValid() || isJobCreating || isJobUpdating}
                   >
-                    {currentStep !== 4 ? "Next: " : ""}
-                    {buttonText.map((txt, i) =>
-                      txt.stepNum === currentStep ? txt.btnTxt : "",
-                    )}
+                    {currentStep < 4 && "Next: "}
+                    {currentStep === 4
+                      ? fromType === "create"
+                        ? isJobCreating
+                          ? "Creating..."
+                          : "Publish Job"
+                        : isJobUpdating
+                          ? "Updating..."
+                          : "Update Job"
+                      : (buttonText.find((txt) => txt.stepNum === currentStep)
+                          ?.btnTxt ?? "")}
                   </Button>
                 </div>
               </Card>
