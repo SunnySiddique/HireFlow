@@ -12,8 +12,4 @@ export const buttonText = [
     stepNum: 3,
     btnTxt: "Job Description",
   },
-  {
-    stepNum: 4,
-    btnTxt: "Publish Job Posting",
-  },
 ];

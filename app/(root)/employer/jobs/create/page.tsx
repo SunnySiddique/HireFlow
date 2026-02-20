@@ -3,7 +3,7 @@ import CreateJobForm from "../_components/CreateJobForm";
 const JobCreatePage = () => {
   return (
     <>
-      <CreateJobForm />
+      <CreateJobForm fromType="create" />
     </>
   );
 };

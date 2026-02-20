@@ -34,3 +34,11 @@ export const getReadableError = (message: string) => {
   }
   return message || "Something went wrong. Please try again.";
 };
+
+// slug
+export const createSlug = (title: string) => {
+  return title
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]/g, "");
+};
