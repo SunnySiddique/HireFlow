@@ -10,6 +10,7 @@ import { JobFormValues } from "@/types/jobs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Check } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, Resolver, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -44,8 +45,11 @@ const jobFormSchema = z
     requirements: z
       .array(z.string().min(1))
       .min(1, "At least one requirement is needed"),
+    responsibilities: z
+      .array(z.string().min(1))
+      .min(1, "At least one responsibility is needed"),
     applicationDeadline: z.string().optional(),
-    publishStatus: z.string().default("draft"),
+    status: z.string().default("draft"),
   })
   .refine((data) => data.maximumSalary >= data.minimumSalary, {
     message: "Maximum salary must be greater than or equal to minimum salary",
@@ -65,6 +69,7 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
     useUpdateJob();
 
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const router = useRouter();
 
   const form = useForm<JobFormValues, any, JobFormValues>({
     resolver: zodResolver(jobFormSchema) as Resolver<JobFormValues>,
@@ -82,9 +87,10 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
       benefits: initialData?.benefits || [],
       jobDescription: initialData?.job_description || "",
       requirements: initialData?.requirements || [],
+      responsibilities: initialData?.responsibilities || [],
       skills: initialData?.skills_required || [],
       applicationDeadline: initialData?.application_deadline || "",
-      publishStatus: initialData?.status || "draft",
+      status: initialData?.status || "draft",
     },
   });
 
@@ -121,16 +127,20 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
         benefits: data.benefits.length > 0 ? data.benefits : [],
         job_description: data.jobDescription,
         requirements: data.requirements.length > 0 ? data.requirements : [],
+        responsibilities:
+          data.responsibilities.length > 0 ? data.responsibilities : [],
         application_deadline: data.applicationDeadline || null,
-        status: data.publishStatus,
+        status: data.status,
         skills_required: data.skills.length > 0 ? data.skills : [],
       };
 
       await createJobPost(payload, {
         onSuccess: () => {
           toast.success("Post Created Successfully");
-
           form.reset();
+        },
+        onSettled: () => {
+          router.push("/employer/jobs");
         },
       });
     } else {
@@ -143,6 +153,9 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
           onSuccess: () => {
             toast.success("Job Updated successfully");
             form.reset();
+          },
+          onSettled: () => {
+            router.push("/employer/jobs");
           },
         },
       );

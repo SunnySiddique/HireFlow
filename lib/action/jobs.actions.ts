@@ -4,6 +4,24 @@ import { jobFormData, JobFormValues, jobUpdateFormData } from "@/types/jobs";
 import { createClient } from "../supabase/server";
 import { createSlug } from "../utils";
 
+export async function getJobPostBySlug(jobSlug: string) {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("jobs")
+      .select("*")
+      .eq("job_slug", jobSlug)
+      .single();
+
+    if (error || !data) return null;
+
+    return data;
+  } catch (error) {
+    console.error("Error in getJobPostBySlug:", error);
+    throw new Error("Failed to execute getJobPostBySlug");
+  }
+}
+
 export async function CreateJobPost(jobData: jobFormData) {
   try {
     const supabase = await createClient();
@@ -79,8 +97,10 @@ export async function updateJobPost(jobSlug: string, jobData: JobFormValues) {
       benefits: jobData.benefits ?? [],
       job_description: jobData.jobDescription,
       requirements: jobData.requirements.length > 0 ? jobData.requirements : [],
+      responsibilities:
+        jobData.responsibilities.length > 0 ? jobData.responsibilities : [],
       application_deadline: jobData.applicationDeadline || null,
-      status: jobData.publishStatus,
+      status: jobData.status,
       skills_required: jobData.skills ?? [],
     };
 
@@ -98,20 +118,34 @@ export async function updateJobPost(jobSlug: string, jobData: JobFormValues) {
   }
 }
 
-export async function getJobPostBySlug(jobSlug: string) {
+export async function deleteJobPost(jobSlug: string) {
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("jobs")
-      .select("*")
-      .eq("job_slug", jobSlug)
+    const {
+      data: { user },
+      error: isAuthError,
+    } = await supabase.auth.getUser();
+    if (isAuthError) throw isAuthError.message;
+    if (!user) return;
+    const { data: employerExist, error: isEmployerError } = await supabase
+      .from("employers")
+      .select("id,auth_id")
+      .eq("auth_id", user?.id)
       .single();
-
-    if (error || !data) return null;
-
-    return data;
+    if (isEmployerError) return { success: false, error: "User not found" };
+    if (employerExist.auth_id.toString() !== user.id.toString())
+      return {
+        success: false,
+        error: "You are not authorized to delete job post",
+      };
+    const { error } = await supabase
+      .from("jobs")
+      .delete()
+      .eq("job_slug", jobSlug);
+    if (error) return { success: false, error: error.message };
+    return { success: true, message: "Job Deleted Successfully" };
   } catch (error) {
-    console.error("Error in getJobPostBySlug:", error);
-    throw new Error("Failed to execute getJobPostBySlug");
+    console.error("Error in deleteJobPost:", error);
+    throw new Error("Failed to execute deleteJobPost");
   }
 }
