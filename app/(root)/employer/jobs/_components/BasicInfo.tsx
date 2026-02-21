@@ -1,5 +1,6 @@
 import CustomField from "@/components/CustomField";
 import { JobFormValues } from "@/types/jobs";
+import { Briefcase, Layers, Users } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
 interface BasicInfoProps {
@@ -9,83 +10,122 @@ interface BasicInfoProps {
 const BasicInfo = ({ form }: BasicInfoProps) => {
   return (
     <>
-      <h2 className="text-2xl font-bold text-foreground mb-2">
-        Basic Information
-      </h2>
-      <p className="text-muted-foreground mb-8">
-        Tell us about the position you're hiring for
-      </p>
+      {/* Enhanced Header */}
+      <div className="mb-8 pb-6 border-b border-border">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-2.5 rounded-lg bg-primary/10 border border-primary/20">
+            <Briefcase className="w-5 h-5 text-primary" />
+          </div>
+          <h2 className="text-3xl font-bold text-foreground">
+            Basic Information
+          </h2>
+        </div>
+        <p className="text-muted-foreground ml-11 text-sm">
+          Tell us about the position you're hiring for
+        </p>
+      </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Job Title */}
-        <CustomField
-          control={form.control}
-          name="jobTitle"
-          label="Job Title *"
-          type="text"
-          placeholder="e.g., Senior Full Stack Developer"
-        />
+        <div>
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <Briefcase className="w-4 h-4 text-primary" />
+            Job Title
+          </h3>
+          <div className="space-y-2">
+            <CustomField
+              control={form.control}
+              name="jobTitle"
+              label=""
+              type="text"
+              placeholder="e.g., Senior Full Stack Developer"
+            />
+          </div>
+        </div>
 
-        {/* Two Column Grid for Desktop */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {/* Job Type */}
-          <CustomField
-            control={form.control}
-            name="jobType"
-            label="Job Type *"
-            type="select"
-            options={[
-              { label: "Software Development", value: "software" },
-              { label: "Design", value: "design" },
-              { label: "Product Management", value: "product" },
-              { label: "Marketing", value: "marketing" },
-              { label: "Sales", value: "sales" },
-              { label: "Operations", value: "operations" },
-              { label: "Human Resources", value: "hr" },
-            ]}
-            placeholder="Select job type"
-          />
+        {/* Job Type & Employment Type */}
+        <div>
+          <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Layers className="w-4 h-4 text-secondary" />
+            Job Details
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {/* Job Type */}
+            <div className="space-y-2">
+              <CustomField
+                control={form.control}
+                name="jobType"
+                label="Job Type *"
+                type="select"
+                options={[
+                  { label: "Software Development", value: "software" },
+                  { label: "Design", value: "design" },
+                  { label: "Product Management", value: "product" },
+                  { label: "Marketing", value: "marketing" },
+                  { label: "Sales", value: "sales" },
+                  { label: "Operations", value: "operations" },
+                  { label: "Human Resources", value: "hr" },
+                ]}
+                placeholder="Select job type"
+              />
+            </div>
 
-          {/* Employment Type */}
-          <CustomField
-            control={form.control}
-            name="employmentType"
-            label="Employment Type *"
-            type="select"
-            options={[
-              { label: "Full Time", value: "full_time" },
-              { label: "Part Time", value: "part_time" },
-              { label: "Contract", value: "contract" },
-              { label: "Freelance", value: "freelance" },
-              { label: "Internship", value: "internship" },
-            ]}
-            placeholder="Select employment type"
-          />
+            {/* Employment Type */}
+            <div className="space-y-2">
+              <CustomField
+                control={form.control}
+                name="employmentType"
+                label="Employment Type *"
+                type="select"
+                options={[
+                  { label: "Full Time", value: "full_time" },
+                  { label: "Part Time", value: "part_time" },
+                  { label: "Contract", value: "contract" },
+                  { label: "Freelance", value: "freelance" },
+                  { label: "Internship", value: "internship" },
+                ]}
+                placeholder="Select employment type"
+              />
+            </div>
+          </div>
+        </div>
 
-          {/* Experience Level */}
-          <CustomField
-            control={form.control}
-            name="experienceLevel"
-            label="Experience Level *"
-            type="select"
-            options={[
-              { label: "Entry Level (0-2 years)", value: "entry" },
-              { label: "Junior (2-4 years)", value: "junior" },
-              { label: "Mid Level (4-7 years)", value: "mid" },
-              { label: "Senior (7-10 years)", value: "senior" },
-              { label: "Lead / Management (10+ years)", value: "lead" },
-            ]}
-            placeholder="Select experience level"
-          />
+        {/* Experience Level & Open Positions */}
+        <div>
+          <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Users className="w-4 h-4 text-primary" />
+            Experience & Positions
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {/* Experience Level */}
+            <div className="space-y-2">
+              <CustomField
+                control={form.control}
+                name="experienceLevel"
+                label="Experience Level *"
+                type="select"
+                options={[
+                  { label: "Entry Level (0-2 years)", value: "entry" },
+                  { label: "Junior (2-4 years)", value: "junior" },
+                  { label: "Mid Level (4-7 years)", value: "mid" },
+                  { label: "Senior (7-10 years)", value: "senior" },
+                  { label: "Lead / Management (10+ years)", value: "lead" },
+                ]}
+                placeholder="Select experience level"
+              />
+            </div>
 
-          {/* Open Positions */}
-          <CustomField
-            control={form.control}
-            name="numberOfPositions"
-            label="Number of Positions"
-            type="number"
-            placeholder="1"
-          />
+            {/* Open Positions */}
+            <div className="space-y-2">
+              <CustomField
+                control={form.control}
+                name="numberOfPositions"
+                label="Number of Positions"
+                type="number"
+                placeholder="1"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </>

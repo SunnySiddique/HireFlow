@@ -13,7 +13,8 @@ export interface jobFormData {
   currency?: string;
   benefits?: string[];
   job_description: string;
-  requirements?: any;
+  requirements?: string[];
+  responsibilities?: string[];
   application_deadline?: string;
   status: string;
   skills_required?: string[];
