@@ -3,19 +3,27 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useEmployerProfile } from "@/hooks/useEmployer";
+import { useDeleteJob } from "@/hooks/useJobs";
 import {
   ArrowRight,
   Bookmark,
   Briefcase,
   Building2,
   DollarSign,
+  Edit,
   Globe,
+  LoaderCircle,
   MapPin,
+  Trash,
   Users,
 } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import Loader from "../Loader";
 
 // Sample job data - replace with actual data from props
-const jobData = {
+const jobPost = {
   jobTitle: "Senior Full Stack Developer",
   companyName: "TechCorp Inc.",
   jobType: "Software Development",
@@ -58,9 +66,23 @@ const jobData = {
   website: "www.techcorp.com",
 };
 
-export default function JobDetailsPage() {
-  const salaryRange = `$${(jobData.minimumSalary / 1000).toFixed(0)}K - $${(jobData.maximumSalary / 1000).toFixed(0)}K`;
+interface JobDetailsPageProps {
+  role: "employer" | "job_seeker";
+  jobPost: any;
+}
 
+const JobDetailsPage = ({ role, jobPost }: JobDetailsPageProps) => {
+  const { mutate: deleteJob, isPending: isDeletingJob } = useDeleteJob();
+  const { data: empProfile, isLoading } = useEmployerProfile();
+  const router = useRouter();
+  const salaryRange = `$${(jobPost.salary_min / 1000).toFixed(0)}K - $${(jobPost.salary_max / 1000).toFixed(0)}K`;
+
+  const handleDelete = (jobSlug: string) => {
+    deleteJob(jobSlug);
+    router.push("/employer/jobs");
+  };
+
+  if (isLoading) return <Loader />;
   return (
     <main className="min-h-screen bg-background">
       <div className="max-w-370 mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -71,16 +93,16 @@ export default function JobDetailsPage() {
             <a href="/jobs" className="hover:text-foreground transition">
               Jobs
             </a>{" "}
-            / {jobData.companyName}
+            / {empProfile?.company_name}
           </div>
 
           {/* Title and Company */}
           <div className="mb-6">
             <h1 className="text-4xl font-bold text-foreground mb-2">
-              {jobData.jobTitle}
+              {jobPost.job_title}
             </h1>
             <p className="text-xl text-muted-foreground">
-              {jobData.companyName}
+              {empProfile?.company_name}
             </p>
           </div>
 
@@ -90,25 +112,25 @@ export default function JobDetailsPage() {
               variant="secondary"
               className="text-sm px-3 py-1.5 font-medium"
             >
-              {jobData.jobType}
+              {jobPost.job_type}
             </Badge>
             <Badge
               variant="secondary"
               className="text-sm px-3 py-1.5 font-medium"
             >
-              {jobData.employmentType}
+              {jobPost.employment_type}
             </Badge>
             <Badge
               variant="secondary"
               className="text-sm px-3 py-1.5 font-medium"
             >
-              {jobData.experienceLevel}
+              {jobPost.experience_level}
             </Badge>
             <Badge
               variant="secondary"
               className="text-sm px-3 py-1.5 font-medium"
             >
-              {jobData.workArrangement}
+              {jobPost.remote_option}
             </Badge>
           </div>
 
@@ -119,7 +141,7 @@ export default function JobDetailsPage() {
               <div>
                 <p className="text-xs text-muted-foreground">Location</p>
                 <p className="font-medium text-foreground">
-                  {jobData.primaryLocation}
+                  {jobPost.location}
                 </p>
               </div>
             </div>
@@ -135,7 +157,7 @@ export default function JobDetailsPage() {
               <div>
                 <p className="text-xs text-muted-foreground">Positions</p>
                 <p className="font-medium text-foreground">
-                  {jobData.numberOfPositions} Open
+                  {jobPost.open_positions} Open
                 </p>
               </div>
             </div>
@@ -149,18 +171,44 @@ export default function JobDetailsPage() {
           </div>
 
           {/* Action Buttons */}
+
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 px-6 py-3">
-              Apply Now
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="border-border hover:bg-muted flex items-center gap-2 px-6 py-3"
-            >
-              <Bookmark className="w-4 h-4" />
-              Save Job
-            </Button>
+            {role === "job_seeker" ? (
+              <>
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 px-6 py-3">
+                  <ArrowRight className="w-4 h-4" />
+                  Apply Now
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-border hover:bg-muted flex items-center gap-2 px-6 py-3"
+                >
+                  <Bookmark className="w-4 h-4" />
+                  Save Job
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 px-6 py-3">
+                  <Edit className="w-4 h-4" />
+                  Edit
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-border hover:bg-muted flex items-center gap-2 px-6 py-3"
+                  onClick={() => handleDelete(jobPost.job_slug)}
+                >
+                  {isDeletingJob ? (
+                    <LoaderCircle className="animate-spin" />
+                  ) : (
+                    <>
+                      <Trash className="w-4 h-4" />
+                      Delete
+                    </>
+                  )}
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
@@ -174,7 +222,7 @@ export default function JobDetailsPage() {
                 Description
               </h2>
               <p className="text-muted-foreground leading-relaxed text-lg">
-                {jobData.description}
+                {jobPost.job_description}
               </p>
             </Card>
 
@@ -184,7 +232,7 @@ export default function JobDetailsPage() {
                 Responsibilities
               </h2>
               <ul className="space-y-4">
-                {jobData.responsibilities.map((responsibility, index) => (
+                {jobPost?.responsibilities?.map((responsibility, index) => (
                   <li key={index} className="flex gap-4">
                     <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-primary mt-2.5"></div>
                     <p className="text-muted-foreground text-lg">
@@ -201,7 +249,7 @@ export default function JobDetailsPage() {
                 Requirements
               </h2>
               <ul className="space-y-4">
-                {jobData.requirements.map((requirement, index) => (
+                {jobPost?.requirements?.map((requirement, index) => (
                   <li key={index} className="flex gap-4">
                     <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-secondary mt-2.5"></div>
                     <p className="text-muted-foreground text-lg">
@@ -218,7 +266,7 @@ export default function JobDetailsPage() {
                 Benefits
               </h2>
               <ul className="space-y-4">
-                {jobData.benefits.map((benefit, index) => (
+                {jobPost?.benefits?.map((benefit, index) => (
                   <li key={index} className="flex gap-4">
                     <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-primary mt-2.5"></div>
                     <p className="text-muted-foreground text-lg">{benefit}</p>
@@ -237,10 +285,22 @@ export default function JobDetailsPage() {
 
               {/* Company Logo Placeholder */}
               <div className="w-full h-32 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg mb-6 flex items-center justify-center border border-border">
-                <div className="text-center">
-                  <Building2 className="w-10 h-10 text-primary/40 mx-auto mb-2" />
-                  <p className="text-xs text-muted-foreground">Company Logo</p>
-                </div>
+                {empProfile?.company_logo_url ? (
+                  <Image
+                    src={empProfile.company_logo_url}
+                    alt="Company Logo"
+                    width={128}
+                    height={128}
+                    className="rounded-lg object-contain"
+                  />
+                ) : (
+                  <div className="text-center">
+                    <Building2 className="w-10 h-10 text-primary/40 mx-auto mb-2" />
+                    <p className="text-xs text-muted-foreground">
+                      Company Logo
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Company Details */}
@@ -250,7 +310,7 @@ export default function JobDetailsPage() {
                     Industry
                   </p>
                   <p className="text-foreground font-medium">
-                    {jobData.industry}
+                    {empProfile?.industry}
                   </p>
                 </div>
 
@@ -259,7 +319,7 @@ export default function JobDetailsPage() {
                     Company Size
                   </p>
                   <p className="text-foreground font-medium">
-                    {jobData.companySize}
+                    {empProfile?.company_size}
                   </p>
                 </div>
 
@@ -268,22 +328,30 @@ export default function JobDetailsPage() {
                     Website
                   </p>
                   <a
-                    href={`https://${jobData.website}`}
+                    href={`https://${empProfile?.website}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary font-medium hover:underline flex items-center gap-2"
                   >
                     <Globe className="w-4 h-4" />
-                    {jobData.website}
+                    {empProfile?.website}
                   </a>
                 </div>
 
                 {/* Bottom CTA */}
-                <div className="pt-4 border-t border-border">
-                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                    Apply Now
-                  </Button>
-                </div>
+                {role === "job_seeker" ? (
+                  <div className="pt-4 border-t border-border">
+                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                      Apply Now
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="pt-4 border-t border-border">
+                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                      Edit
+                    </Button>
+                  </div>
+                )}
               </div>
             </Card>
           </div>
@@ -291,4 +359,6 @@ export default function JobDetailsPage() {
       </div>
     </main>
   );
-}
+};
+
+export default JobDetailsPage;

@@ -150,8 +150,8 @@ export const jobSeekerSections = [
 
 export const employerLinks = [
   { label: "Profile", href: (slug: string) => `/employer/${slug}` },
-  { label: "Post a Job", href: "/employer/jobs/new" },
-  { label: "Manage Jobs", href: "/employer/manage-jobs" },
+  { label: "Post a Job", href: "/employer/jobs/create" },
+  { label: "Manage Jobs", href: "/employer/jobs" },
 ];
 
 export const employerSections = [

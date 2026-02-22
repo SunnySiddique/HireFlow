@@ -176,82 +176,79 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
     }
   }, [employerProfile, editMode, form]);
 
-  //TODO fix the input fields toast error and commit the changes in the github
   return (
     <FormProvider {...form}>
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <Header
-          handleProfileSave={form.handleSubmit(onSubmit, onError)}
-          form={form}
-          editMode={editMode}
-          setEditMode={setEditMode}
-          isLoading={isSaving}
-        />
+      {/* Header */}
+      <Header
+        handleProfileSave={form.handleSubmit(onSubmit, onError)}
+        form={form}
+        editMode={editMode}
+        setEditMode={setEditMode}
+        isLoading={isSaving}
+      />
 
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Sidebar Navigation */}
-            <NavigationSidebar
-              activeSection={activeSection}
-              setActiveSection={setActiveSection}
-              role="employer"
+      {/* Main Content */}
+      <div className="py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Sidebar Navigation */}
+          <NavigationSidebar
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+            role="employer"
+          />
+
+          {/* Content Area */}
+          <div className="lg:col-span-3 space-y-8">
+            {/* Hero Section */}
+            <EmployerHeroSection
+              editMode={editMode}
+              form={form}
+              setEditMode={setEditMode}
+              employer={employerProfile}
+              setLogoFile={setLogoFile}
+              isLoading={isSaving}
             />
-
-            {/* Content Area */}
-            <div className="lg:col-span-3 space-y-8">
-              {/* Hero Section */}
-              <EmployerHeroSection
+            {/* About Section */}
+            {activeSection === "about" && (
+              <EmployerAbout
                 editMode={editMode}
                 form={form}
                 setEditMode={setEditMode}
                 employer={employerProfile}
-                setLogoFile={setLogoFile}
-                isLoading={isSaving}
               />
-              {/* About Section */}
-              {activeSection === "about" && (
-                <EmployerAbout
-                  editMode={editMode}
-                  form={form}
-                  setEditMode={setEditMode}
-                  employer={employerProfile}
-                />
-              )}
-              {/* Open Positions Section */}
-              {activeSection === "positions" && (
-                <OpenPositions
-                  editMode={editMode}
-                  form={form}
-                  employer={employerProfile}
-                />
-              )}
-              {/* Culture Section */}
-              {activeSection === "culture" && (
-                <EmployerCulture
-                  coreValues={coreValues}
-                  setCoreValues={setCoreValues}
-                  editMode={editMode}
-                />
-              )}
-              {/* Locations Section */}
-              {activeSection === "locations" && (
-                <EmployerLocations
-                  editMode={editMode}
-                  form={form}
-                  employer={employerProfile}
-                />
-              )}
-              {/* Social Links Section */}
-              {activeSection === "social" && (
-                <EmployerSocialLinks
-                  editMode={editMode}
-                  form={form}
-                  employer={employerProfile}
-                />
-              )}
-            </div>
+            )}
+            {/* Open Positions Section */}
+            {activeSection === "positions" && (
+              <OpenPositions
+                editMode={editMode}
+                form={form}
+                employer={employerProfile}
+              />
+            )}
+            {/* Culture Section */}
+            {activeSection === "culture" && (
+              <EmployerCulture
+                coreValues={coreValues}
+                setCoreValues={setCoreValues}
+                editMode={editMode}
+              />
+            )}
+            {/* Locations Section */}
+            {activeSection === "locations" && (
+              <EmployerLocations
+                editMode={editMode}
+                form={form}
+                employer={employerProfile}
+              />
+            )}
+            {/* Social Links Section */}
+            {activeSection === "social" && (
+              <EmployerSocialLinks
+                editMode={editMode}
+                form={form}
+                employer={employerProfile}
+              />
+            )}
           </div>
         </div>
       </div>

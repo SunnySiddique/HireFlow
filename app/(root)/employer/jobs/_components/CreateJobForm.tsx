@@ -9,7 +9,6 @@ import { createSlug } from "@/lib/utils";
 import { JobFormValues } from "@/types/jobs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Check } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, Resolver, useForm } from "react-hook-form";
@@ -202,22 +201,9 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
 
   return (
     <>
-      <main className="min-h-screen bg-background">
-        {/* Back Button */}
-        <div className="max-w-370 mx-auto px-4 sm:px-6 lg:px-8 pt-6 mb-8">
-          <Link href="/dashboard/employer">
-            <Button
-              variant="ghost"
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Dashboard
-            </Button>
-          </Link>
-        </div>
-
+      <main>
         {/* Page Header */}
-        <div className="max-w-370 mx-auto px-4 sm:px-6 lg:px-8 py-5">
+        <div className="">
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-foreground mb-2">
               Create New Job Posting
@@ -311,7 +297,7 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
         </div>
 
         {/* Form Content */}
-        <div className="max-w-370 mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div className=" pb-12">
           <FormProvider {...form}>
             <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
               {/* Step 1: Basic Information */}

@@ -1,13 +1,22 @@
-import DashboardNavbar from "@/components/DashboardNavbar";
-import { ReactNode } from "react";
+import EmployerSidebar from "@/components/sidebar/EmployerSidebar";
+import EmployerNavbar from "../../../components/navbar/EmployerNavbar";
 
-const EmployerLayout = ({ children }: { children: ReactNode }) => {
+export default function EmployerLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <>
-      <DashboardNavbar role="employer" />
-      <div className="">{children}</div>
-    </>
-  );
-};
+    <div className="flex h-screen bg-background">
+      <EmployerSidebar />
 
-export default EmployerLayout;
+      <div className="ml-70 flex flex-col flex-1">
+        <EmployerNavbar />
+
+        <main className="flex-1 overflow-y-auto p-8 bg-background">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}

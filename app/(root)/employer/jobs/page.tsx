@@ -19,131 +19,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import toast from "react-hot-toast";
-
-// Dummy data for jobs
-const dummyJobs = [
-  {
-    id: 1,
-    job_title: "Senior Full Stack Developer",
-    job_slug: "senior-full-stack-developer",
-    company_id: "comp-001",
-    job_description: "Looking for an experienced full stack developer...",
-    job_type: "Software Development",
-    employment_type: "Full Time",
-    experience_level: "Senior (7-10 years)",
-    salary_min: 120000,
-    salary_max: 160000,
-    currency: "USD",
-    location: "San Francisco, CA",
-    remote_option: "Hybrid",
-    skills_required: ["React", "Node.js", "TypeScript", "PostgreSQL"],
-    benefits: "Health insurance, 401k, stock options",
-    application_deadline: "2024-03-15",
-    open_positions: 2,
-    status: "Open",
-  },
-  {
-    id: 2,
-    job_title: "Product Manager",
-    job_slug: "product-manager",
-    company_id: "comp-001",
-    job_description: "Lead our product vision and strategy...",
-    job_type: "Product Management",
-    employment_type: "Full Time",
-    experience_level: "Mid Level (4-7 years)",
-    salary_min: 100000,
-    salary_max: 140000,
-    currency: "USD",
-    location: "New York, NY",
-    remote_option: "Remote",
-    skills_required: ["Product Strategy", "Analytics", "Leadership"],
-    benefits: "Health insurance, flexible hours",
-    application_deadline: "2024-03-20",
-    open_positions: 1,
-    status: "Open",
-  },
-  {
-    id: 3,
-    job_title: "UX Designer",
-    job_slug: "ux-designer",
-    company_id: "comp-001",
-    job_description: "Design beautiful and intuitive user experiences...",
-    job_type: "Design",
-    employment_type: "Full Time",
-    experience_level: "Mid Level (4-7 years)",
-    salary_min: 80000,
-    salary_max: 110000,
-    currency: "USD",
-    location: "Los Angeles, CA",
-    remote_option: "Hybrid",
-    skills_required: ["Figma", "User Research", "Prototyping"],
-    benefits: "Health insurance, learning budget",
-    application_deadline: "2024-03-10",
-    open_positions: 1,
-    status: "Draft",
-  },
-  {
-    id: 4,
-    job_title: "Marketing Manager",
-    job_slug: "marketing-manager",
-    company_id: "comp-001",
-    job_description: "Drive marketing strategy and campaigns...",
-    job_type: "Marketing",
-    employment_type: "Full Time",
-    experience_level: "Junior (2-4 years)",
-    salary_min: 60000,
-    salary_max: 85000,
-    currency: "USD",
-    location: "Chicago, IL",
-    remote_option: "On-site",
-    skills_required: ["Digital Marketing", "SEO", "Analytics"],
-    benefits: "Health insurance, PTO",
-    application_deadline: "2024-03-25",
-    open_positions: 1,
-    status: "Closed",
-  },
-  {
-    id: 5,
-    job_title: "DevOps Engineer",
-    job_slug: "devops-engineer",
-    company_id: "comp-001",
-    job_description: "Manage our infrastructure and deployment...",
-    job_type: "Software Development",
-    employment_type: "Full Time",
-    experience_level: "Senior (7-10 years)",
-    salary_min: 130000,
-    salary_max: 170000,
-    currency: "USD",
-    location: "Seattle, WA",
-    remote_option: "Remote",
-    skills_required: ["AWS", "Kubernetes", "Docker", "CI/CD"],
-    benefits: "Health insurance, stock options, gym membership",
-    application_deadline: "2024-04-01",
-    open_positions: 2,
-    status: "Open",
-  },
-  {
-    id: 6,
-    job_title: "Data Analyst",
-    job_slug: "data-analyst",
-    company_id: "comp-001",
-    job_description: "Transform data into actionable insights...",
-    job_type: "Operations",
-    employment_type: "Full Time",
-    experience_level: "Entry Level (0-2 years)",
-    salary_min: 50000,
-    salary_max: 70000,
-    currency: "USD",
-    location: "Boston, MA",
-    remote_option: "Hybrid",
-    skills_required: ["SQL", "Python", "Tableau"],
-    benefits: "Health insurance, mentorship program",
-    application_deadline: "2024-03-30",
-    open_positions: 3,
-    status: "Open",
-  },
-];
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -178,9 +53,6 @@ const ManageJobsPage = () => {
   const handleDeleteJob = async (jobSlug: string) => {
     setJobToDelete(jobSlug);
     await deleteJobPost(jobSlug, {
-      onSuccess: () => {
-        toast.success("Job deleted successfully");
-      },
       onSettled: () => {
         setJobToDelete(null);
       },
@@ -191,8 +63,8 @@ const ManageJobsPage = () => {
 
   if (isEmployerProfileLoading || empJobLoading) return <Loader />;
   return (
-    <main className="min-h-screen bg-background">
-      <div className="max-w-370 mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <main>
+      <div>
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
           <div>
@@ -314,14 +186,16 @@ const ManageJobsPage = () => {
                         Edit
                       </Button>
                     </Link>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 border-border hover:bg-muted"
-                    >
-                      <Eye className="w-4 h-4 mr-1" />
-                      View
-                    </Button>
+                    <Link href={`/employer/jobs/${job.job_slug}`}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 border-border hover:bg-muted"
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        View
+                      </Button>
+                    </Link>
                     <Button
                       variant="outline"
                       size="sm"
