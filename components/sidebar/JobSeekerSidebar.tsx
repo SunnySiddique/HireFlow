@@ -18,8 +18,8 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { employerLinks } from "@/constants";
-import { useEmployerProfile } from "@/hooks/useEmployer";
+import { jobSeekerLinks } from "@/constants";
+import { useGetJobSeekerProfile } from "@/hooks/useJobSeeker";
 import { createClient } from "@/lib/supabase/client";
 import { getInitials } from "@/lib/utils";
 import { Check, MonitorIcon, Moon, PaletteIcon, Sun } from "lucide-react";
@@ -29,19 +29,19 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface EmployerSidebarProps {
+interface JobSeekerSidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
 }
 
-const EmployerSidebar = ({
+const JobSeekerSidebar = ({
   sidebarOpen,
   setSidebarOpen,
-}: EmployerSidebarProps) => {
+}: JobSeekerSidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const { theme, setTheme } = useTheme();
-  const { data: empProfile } = useEmployerProfile();
+  const { data: jobSeekerProfile } = useGetJobSeekerProfile();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -95,10 +95,10 @@ const EmployerSidebar = ({
             </p>
 
             <div className="space-y-2">
-              {employerLinks.slice(0, 3).map((link) => {
+              {jobSeekerLinks.slice(0, 3).map((link) => {
                 const href =
                   typeof link.href === "function"
-                    ? link.href(empProfile?.slug ?? "")
+                    ? link.href(jobSeekerProfile?.slug ?? "")
                     : link.href;
                 return (
                   <Link
@@ -120,10 +120,10 @@ const EmployerSidebar = ({
               Manage
             </p>
             <div className="space-y-2">
-              {employerLinks.slice(3).map((link) => {
+              {jobSeekerLinks.slice(3).map((link) => {
                 const href =
                   typeof link.href === "function"
-                    ? link.href(empProfile?.slug ?? "")
+                    ? link.href(jobSeekerProfile?.slug ?? "")
                     : link.href;
                 return (
                   <Link
@@ -136,15 +136,6 @@ const EmployerSidebar = ({
                   </Link>
                 );
               })}
-
-              {/* <div className="flex items-center gap-3 px-4 py-3 rounded-md hover:bg-sidebar-accent cursor-pointer">
-                <BarChart2 className="w-4 h-4" />
-                <span className="text-sm font-medium">Analytics</span>
-              </div> */}
-              {/* <div className="flex items-center gap-3 px-4 py-3 rounded-md hover:bg-sidebar-accent cursor-pointer">
-                <Settings className="w-4 h-4" />
-                <span className="text-sm font-medium">Settings</span>
-              </div> */}
             </div>
           </div>
         </nav>
@@ -157,22 +148,22 @@ const EmployerSidebar = ({
                 className="w-full h-auto px-3 py-2 rounded-lg justify-start hover:bg-sidebar-accent transition-colors"
               >
                 <Avatar className="h-10 w-10 flex-shrink-0">
-                  {empProfile?.company_logo_url ? (
+                  {jobSeekerProfile?.profile_url ? (
                     <AvatarImage
-                      src={empProfile?.company_logo_url || "/placeholder.svg"}
-                      alt={empProfile?.company_name || "Company Logo"}
+                      src={jobSeekerProfile?.profile_url || "/placeholder.svg"}
+                      alt={jobSeekerProfile?.full_name || "User Profile"}
                     />
                   ) : (
                     <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                      {getInitials(empProfile?.company_name ?? "User")}
+                      {getInitials(jobSeekerProfile?.full_name ?? "User")}
                     </AvatarFallback>
                   )}
                 </Avatar>
                 <div className="flex-1 text-left ml-3 min-w-0">
                   <p className="text-sm font-semibold text-foreground truncate">
-                    {empProfile?.company_name || "TechNova Inc."}
+                    {jobSeekerProfile?.full_name || "John Doe"}
                   </p>
-                  <p className="text-xs text-muted-foreground">Employer</p>
+                  <p className="text-xs text-muted-foreground">Job Seeker</p>
                 </div>
                 <MoreVertical className="w-4 h-4 flex-shrink-0 ml-2" />
               </Button>
@@ -182,20 +173,20 @@ const EmployerSidebar = ({
               {/* User Info */}
               <div className="flex items-center gap-3 px-2 py-3">
                 <Avatar className="h-10 w-10">
-                  {empProfile?.company_logo_url ? (
+                  {jobSeekerProfile?.profile_url ? (
                     <AvatarImage
-                      src={empProfile?.company_logo_url || "/placeholder.svg"}
-                      alt={empProfile?.company_logo_url || "Company Logo"}
+                      src={jobSeekerProfile?.profile_url || "/placeholder.svg"}
+                      alt={jobSeekerProfile?.full_name || "User Profile"}
                     />
                   ) : (
                     <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                      {getInitials(empProfile?.company_name ?? "User")}
+                      {getInitials(jobSeekerProfile?.full_name ?? "User")}
                     </AvatarFallback>
                   )}
                 </Avatar>
                 <div className="flex flex-col gap-0.5">
                   <p className="text-sm font-semibold text-foreground">
-                    {empProfile?.company_name}
+                    {jobSeekerProfile?.full_name}
                   </p>
                 </div>
               </div>
@@ -269,4 +260,4 @@ const EmployerSidebar = ({
   );
 };
 
-export default EmployerSidebar;
+export default JobSeekerSidebar;

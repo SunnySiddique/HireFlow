@@ -1,14 +1,29 @@
-import DashboardNavbar from "@/components/DashboardNavbar";
-import { ReactNode } from "react";
+"use client";
 
-const jobSeekerLayout = ({ children }: { children: ReactNode }) => {
+import JobSeekerNavbar from "@/components/navbar/JobSeekerNavbar";
+import JobSeekerSidebar from "@/components/sidebar/JobSeekerSidebar";
+import { useState } from "react";
+
+export default function JobSeekerLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
-    <>
-      <DashboardNavbar role="job_seeker" />
+    <div className="flex h-screen bg-background">
+      <JobSeekerSidebar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      />
 
-      {children}
-    </>
+      <div className="flex flex-col flex-1">
+        <JobSeekerNavbar setSidebarOpen={setSidebarOpen} />
+        <main className="flex-1 overflow-y-auto p-8 bg-background">
+          {children}
+        </main>
+      </div>
+    </div>
   );
-};
-
-export default jobSeekerLayout;
+}

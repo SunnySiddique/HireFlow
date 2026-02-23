@@ -17,7 +17,6 @@ export interface EducationItem {
 }
 
 export interface JobSeekerProfile {
-  auth_id: string;
   full_name: string;
   headline?: string;
   bio?: string;

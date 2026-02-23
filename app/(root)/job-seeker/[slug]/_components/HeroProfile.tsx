@@ -24,12 +24,11 @@ const HeroProfile = ({
   handleProfileSave,
   isPending,
   setProfileFile,
-  jobSeekerProfile,
+  jobSeekerProfile: profile,
 }: HeroProifleProps) => {
   const { data: user } = useGetCurrentUser();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const profileImageRef = useRef<null>(null);
-  const profile = jobSeekerProfile?.profile;
 
   const handleProfileImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

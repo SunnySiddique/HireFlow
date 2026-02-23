@@ -11,6 +11,7 @@ import JobPreferences from "./_components/JobPreferences";
 import Skills from "./_components/Skills";
 
 import Loader from "@/components/Loader";
+import { jobSeekerSections } from "@/constants";
 import {
   useGetJobSeekerProfileBySlug,
   useSaveJobSeekerProfile,
@@ -95,23 +96,25 @@ const ProfilePage = () => {
   const { mutateAsync: saveProfile } = useSaveJobSeekerProfile();
   const { mutateAsync: uploadImage } = useUploadProfileAndResume();
 
-  const profile = jobSeekerProfile?.profile;
-
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullName: profile?.full_name || "",
-      headline: profile?.headline || "",
-      bio: profile?.bio || "",
-      desiredRole: profile?.desired_role || "",
-      expectedSalaryMin: profile?.expected_salary_min || "",
-      expectedSalaryMax: profile?.expected_salary_max || "",
-      preferredLocations: profile?.preferred_locations || "",
-      portfolioUrl: profile?.portfolio_url || "",
-      openToWork: profile?.open_to_work || true,
-      jobType: profile?.preferred_job_type || "",
+      fullName: jobSeekerProfile?.full_name || "",
+      headline: jobSeekerProfile?.headline || "",
+      bio: jobSeekerProfile?.bio || "",
+      desiredRole: jobSeekerProfile?.desired_role || "",
+      expectedSalaryMin: jobSeekerProfile?.expected_salary_min || "",
+      expectedSalaryMax: jobSeekerProfile?.expected_salary_max || "",
+      preferredLocations: jobSeekerProfile?.preferred_locations || "",
+      portfolioUrl: jobSeekerProfile?.portfolio_url || "",
+      openToWork: jobSeekerProfile?.open_to_work || true,
+      jobType: jobSeekerProfile?.preferred_job_type || "",
     },
   });
+
+  const preferencesId = jobSeekerSections.find(
+    (s) => s.label === "Job Preferences",
+  )?.id;
 
   const onValid = async (data: ProfileFormData) => {
     if (!jobSeekerProfile?.profile?.auth_id) return;
@@ -172,7 +175,6 @@ const ProfilePage = () => {
       }
 
       const payload: JobSeekerProfile = {
-        auth_id: jobSeekerProfile.profile.auth_id,
         full_name: data.fullName.trim(),
         headline: data.headline.trim(),
         bio: data.bio.trim(),
@@ -210,11 +212,10 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
-    const profile = jobSeekerProfile?.profile;
-    if (!profile) return;
+    if (!jobSeekerProfile) return;
 
     setExperiences(
-      (profile.experience ?? []).map((exp: any, idx: number) => ({
+      (jobSeekerProfile.experience ?? []).map((exp: any, idx: number) => ({
         id: idx,
         title: exp.title ?? "",
         company: exp.company ?? "",
@@ -224,7 +225,7 @@ const ProfilePage = () => {
     );
 
     setEducaiton(
-      (profile.education ?? []).map((edu: any, idx: number) => ({
+      (jobSeekerProfile.education ?? []).map((edu: any, idx: number) => ({
         id: idx,
         degree: edu.degree ?? "",
         school: edu.school ?? "",
@@ -232,22 +233,22 @@ const ProfilePage = () => {
       })),
     );
 
-    setSkills(profile.skills ?? []);
+    setSkills(jobSeekerProfile.skills ?? []);
 
     form.reset({
-      fullName: profile.full_name ?? "",
-      headline: profile.headline ?? "",
-      about: profile.about ?? "",
-      bio: profile.bio ?? "",
-      desiredRole: profile.desired_role ?? "",
-      expectedSalaryMin: profile.expected_salary_min ?? "",
-      expectedSalaryMax: profile.expected_salary_max ?? "",
-      preferredLocations: profile.preferred_locations ?? "",
-      portfolioUrl: profile.portfolio_url ?? "",
-      openToWork: profile.open_to_work ?? true,
-      jobType: profile.preferred_job_type ?? "",
+      fullName: jobSeekerProfile.full_name ?? "",
+      headline: jobSeekerProfile.headline ?? "",
+      about: jobSeekerProfile.about ?? "",
+      bio: jobSeekerProfile.bio ?? "",
+      desiredRole: jobSeekerProfile.desired_role ?? "",
+      expectedSalaryMin: jobSeekerProfile.expected_salary_min ?? "",
+      expectedSalaryMax: jobSeekerProfile.expected_salary_max ?? "",
+      preferredLocations: jobSeekerProfile.preferred_locations ?? "",
+      portfolioUrl: jobSeekerProfile.portfolio_url ?? "",
+      openToWork: jobSeekerProfile.open_to_work ?? true,
+      jobType: jobSeekerProfile.preferred_job_type ?? "",
     });
-  }, [jobSeekerProfile?.profile, editMode, form]);
+  }, [jobSeekerProfile, editMode, form]);
 
   const onInvalid = (errors: any) => {
     const firstError = Object.values(errors)[0] as any;
@@ -286,7 +287,7 @@ const ProfilePage = () => {
               <About
                 form={form}
                 editMode={editMode}
-                about={jobSeekerProfile?.profile?.about}
+                about={jobSeekerProfile?.about}
               />
             )}
 
@@ -296,7 +297,7 @@ const ProfilePage = () => {
                 experiences={experiences}
                 setExperiences={setExperiences}
                 editMode={editMode}
-                jobSeekerProfile={jobSeekerProfile?.profile}
+                jobSeekerProfile={jobSeekerProfile}
               />
             )}
 
@@ -323,7 +324,7 @@ const ProfilePage = () => {
               <JobPreferences
                 editMode={editMode}
                 form={form}
-                profile={profile}
+                profile={jobSeekerProfile}
               />
             )}
 
@@ -332,8 +333,8 @@ const ProfilePage = () => {
               <Documents
                 editMode={editMode}
                 form={form}
-                portfolioUrl={profile?.portfolio_url}
-                resumeUrl={profile?.resume_url}
+                portfolioUrl={jobSeekerProfile?.portfolio_url}
+                resumeUrl={jobSeekerProfile?.resume_url}
                 setResumeFile={setResumeFile}
               />
             )}

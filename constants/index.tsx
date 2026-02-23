@@ -6,8 +6,10 @@ import {
   Globe,
   GraduationCap,
   Heart,
+  LayoutDashboard,
   MapPin,
   MessageSquare,
+  PlusCircle,
   Target,
   TrendingUp,
   User,
@@ -129,8 +131,15 @@ export const AUTH_TABS = [
 // <--- JOB SEEKER PROFILE ---> //
 
 export const jobSeekerLinks = [
-  { label: "Profile", href: (slug: string) => `/job-seeker/${slug}` },
-  { label: "My Jobs", href: "/jobs" },
+  { label: "Browse Jobs", href: "/job-seeker/jobs", icon: Briefcase },
+  { label: "My Applications", href: "/job-seeker/applications", icon: Users },
+  { label: "Saved Jobs", href: "/job-seeker/saved-jobs", icon: Heart },
+  { label: "My Jobs", href: "/jobs", icon: LayoutDashboard },
+  {
+    label: "Profile",
+    href: (slug: string) => `/job-seeker/${slug}`,
+    icon: User,
+  },
 ];
 
 export const jobType = ["Full-time", "Contract", "Remote"];
@@ -149,9 +158,15 @@ export const jobSeekerSections = [
 // <---  EMPLOYER PROFILE  ---> //
 
 export const employerLinks = [
-  { label: "Profile", href: (slug: string) => `/employer/${slug}` },
-  { label: "Post a Job", href: "/employer/jobs/create" },
-  { label: "Manage Jobs", href: "/employer/jobs" },
+  { label: "Dashboard", href: "/employer/dashboard", icon: LayoutDashboard },
+  { label: "Manage Jobs", href: "/employer/jobs", icon: Briefcase },
+  { label: "Applicants", href: "/employer/applicants", icon: Users },
+  { label: "Post a Job", href: "/employer/jobs/create", icon: PlusCircle },
+  {
+    label: "Profile",
+    href: (slug: string) => `/employer/${slug}`,
+    icon: Building2,
+  },
 ];
 
 export const employerSections = [
