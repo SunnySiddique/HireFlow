@@ -84,8 +84,8 @@ const JobDetailsPage = ({ role, jobPost }: JobDetailsPageProps) => {
 
   if (isLoading) return <Loader />;
   return (
-    <main className="min-h-screen bg-background">
-      <div className="max-w-370 mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main>
+      <div>
         {/* Header Section */}
         <div className="mb-8">
           {/* Breadcrumb */}

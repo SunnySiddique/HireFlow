@@ -21,7 +21,7 @@ export const useEmployerProfile = () => {
         .from("employers")
         .select("*")
         .eq("auth_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 

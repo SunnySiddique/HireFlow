@@ -43,8 +43,7 @@ const employerSchema = z.object({
     .enum(["actively hiring", "selective", "not hiring"])
     .default("actively hiring"),
 
-  foundedYear: z.string().optional().or(z.literal("")),
-
+  foundedYear: z.coerce.number().nullable().optional(),
   linkedinUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
 
   twitterUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
@@ -117,7 +116,6 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
         }
       }
       const payload: EmployerType = {
-        auth_id: employerProfile.auth_id,
         company_name: data.companyName,
         website: data.website,
         company_logo_url: logoUrl,
@@ -125,10 +123,10 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
         company_size: data.companySize,
         description: data.description,
         headquarters_location: data.headquartersLocation,
-        open_positions_count: data.openPositionsCount || "0",
+        open_positions_count: Number(data.openPositionsCount) || 0, // if DB expects number
         hiring_status: data.hiringStatus,
         core_values: coreValues.length ? coreValues : [],
-        founded_year: data.foundedYear,
+        founded_year: data.foundedYear ? Number(data.foundedYear) : null,
         linkedin_url: data.linkedinUrl,
         twitter_url: data.twitterUrl,
         operating_locations: data.operatingLocations || "",
