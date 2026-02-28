@@ -118,6 +118,19 @@ export async function updateJobPost(jobSlug: string, jobData: JobFormValues) {
   }
 }
 
+export async function updateJobStatus(jobId: string, status: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("jobs")
+    .update({ status })
+    .eq("id", jobId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function deleteJobPost(jobSlug: string) {
   try {
     const supabase = await createClient();

@@ -1,4 +1,7 @@
+"use client";
+
 import { clsx, type ClassValue } from "clsx";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { twMerge } from "tailwind-merge";
 
@@ -42,3 +45,21 @@ export const createSlug = (title: string) => {
     .replace(/\s+/g, "-")
     .replace(/[^\w-]/g, "");
 };
+
+// job salaery formate
+export const formatSalary = (min: number, max: number, currency: string) => {
+  const format = (num: number) => `$${(num / 1000).toFixed(0)}k`;
+  return `${format(min)} - ${format(max)} ${currency}`;
+};
+
+// debounce
+export function useDebounce<T>(value: T, delay = 500) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler); // reset if value changes before delay
+  }, [value, delay]);
+
+  return debouncedValue;
+}

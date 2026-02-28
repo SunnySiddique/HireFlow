@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { buttonText } from "@/constants/employerData";
 import { useEmployerProfile } from "@/hooks/useEmployer";
-import { useCreateJob, useUpdateJob } from "@/hooks/useJobs";
+import { useCreateJob, useUpdateJob } from "@/hooks/useEmployerJobs";
 import { createSlug } from "@/lib/utils";
 import { JobFormValues } from "@/types/jobs";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,8 +22,8 @@ import WorkLocation from "./WorkLocation";
 // Zod Validation Schema
 const jobFormSchema = z
   .object({
-    jobTitle: z.string().min(3, "Job title must be at least 3 characters"),
-    jobType: z.string().min(1, "Job type is required"),
+    jobTitle: z.string().min(1, "Job title must be at least 3 characters"),
+    category: z.string().min(1, "Category type is required"),
     employmentType: z.string().min(1, "Employment type is required"),
     experienceLevel: z.string().min(1, "Experience level is required"),
     numberOfPositions: z.coerce.number().min(1, "At least 1 position required"),
@@ -89,7 +89,7 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
       responsibilities: initialData?.responsibilities || [],
       skills: initialData?.skills_required || [],
       applicationDeadline: initialData?.application_deadline || "",
-      status: initialData?.status || "draft",
+      status: initialData?.status.toLowerCase() || "draft",
     },
   });
 

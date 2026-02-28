@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useEmployerProfile } from "@/hooks/useEmployer";
-import { useDeleteJob } from "@/hooks/useJobs";
+import { useDeleteJob } from "@/hooks/useEmployerJobs";
 import {
   ArrowRight,
   Bookmark,

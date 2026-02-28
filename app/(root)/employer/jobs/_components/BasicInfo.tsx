@@ -1,4 +1,9 @@
 import CustomField from "@/components/CustomField";
+import {
+  EMPLOYMENT_TYPES,
+  EXPERIENCE_LEVELS,
+  JOB_CATEGORY,
+} from "@/constants/jobsData";
 import { JobFormValues } from "@/types/jobs";
 import { Briefcase, Layers, Users } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
@@ -54,18 +59,10 @@ const BasicInfo = ({ form }: BasicInfoProps) => {
             <div className="space-y-2">
               <CustomField
                 control={form.control}
-                name="jobType"
-                label="Job Type *"
+                name="category"
+                label="Category *"
                 type="select"
-                options={[
-                  { label: "Software Development", value: "software" },
-                  { label: "Design", value: "design" },
-                  { label: "Product Management", value: "product" },
-                  { label: "Marketing", value: "marketing" },
-                  { label: "Sales", value: "sales" },
-                  { label: "Operations", value: "operations" },
-                  { label: "Human Resources", value: "hr" },
-                ]}
+                options={JOB_CATEGORY}
                 placeholder="Select job type"
               />
             </div>
@@ -77,13 +74,7 @@ const BasicInfo = ({ form }: BasicInfoProps) => {
                 name="employmentType"
                 label="Employment Type *"
                 type="select"
-                options={[
-                  { label: "Full Time", value: "full_time" },
-                  { label: "Part Time", value: "part_time" },
-                  { label: "Contract", value: "contract" },
-                  { label: "Freelance", value: "freelance" },
-                  { label: "Internship", value: "internship" },
-                ]}
+                options={EMPLOYMENT_TYPES}
                 placeholder="Select employment type"
               />
             </div>
@@ -104,13 +95,7 @@ const BasicInfo = ({ form }: BasicInfoProps) => {
                 name="experienceLevel"
                 label="Experience Level *"
                 type="select"
-                options={[
-                  { label: "Entry Level (0-2 years)", value: "entry" },
-                  { label: "Junior (2-4 years)", value: "junior" },
-                  { label: "Mid Level (4-7 years)", value: "mid" },
-                  { label: "Senior (7-10 years)", value: "senior" },
-                  { label: "Lead / Management (10+ years)", value: "lead" },
-                ]}
+                options={EXPERIENCE_LEVELS}
                 placeholder="Select experience level"
               />
             </div>

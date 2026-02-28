@@ -2,6 +2,7 @@ import {
   CreateJobPost,
   deleteJobPost,
   updateJobPost,
+  updateJobStatus,
 } from "@/lib/action/jobs.actions";
 import { createClient } from "@/lib/supabase/client";
 import { jobFormData, jobUpdateFormData } from "@/types/jobs";
@@ -53,6 +54,18 @@ export const useUpdateJob = () => {
   });
 };
 
+export const useUpdateJobStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ jobId, status }: { jobId: string; status: string }) =>
+      updateJobStatus(jobId, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getEmployerJobs"] });
+    },
+  });
+};
+
 export const useDeleteJob = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -64,5 +77,38 @@ export const useDeleteJob = () => {
     onError: (error: any) => {
       toast.error("Failed to delete job:", error);
     },
+  });
+};
+
+// get applicants
+export const useGetAllApplicatns = (empId: string) => {
+  return useQuery({
+    queryKey: ["allApplicants"],
+    queryFn: async () => {
+      const supabase = createClient();
+
+      const { data, error } = await supabase
+        .from("applicants")
+        .select(
+          `
+          id,
+          status,
+          applied_at,
+          jobs:!inner(
+          id,
+          title,
+          employer_id
+          ),
+          job_seekers(
+          id,
+          full_name,
+          email
+          )
+          `,
+        )
+        .eq("jobs.employer_id", empId)
+        .order("applied_at", { ascending: false });
+    },
+    enabled: !!empId,
   });
 };

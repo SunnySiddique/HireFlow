@@ -19,7 +19,7 @@ interface JobDescriptionProps {
 
 const JobDescription = ({ form }: JobDescriptionProps) => {
   const [skillInput, setSkillInput] = useState<string>("");
-  // Replace the requirements textarea with this
+
   const [requirementInput, setRequirementInput] = useState("");
   const [responsibilitiesInput, setResponsibilitiesInput] = useState("");
 
@@ -350,9 +350,7 @@ const JobDescription = ({ form }: JobDescriptionProps) => {
       <div className="space-y-2 pt-4">
         <div className="flex items-center gap-2">
           <Shield className="w-4 h-4 text-primary" />
-          <label className="text-sm font-bold text-foreground">
-            Publication Status
-          </label>
+          <label className="text-sm font-bold text-foreground">Status</label>
         </div>
         <CustomField
           control={form.control}
