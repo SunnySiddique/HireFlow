@@ -1,3 +1,4 @@
+// employer
 export interface jobFormData {
   employer_id: string;
   job_slug: string;
@@ -22,3 +23,18 @@ export interface jobFormData {
 
 export type jobUpdateFormData = Partial<Omit<jobFormData, "employer_id">>;
 export type JobFormValues = z.infer<typeof jobFormSchema>;
+
+// jobSeeker jobs types
+
+export interface JobFiltersType {
+  search?: string;
+  location?: string;
+  category?: string;
+  employmentType?: string;
+  experienceLevel?: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  page?: number;
+  limit?: number;
+  sort?: "recent" | "salary-high" | "salary-low";
+}

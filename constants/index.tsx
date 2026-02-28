@@ -222,3 +222,36 @@ export const notifications = [
     unread: false,
   },
 ];
+
+export const DUMMY_SAVED_JOBS = [
+  {
+    id: "1",
+    title: "Senior Frontend Developer",
+    companyName: "Tech Solutions Inc.",
+    companyLogo: "/images/company-logo-1.png",
+    location: "San Francisco, CA",
+    jobType: "Full-time",
+    locationType: "Remote",
+    postedAt: "2 days ago",
+  },
+  {
+    id: "2",
+    title: "UX/UI Designer",
+    companyName: "Creative Minds LLC",
+    companyLogo: "/images/company-logo-2.png",
+    location: "New York, NY",
+    jobType: "Contract",
+    locationType: "On-site",
+    postedAt: "5 days ago",
+  },
+  {
+    id: "3",
+    title: "Data Scientist",
+    companyName: "Data Insights Co.",
+    companyLogo: "/images/company-logo-3.png",
+    location: "Austin, TX",
+    jobType: "Full-time",
+    locationType: "Hybrid",
+    postedAt: "1 week ago",
+  },
+];

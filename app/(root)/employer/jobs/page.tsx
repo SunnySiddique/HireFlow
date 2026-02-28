@@ -4,8 +4,20 @@ import Loader from "@/components/Loader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useEmployerProfile } from "@/hooks/useEmployer";
-import { useDeleteJob, useGetEmployerJobs } from "@/hooks/useJobs";
+import {
+  useDeleteJob,
+  useGetEmployerJobs,
+  useUpdateJobStatus,
+} from "@/hooks/useEmployerJobs";
+import { formatSalary } from "@/lib/utils";
 import {
   Briefcase,
   Calendar,
@@ -18,7 +30,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -33,14 +45,11 @@ const getStatusColor = (status: string) => {
   }
 };
 
-const formatSalary = (min: number, max: number, currency: string) => {
-  const format = (num: number) => `$${(num / 1000).toFixed(0)}k`;
-  return `${format(min)} - ${format(max)} ${currency}`;
-};
-
 const ManageJobsPage = () => {
   const { data: employerProfile, isLoading: isEmployerProfileLoading } =
     useEmployerProfile();
+  const { mutate: updateStatus, isPending: isUpdatingStatus } =
+    useUpdateJobStatus();
 
   const { data: empJobs, isLoading: empJobLoading } = useGetEmployerJobs(
     employerProfile?.id as string,
@@ -49,6 +58,7 @@ const ManageJobsPage = () => {
   const { mutateAsync: deleteJobPost, isPending: isDeletingJob } =
     useDeleteJob();
   const [jobToDelete, setJobToDelete] = useState<string | null>(null);
+  const [jobs, setJobs] = useState(empJobs || []);
 
   const handleDeleteJob = async (jobSlug: string) => {
     setJobToDelete(jobSlug);
@@ -59,9 +69,24 @@ const ManageJobsPage = () => {
     });
   };
 
+  const handleChangeJobStatus = (jobId: string, newStatus: string) => {
+    setJobs((prev) =>
+      prev.map((job) =>
+        job.id === jobId ? { ...job, status: newStatus } : job,
+      ),
+    );
+
+    updateStatus({ jobId, status: newStatus });
+  };
+
+  useEffect(() => {
+    if (empJobs) setJobs(empJobs);
+  }, [empJobs]);
+
   if (!empJobs) return <Loader />;
 
-  if (isEmployerProfileLoading || empJobLoading) return <Loader />;
+  if (isEmployerProfileLoading || empJobLoading || isUpdatingStatus)
+    return <Loader />;
   return (
     <main>
       <div>
@@ -82,9 +107,9 @@ const ManageJobsPage = () => {
         </div>
 
         {/* Jobs Grid */}
-        {empJobs.length > 0 ? (
+        {jobs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {empJobs.map((job) => (
+            {jobs.map((job) => (
               <Card
                 key={job.id}
                 className="border-border bg-card hover:shadow-lg transition-shadow duration-300 flex flex-col rounded-xl overflow-hidden"
@@ -97,13 +122,34 @@ const ManageJobsPage = () => {
                         {job.job_title}
                       </h3>
                     </div>
-                    <Badge
-                      className={`${getStatusColor(job.status as string)} border`}
-                    >
-                      {job.status}
-                    </Badge>
-                  </div>
 
+                    {/* Status + Dropdown */}
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        className={`${getStatusColor(job.status as string)} border`}
+                      >
+                        {job.status}
+                      </Badge>
+
+                      {/* Optional: Inline status dropdown */}
+
+                      <Select
+                        value={job.status || ""}
+                        onValueChange={(newStatus) =>
+                          handleChangeJobStatus(job.id, newStatus)
+                        }
+                      >
+                        <SelectTrigger className="h-8 w-[110px] text-xs">
+                          <SelectValue placeholder="Change" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Open">Open</SelectItem>
+                          <SelectItem value="Closed">Closed</SelectItem>
+                          <SelectItem value="Draft">Draft</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                   {/* Job Type and Employment Type */}
                   <div className="flex flex-wrap gap-2 mb-4">
                     <Badge
