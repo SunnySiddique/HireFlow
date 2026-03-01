@@ -83,3 +83,41 @@ export const useGetAllJobsForJobSeeker = (filters: JobFiltersType) => {
     placeholderData: (prevData) => prevData,
   });
 };
+
+export const useGetSimilarJobs = (jobId: string) => {
+  return useQuery({
+    queryKey: ["getSimilerJobs", jobId],
+    queryFn: async () => {
+      const supabase = createClient();
+
+      const { data: job } = await supabase
+        .from("jobs")
+        .select("category, employment_type, experience_level")
+        .eq("id", jobId)
+        .single();
+
+      if (!job) return [];
+
+      const { data: similarJobs } = await supabase
+        .from("jobs")
+        .select(
+          `*,
+            employer:employer_id (
+            id,
+            company_name,
+            company_logo_url,
+            website
+        )
+          `,
+        )
+        .neq("id", jobId)
+        .eq("status", "open")
+        .eq("category", job.category)
+        .eq("employment_type", job.employment_type)
+        .limit(6);
+
+      return similarJobs ?? [];
+    },
+    enabled: !!jobId,
+  });
+};

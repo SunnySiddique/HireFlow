@@ -1,6 +1,6 @@
+import JobDetailClient from "@/components/jobs/JobDetailClient";
 import { getJobPostBySlug } from "@/lib/action/jobs.actions";
-import JobDetailsPage from "../../../../../components/jobs/JobDetail";
-import NoJobsFound from "../_components/NoJobsFound";
+import NoJobsFound from "../../../../../components/jobs/NoJobsFound";
 
 interface EmployerDetailViewPageProps {
   params: Promise<{ slug: string }>;
@@ -13,10 +13,10 @@ const EmployerDetailViewPage = async ({
 
   const jobPost = await getJobPostBySlug(slug);
 
-  if (!jobPost) return <NoJobsFound />;
+  if (!jobPost) return <NoJobsFound isEmployer={true} />;
   return (
     <>
-      <JobDetailsPage role="employer" jobPost={jobPost} />
+      <JobDetailClient job={jobPost} />
     </>
   );
 };

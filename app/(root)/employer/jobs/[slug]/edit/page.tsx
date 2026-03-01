@@ -1,6 +1,6 @@
 import { getJobPostBySlug } from "@/lib/action/jobs.actions";
+import NoJobsFound from "../../../../../../components/jobs/NoJobsFound";
 import CreateJobForm from "../../_components/CreateJobForm";
-import NoJobsFound from "../../_components/NoJobsFound";
 interface PageProps {
   params: Promise<{ slug: string }>;
 }

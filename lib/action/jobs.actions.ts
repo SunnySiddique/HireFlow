@@ -9,7 +9,17 @@ export async function getJobPostBySlug(jobSlug: string) {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("jobs")
-      .select("*")
+      .select(
+        `*,
+        employer:employer_id(
+      id,
+      company_name,
+      company_logo_url,
+      website,
+      description
+        )
+        `,
+      )
       .eq("job_slug", jobSlug)
       .single();
 
@@ -85,7 +95,7 @@ export async function updateJobPost(jobSlug: string, jobData: JobFormValues) {
     const payload: jobUpdateFormData = {
       job_slug: updatedSlug,
       job_title: jobData.jobTitle,
-      job_type: jobData.jobType,
+      category: jobData.category,
       employment_type: jobData.employmentType,
       experience_level: jobData.experienceLevel,
       open_positions: jobData.numberOfPositions,

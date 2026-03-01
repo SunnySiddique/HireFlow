@@ -74,7 +74,7 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
     resolver: zodResolver(jobFormSchema) as Resolver<JobFormValues>,
     defaultValues: {
       jobTitle: initialData?.job_title || "",
-      jobType: initialData?.job_type || "",
+      category: initialData?.category || "",
       employmentType: initialData?.employment_type || "",
       experienceLevel: initialData?.experience_level || "",
       numberOfPositions: initialData?.open_positions || 1,
@@ -114,7 +114,7 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
         employer_id: currentEmployerProfile.id,
         job_slug: jobSlug,
         job_title: data.jobTitle,
-        job_type: data.jobType,
+        job_type: data.category,
         employment_type: data.employmentType,
         experience_level: data.experienceLevel,
         open_positions: data.numberOfPositions,
@@ -166,7 +166,7 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
       case 1:
         return (
           form.watch("jobTitle").trim().length >= 3 &&
-          form.watch("jobType").trim() !== "" &&
+          form.watch("category").trim() !== "" &&
           form.watch("employmentType").trim() !== "" &&
           form.watch("experienceLevel").trim() !== "" &&
           form.watch("numberOfPositions") >= 1

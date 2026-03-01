@@ -23,13 +23,13 @@ const JobTopBar = ({
   setViewMode,
 }: JobTopBarProps) => {
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+    <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
       <p className="text-sm text-muted-foreground">
         Showing{" "}
         <span className="font-medium text-foreground">{totalCount}</span> jobs
       </p>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-3">
         <Select
           value={sort ?? "recent"}
           onValueChange={(val) => onSortChange(val as JobFiltersType["sort"])}
