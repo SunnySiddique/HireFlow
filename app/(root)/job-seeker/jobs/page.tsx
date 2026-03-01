@@ -1,5 +1,6 @@
 "use client";
 
+import JobCard from "@/components/jobs/JobCard";
 import JobCardSkeleton from "@/components/jobs/JobCardSkeleton";
 import Loader from "@/components/Loader";
 import { SALARY_RANGES } from "@/constants/jobsData";
@@ -7,12 +8,11 @@ import { useGetAllJobsForJobSeeker } from "@/hooks/useJobSeekerJobs";
 import { JobFiltersType } from "@/types/jobs";
 import { useState } from "react";
 import JobFilters from "./_components/JobFilters";
-import JobCard from "./_components/JobsCard";
 import JobTopBar from "./_components/JobTopBar";
 import NoJobsFound from "./_components/NoJobsFound";
 import SearchAndFilterBar from "./_components/SearchAndFilterBar";
 
-export default function BrowseJobs() {
+const BrowseJobs = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
 
   const [filters, setFilters] = useState<JobFiltersType>({
@@ -90,7 +90,7 @@ export default function BrowseJobs() {
             </aside>
 
             {/* Jobs Grid */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1">
               <JobTopBar
                 totalCount={totalCount ?? 0}
                 sort={filters.sort}
@@ -115,12 +115,12 @@ export default function BrowseJobs() {
                 <div
                   className={
                     viewMode === "grid"
-                      ? "grid grid-cols-1 lg:grid-cols-3 gap-5"
-                      : "flex flex-col"
+                      ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 "
+                      : "flex flex-col gap-5"
                   }
                 >
                   {jobs.map((job) => (
-                    <JobCard key={job.id} job={job} />
+                    <JobCard key={job.id} job={job} variant="browse" />
                   ))}
                 </div>
               ) : (
@@ -132,4 +132,6 @@ export default function BrowseJobs() {
       </div>
     </div>
   );
-}
+};
+
+export default BrowseJobs;

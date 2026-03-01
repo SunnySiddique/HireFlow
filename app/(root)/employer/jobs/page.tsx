@@ -1,5 +1,6 @@
 "use client";
 
+import NoJobsFound from "@/components/jobs/NoJobsFound";
 import Loader from "@/components/Loader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,9 @@ import {
   useGetEmployerJobs,
   useUpdateJobStatus,
 } from "@/hooks/useEmployerJobs";
-import { formatSalary } from "@/lib/utils";
+import { formatLabel, formatSalary } from "@/lib/utils";
+import { Job } from "@/types/jobs";
+import { motion } from "framer-motion";
 import {
   Briefcase,
   Calendar,
@@ -34,14 +37,14 @@ import { useEffect, useState } from "react";
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case "Open":
-      return "bg-green-50 text-green-700 border-green-200";
-    case "Closed":
-      return "bg-red-50 text-red-700 border-red-200";
-    case "Draft":
-      return "bg-gray-50 text-gray-700 border-gray-200";
+    case "open":
+      return "bg-green-50 text-green-700 ...";
+    case "closed":
+      return "bg-red-50 text-red-700 ...";
+    case "draft":
+      return "bg-muted text-muted-foreground border-border";
     default:
-      return "bg-gray-50 text-gray-700 border-gray-200";
+      return "bg-muted text-muted-foreground border-border";
   }
 };
 
@@ -50,23 +53,18 @@ const ManageJobsPage = () => {
     useEmployerProfile();
   const { mutate: updateStatus, isPending: isUpdatingStatus } =
     useUpdateJobStatus();
-
   const { data: empJobs, isLoading: empJobLoading } = useGetEmployerJobs(
     employerProfile?.id as string,
   );
-
   const { mutateAsync: deleteJobPost, isPending: isDeletingJob } =
     useDeleteJob();
+
   const [jobToDelete, setJobToDelete] = useState<string | null>(null);
-  const [jobs, setJobs] = useState(empJobs || []);
+  const [jobs, setJobs] = useState<Job[]>(empJobs || []);
 
   const handleDeleteJob = async (jobSlug: string) => {
     setJobToDelete(jobSlug);
-    await deleteJobPost(jobSlug, {
-      onSettled: () => {
-        setJobToDelete(null);
-      },
-    });
+    await deleteJobPost(jobSlug, { onSettled: () => setJobToDelete(null) });
   };
 
   const handleChangeJobStatus = (jobId: string, newStatus: string) => {
@@ -75,7 +73,6 @@ const ManageJobsPage = () => {
         job.id === jobId ? { ...job, status: newStatus } : job,
       ),
     );
-
     updateStatus({ jobId, status: newStatus });
   };
 
@@ -83,14 +80,13 @@ const ManageJobsPage = () => {
     if (empJobs) setJobs(empJobs);
   }, [empJobs]);
 
-  if (!empJobs) return <Loader />;
-
-  if (isEmployerProfileLoading || empJobLoading || isUpdatingStatus)
+  if (!empJobs || isEmployerProfileLoading || empJobLoading || isUpdatingStatus)
     return <Loader />;
+
   return (
     <main>
       <div>
-        {/* Header Section */}
+        {/* ── Header ─────────────────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
           <div>
             <h1 className="text-4xl font-bold text-foreground">Manage Jobs</h1>
@@ -98,189 +94,171 @@ const ManageJobsPage = () => {
               Create, edit and manage your job postings
             </p>
           </div>
-          <Link href="/employer/jobs/create">
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 h-11">
-              <Plus className="w-5 h-5" />
-              Create New Job
-            </Button>
-          </Link>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+            <Link href="/employer/jobs/create">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 h-11">
+                <Plus className="w-5 h-5" />
+                Create New Job
+              </Button>
+            </Link>
+          </motion.div>
         </div>
 
-        {/* Jobs Grid */}
         {jobs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {jobs.map((job) => (
-              <Card
-                key={job.id}
-                className="border-border bg-card hover:shadow-lg transition-shadow duration-300 flex flex-col rounded-xl overflow-hidden"
-              >
-                <div className="p-6 flex-1 flex flex-col">
-                  {/* Card Header with Status Badge */}
-                  <div className="flex items-start justify-between gap-3 mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-foreground line-clamp-2">
+              <div key={job.id}>
+                <Card className="border-border bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200 flex flex-col rounded-xl overflow-hidden h-full">
+                  <div className="p-5 flex-1 flex flex-col">
+                    {/* Status row */}
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <h3 className="text-base font-semibold text-foreground line-clamp-2 flex-1">
                         {job.job_title}
                       </h3>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Badge
+                          className={`${getStatusColor(job.status as string)} border text-[11px] rounded-sm`}
+                        >
+                          {job.status}
+                        </Badge>
+                        <Select
+                          value={job.status || ""}
+                          onValueChange={(newStatus) =>
+                            handleChangeJobStatus(job.id, newStatus)
+                          }
+                        >
+                          <SelectTrigger className="h-7 w-[90px] text-xs">
+                            <SelectValue placeholder="Change" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="open">Open</SelectItem>
+                            <SelectItem value="closed">Closed</SelectItem>
+                            <SelectItem value="draft">Draft</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
 
-                    {/* Status + Dropdown */}
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        className={`${getStatusColor(job.status as string)} border`}
-                      >
-                        {job.status}
-                      </Badge>
-
-                      {/* Optional: Inline status dropdown */}
-
-                      <Select
-                        value={job.status || ""}
-                        onValueChange={(newStatus) =>
-                          handleChangeJobStatus(job.id, newStatus)
-                        }
-                      >
-                        <SelectTrigger className="h-8 w-[110px] text-xs">
-                          <SelectValue placeholder="Change" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Open">Open</SelectItem>
-                          <SelectItem value="Closed">Closed</SelectItem>
-                          <SelectItem value="Draft">Draft</SelectItem>
-                        </SelectContent>
-                      </Select>
+                    {/* Type badges */}
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {[
+                        formatLabel(job.category),
+                        formatLabel(job.employment_type),
+                        formatLabel(job.experience_level),
+                        formatLabel(job.status),
+                      ].map((label) => (
+                        <Badge
+                          key={label}
+                          className="text-[11px] px-2 py-0.5 rounded-sm bg-muted text-muted-foreground border border-border"
+                        >
+                          {label}
+                        </Badge>
+                      ))}
                     </div>
-                  </div>
-                  {/* Job Type and Employment Type */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <Badge
-                      variant="outline"
-                      className="bg-accent border-border"
-                    >
-                      {job.job_type}
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className="bg-accent border-border"
-                    >
-                      {job.employment_type}
-                    </Badge>
-                  </div>
 
-                  {/* Location and Remote Option */}
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                    <MapPin className="w-4 h-4" />
-                    <span>{job.location}</span>
-                  </div>
+                    {/* Meta */}
+                    <div className="flex gap-3 items-center  mb-4 text-[11px] text-muted-foreground">
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="w-3 h-3 text-primary/70 flex-shrink-0" />
+                        <span>{job.location}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Briefcase className="w-3 h-3 text-primary/70 flex-shrink-0" />
+                        <span>{job.experience_level}</span>
+                      </div>
+                    </div>
 
-                  {/* Experience Level */}
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                    <Briefcase className="w-4 h-4" />
-                    <span>{job.experience_level}</span>
-                  </div>
-
-                  {/* Salary Range */}
-                  <div className="flex items-center gap-2 text-sm font-semibold text-foreground mb-4 pt-2 border-t border-border">
-                    <span className="text-primary">
+                    {/* Salary */}
+                    <div className="text-sm font-semibold text-primary mb-4 pb-3 border-b border-border">
                       {formatSalary(
                         job.salary_min as number,
                         job.salary_max as number,
                         job.currency as string,
                       )}
-                    </span>
-                  </div>
+                    </div>
 
-                  {/* Open Positions and Deadline */}
-                  <div className="grid grid-cols-2 gap-3 mb-6 pt-2 border-t border-border">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Positions
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-secondary" />
-                        <span className="font-semibold text-foreground">
-                          {job.open_positions} Open
-                        </span>
+                    {/* Positions + Deadline */}
+                    <div className="grid grid-cols-2 gap-3 mb-4 pb-3 border-b border-border">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
+                          Positions
+                        </p>
+                        <div className="flex items-center gap-1.5">
+                          <Users className="w-3 h-3 text-primary/70" />
+                          <span className="text-sm font-semibold text-foreground">
+                            {job.open_positions} Open
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
+                          Deadline
+                        </p>
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="w-3 h-3 text-primary/70" />
+                          <span className="text-sm font-semibold text-foreground">
+                            {new Date(
+                              job.application_deadline as string,
+                            ).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Deadline
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-secondary" />
-                        <span className="font-semibold text-foreground text-sm">
-                          {new Date(
-                            job.application_deadline as string,
-                          ).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 mt-auto pt-4 border-t border-border">
-                    <Link href={`/employer/jobs/${job.job_slug}/edit`}>
+                    {/* Actions */}
+                    <div className="flex gap-2 mt-auto">
+                      <Link
+                        href={`/employer/jobs/${job.job_slug}/edit`}
+                        className="flex-1"
+                      >
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full border-border hover:bg-muted text-xs"
+                        >
+                          <Edit2 className="w-3.5 h-3.5 mr-1" />
+                          Edit
+                        </Button>
+                      </Link>
+                      <Link
+                        href={`/employer/jobs/${job.job_slug}`}
+                        className="flex-1"
+                      >
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full border-border hover:bg-muted text-xs"
+                        >
+                          <Eye className="w-3.5 h-3.5 mr-1" />
+                          View
+                        </Button>
+                      </Link>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex-1 border-border hover:bg-muted"
+                        className="flex-1 border-destructive/40 text-destructive hover:bg-destructive/10 hover:border-destructive text-xs transition-colors"
+                        onClick={() => handleDeleteJob(job.job_slug)}
                       >
-                        <Edit2 className="w-4 h-4 mr-1" />
-                        Edit
+                        {isDeletingJob && jobToDelete === job.job_slug ? (
+                          <LoaderCircle className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <>
+                            <Trash2 className="w-3.5 h-3.5 mr-1" />
+                            Delete
+                          </>
+                        )}
                       </Button>
-                    </Link>
-                    <Link href={`/employer/jobs/${job.job_slug}`}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 border-border hover:bg-muted"
-                      >
-                        <Eye className="w-4 h-4 mr-1" />
-                        View
-                      </Button>
-                    </Link>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 border-destructive text-destructive hover:bg-destructive/10"
-                      onClick={() => handleDeleteJob(job.job_slug)}
-                    >
-                      {isDeletingJob && jobToDelete === job.job_slug ? (
-                        <LoaderCircle className="w-4 h-4 mr-1 animate-spin" />
-                      ) : (
-                        <>
-                          <Trash2 className="w-4 h-4" />
-                          Delete
-                        </>
-                      )}
-                    </Button>
+                    </div>
                   </div>
-                </div>
-              </Card>
+                </Card>
+              </div>
             ))}
           </div>
         ) : (
-          /* Empty State */
-          <div className="flex flex-col items-center justify-center py-20 px-4">
-            <div className="w-32 h-32 rounded-lg bg-muted flex items-center justify-center mb-6">
-              <Briefcase className="w-16 h-16 text-muted-foreground" />
-            </div>
-            <h3 className="text-2xl font-bold text-foreground mb-2">
-              No jobs created yet
-            </h3>
-            <p className="text-muted-foreground text-center mb-8 max-w-sm">
-              Start by creating your first job posting to attract qualified
-              candidates
-            </p>
-            <Link href="/employer/jobs/create">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                Create Your First Job
-              </Button>
-            </Link>
-          </div>
+          <NoJobsFound isEmployer={true} />
         )}
       </div>
     </main>

@@ -1,7 +1,4 @@
-"use client";
-
 import { clsx, type ClassValue } from "clsx";
-import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { twMerge } from "tailwind-merge";
 
@@ -49,17 +46,27 @@ export const createSlug = (title: string) => {
 // job salaery formate
 export const formatSalary = (min: number, max: number, currency: string) => {
   const format = (num: number) => `$${(num / 1000).toFixed(0)}k`;
-  return `${format(min)} - ${format(max)} ${currency}`;
+  return `${format(min)} - ${format(max)} ${currency.toUpperCase()}`;
 };
 
-// debounce
-export function useDebounce<T>(value: T, delay = 500) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
+// formatLabel
+export const formatLabel = (value: string): string => {
+  switch (value) {
+    case "full_time":
+      return "Full-time";
+    case "part_time":
+      return "Part-time";
+    default:
+      return value.charAt(0).toUpperCase() + value.slice(1);
+  }
+};
 
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler); // reset if value changes before delay
-  }, [value, delay]);
-
-  return debouncedValue;
-}
+// formate Date
+export const formatDeadline = (dateStr: string) => {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
