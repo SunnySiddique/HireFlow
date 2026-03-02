@@ -10,6 +10,7 @@ import { useState } from "react";
 import JobFilters from "./_components/JobFilters";
 import JobTopBar from "./_components/JobTopBar";
 import NoJobsFound from "./_components/NoJobsFound";
+import { default as Pagination } from "./_components/Pagination";
 import SearchAndFilterBar from "./_components/SearchAndFilterBar";
 
 const BrowseJobs = () => {
@@ -30,10 +31,11 @@ const BrowseJobs = () => {
   const [salaryLabel, setSalaryLabel] = useState("");
 
   const {
-    data: { jobs, totalCount } = { jobs: [], totalCount: 0 },
+    data = { jobs: [], totalCount: 0, totalPages: 0 },
     isLoading,
     isFetching,
   } = useGetAllJobsForJobSeeker(filters);
+  const { jobs, totalCount, totalPages } = data;
 
   const updateFilters = (updated: Partial<typeof filters>) => {
     setFilters((prev) => ({ ...prev, ...updated, page: 1 }));
@@ -126,6 +128,14 @@ const BrowseJobs = () => {
               ) : (
                 <NoJobsFound />
               )}
+              <Pagination
+                page={filters.page ?? 1}
+                totalItems={totalCount}
+                totalPages={totalPages}
+                onPageChange={(newPage) =>
+                  setFilters((prev) => ({ ...prev, page: newPage }))
+                }
+              />
             </div>
           </div>
         </div>
