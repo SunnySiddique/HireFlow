@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { buttonText } from "@/constants/employerData";
 import { useEmployerProfile } from "@/hooks/useEmployer";
-import { useCreateJob, useUpdateJob } from "@/hooks/useEmployerJobs";
+import { useCreateJob, useUpdateJob } from "@/hooks/useJobs";
 import { createSlug } from "@/lib/utils";
 import { JobFormValues } from "@/types/jobs";
 import { zodResolver } from "@hookform/resolvers/zod";

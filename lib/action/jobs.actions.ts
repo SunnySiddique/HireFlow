@@ -4,6 +4,7 @@ import { jobFormData, JobFormValues, jobUpdateFormData } from "@/types/jobs";
 import { createClient } from "../supabase/server";
 import { createSlug } from "../utils";
 
+// Get job by slug
 export async function getJobPostBySlug(jobSlug: string) {
   try {
     const supabase = await createClient();
@@ -32,6 +33,7 @@ export async function getJobPostBySlug(jobSlug: string) {
   }
 }
 
+// Create job for employer
 export async function CreateJobPost(jobData: jobFormData) {
   try {
     const supabase = await createClient();
@@ -67,6 +69,7 @@ export async function CreateJobPost(jobData: jobFormData) {
   }
 }
 
+// Update job for employer
 export async function updateJobPost(jobSlug: string, jobData: JobFormValues) {
   try {
     const supabase = await createClient();
@@ -128,6 +131,7 @@ export async function updateJobPost(jobSlug: string, jobData: JobFormValues) {
   }
 }
 
+// Update job status for employer
 export async function updateJobStatus(jobId: string, status: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -141,6 +145,7 @@ export async function updateJobStatus(jobId: string, status: string) {
   return data;
 }
 
+// Delete job for employer
 export async function deleteJobPost(jobSlug: string) {
   try {
     const supabase = await createClient();
@@ -170,5 +175,77 @@ export async function deleteJobPost(jobSlug: string) {
   } catch (error) {
     console.error("Error in deleteJobPost:", error);
     throw new Error("Failed to execute deleteJobPost");
+  }
+}
+
+// Apply job for job seeker
+export async function applyJob(jobId: string, coverLetter: string) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) throw new Error("User not found");
+
+    const { data: jobSeeker, error: jobSeekerError } = await supabase
+      .from("job_seekers")
+      .select("id")
+      .eq("auth_id", user.id)
+      .single();
+
+    if (jobSeekerError || !jobSeeker)
+      throw new Error("Job seeker profile not found");
+
+    const { error } = await supabase
+      .from("applicants")
+      .insert({
+        job_id: jobId,
+        user_id: jobSeeker.id,
+        cover_letter: coverLetter,
+      })
+      .maybeSingle();
+
+    if (error) throw error;
+
+    return { success: true, message: "Job applied successfully" };
+  } catch (error) {
+    console.error("Error in applyJob:", error);
+    throw new Error("Failed to execute applyJob");
+  }
+}
+
+export async function savedJob(jobId: string) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) throw new Error("User not found");
+
+    const { data: jobSeeker, error: jobSeekerError } = await supabase
+      .from("job_seekers")
+      .select("id")
+      .eq("auth_id", user.id)
+      .single();
+
+    if (jobSeekerError || !jobSeeker)
+      throw new Error("Job seeker profile not found");
+
+    const { error } = await supabase
+      .from("save_jobs")
+      .insert({ job_id: jobId, user_id: jobSeeker.id })
+      .maybeSingle();
+
+    if (error) throw error;
+
+    return { success: true, message: "Job saved successfully" };
+  } catch (error) {
+    console.error("Error in savedJob:", error);
+    throw new Error("Failed to execute savedJob");
   }
 }
