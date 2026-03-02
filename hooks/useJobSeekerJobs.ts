@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export const useGetAllJobsForJobSeeker = (filters: JobFiltersType) => {
   return useQuery({
-    queryKey: ["getAllJobs", filters],
+    queryKey: ["getAllJobs", JSON.stringify(filters)],
     queryFn: async () => {
       const supabase = createClient();
 
@@ -21,7 +21,7 @@ export const useGetAllJobsForJobSeeker = (filters: JobFiltersType) => {
         `,
           { count: "exact" },
         )
-        .neq("status", "closed".toLowerCase());
+        .neq("status", "closed");
 
       if (filters.category) {
         query = query.eq("category", filters.category);
@@ -78,7 +78,15 @@ export const useGetAllJobsForJobSeeker = (filters: JobFiltersType) => {
 
       if (error) throw error;
 
-      return { jobs: data, totalCount: count };
+      const totalCount = count ?? 0;
+      const totalPages = Math.ceil(totalCount / limit);
+
+      return {
+        jobs: data ?? [],
+        totalCount,
+        currentPage: page,
+        totalPages,
+      };
     },
     placeholderData: (prevData) => prevData,
   });

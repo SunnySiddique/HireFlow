@@ -104,11 +104,7 @@ const statusStyle: Record<string, string> = {
   draft: "bg-muted text-muted-foreground border-border",
 };
 
-export default function JobCard({
-  job,
-  variant = "browse",
-  href,
-}: JobCardProps) {
+const JobCard = ({ job, variant = "browse", href }: JobCardProps) => {
   const [saved, setSaved] = useState(false);
   const [hovered, setHovered] = useState(false);
 
@@ -267,4 +263,6 @@ export default function JobCard({
       </div>
     </Card>
   );
-}
+};
+
+export default JobCard;
