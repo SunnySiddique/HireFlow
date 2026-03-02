@@ -1,6 +1,20 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  useApplyJob,
+  useGetSingleApplicant,
+  useGetSingleSaveJob,
+  useSavedJob,
+} from "@/hooks/useJobs";
 import { formatDeadline, formatLabel, formatSalary } from "@/lib/utils";
 import { Job } from "@/types/jobs";
 import { motion } from "framer-motion";
@@ -16,7 +30,31 @@ import { useState } from "react";
 import { fadeUp, stagger } from "./animation";
 
 const HeaderCard = ({ job }: { job: Job }) => {
-  const [saved, setSaved] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [coverLetter, setCoverLetter] = useState("");
+  const { mutate: applyJob, isPending: isApplying } = useApplyJob();
+  const { mutate: saveJob, isPending: isSaving } = useSavedJob();
+  const { data: applicant } = useGetSingleApplicant(job.id);
+  const { data: savedJob } = useGetSingleSaveJob(job.id);
+
+  const isApplied = !!applicant;
+  const isSaved = !!savedJob;
+
+  const handleApplyJob = () => {
+    applyJob(
+      { jobId: job.id, coverLetter },
+      {
+        onSuccess: () => {
+          setOpen(false);
+          setCoverLetter("");
+        },
+      },
+    );
+  };
+
+  const handleSaveJob = () => {
+    saveJob(job.id);
+  };
 
   return (
     <>
@@ -26,7 +64,6 @@ const HeaderCard = ({ job }: { job: Job }) => {
         transition={{ duration: 0.45, ease: "easeOut" }}
       >
         <Card className="p-6 lg:p-8 bg-background border border-border overflow-hidden relative">
-          {/* Decorative top bar */}
           <motion.div
             className="absolute top-0 left-0 h-[3px] bg-primary"
             initial={{ width: 0 }}
@@ -45,7 +82,6 @@ const HeaderCard = ({ job }: { job: Job }) => {
                 {job.job_title}
               </motion.h1>
 
-              {/* Badges */}
               <motion.div
                 initial="hidden"
                 animate="visible"
@@ -56,7 +92,6 @@ const HeaderCard = ({ job }: { job: Job }) => {
                   formatLabel(job.category),
                   formatLabel(job.employment_type),
                   formatLabel(job.experience_level),
-                  formatLabel(job.status),
                 ].map((b) => (
                   <motion.div key={b} variants={fadeUp}>
                     <Badge className="bg-background border border-border text-muted-foreground rounded-sm hover:border-primary/40 transition-colors">
@@ -73,7 +108,6 @@ const HeaderCard = ({ job }: { job: Job }) => {
                 </motion.div>
               </motion.div>
 
-              {/* Meta row */}
               <motion.div
                 initial="hidden"
                 animate="visible"
@@ -84,7 +118,11 @@ const HeaderCard = ({ job }: { job: Job }) => {
                   { icon: MapPin, text: job.location },
                   {
                     icon: DollarSign,
-                    text: `${formatSalary(job.salary_min, job.salary_max, job.currency)}`,
+                    text: formatSalary(
+                      job.salary_min,
+                      job.salary_max,
+                      job.currency,
+                    ),
                   },
                   { icon: Users, text: `${job.open_positions} open positions` },
                   {
@@ -111,30 +149,69 @@ const HeaderCard = ({ job }: { job: Job }) => {
               transition={{ duration: 0.4, delay: 0.25 }}
               className="flex gap-2 flex-shrink-0 h-fit"
             >
-              <Button
-                className="bg-primary/50 text-primary-foreground opacity-50 cursor-not-allowed line-through"
-                disabled
-              >
-                Apply Now
-              </Button>
+              {isApplied ? (
+                <Button variant={"outline"}>Applied</Button>
+              ) : (
+                <Button
+                  className="bg-primary text-primary-foreground"
+                  onClick={() => setOpen(true)}
+                >
+                  Apply Now
+                </Button>
+              )}
+
               <motion.div whileTap={{ scale: 0.95 }}>
                 <Button
                   variant="outline"
-                  className={`border-border transition-all duration-200 ${saved ? "border-primary/50 text-primary bg-primary/5" : "text-foreground hover:bg-muted"}`}
-                  onClick={() => setSaved((s) => !s)}
+                  className={`border-border transition-all duration-200 ${isSaved ? "border-primary/50 text-primary bg-primary/5" : "text-foreground hover:bg-muted"}`}
+                  onClick={handleSaveJob}
                 >
-                  {saved ? (
+                  {isSaved ? (
                     <BookmarkCheck className="w-4 h-4 mr-2" />
                   ) : (
-                    <Bookmark className="w-4 h-4 mr-2" />
+                    !isSaved && <Bookmark className="w-4 h-4 mr-2" />
                   )}
-                  {saved ? "Saved" : "Save Job"}
+                  {isSaving ? "Saving..." : "Save Job"}
                 </Button>
               </motion.div>
             </motion.div>
           </div>
         </Card>
       </motion.div>
+
+      {/* ✅ Cover Letter Dialog */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Apply for {job.job_title}</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              Cover Letter{" "}
+              <span className="text-muted-foreground">(optional)</span>
+            </label>
+            <Textarea
+              placeholder="Tell the employer why you're a great fit for this role..."
+              className="min-h-[180px] resize-none"
+              value={coverLetter}
+              onChange={(e) => setCoverLetter(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              {coverLetter.length} characters
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleApplyJob} disabled={isApplying}>
+              {isApplying ? "Applying..." : "Submit Application"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

@@ -17,7 +17,7 @@ import {
   useDeleteJob,
   useGetEmployerJobs,
   useUpdateJobStatus,
-} from "@/hooks/useEmployerJobs";
+} from "@/hooks/useJobs";
 import { formatLabel, formatSalary } from "@/lib/utils";
 import { Job } from "@/types/jobs";
 import { motion } from "framer-motion";

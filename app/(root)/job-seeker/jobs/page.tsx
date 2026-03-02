@@ -4,7 +4,7 @@ import JobCard from "@/components/jobs/JobCard";
 import JobCardSkeleton from "@/components/jobs/JobCardSkeleton";
 import Loader from "@/components/Loader";
 import { SALARY_RANGES } from "@/constants/jobsData";
-import { useGetAllJobsForJobSeeker } from "@/hooks/useJobSeekerJobs";
+import { useGetAllJobsForJobSeeker } from "@/hooks/useJobs";
 import { JobFiltersType } from "@/types/jobs";
 import { useState } from "react";
 import JobFilters from "./_components/JobFilters";

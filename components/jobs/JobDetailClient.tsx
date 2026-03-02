@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetSimilarJobs } from "@/hooks/useJobSeekerJobs";
+import { useGetSimilarJobs } from "@/hooks/useJobs";
 import { Job } from "@/types/jobs";
 import { AnimatedSection } from "../../app/(root)/job-seeker/jobs/[slug]/_components/animation";
 import JobDetailContent from "../../app/(root)/job-seeker/jobs/[slug]/_components/JobDetailContent";
@@ -11,7 +11,6 @@ import JobCard from "./JobCard";
 
 const JobDetailClient = ({ job }: { job: Job }) => {
   const { data: similarJobs = [], isLoading } = useGetSimilarJobs(job.id);
-  console.log("simsi:", similarJobs);
 
   if (isLoading) return <Loader />;
   return (
