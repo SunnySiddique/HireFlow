@@ -11,8 +11,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import {
   useApplyJob,
-  useGetSingleApplicant,
-  useGetSingleSaveJob,
+  useGetCurrentUserAppliedJob,
+  useGetCurrentUserSaveJobs,
   useSavedJob,
 } from "@/hooks/useJobs";
 import { formatDeadline, formatLabel, formatSalary } from "@/lib/utils";
@@ -33,12 +33,14 @@ const HeaderCard = ({ job }: { job: Job }) => {
   const [open, setOpen] = useState(false);
   const [coverLetter, setCoverLetter] = useState("");
   const { mutate: applyJob, isPending: isApplying } = useApplyJob();
-  const { mutate: saveJob, isPending: isSaving } = useSavedJob();
-  const { data: applicant } = useGetSingleApplicant(job.id);
-  const { data: savedJob } = useGetSingleSaveJob(job.id);
+  const { mutate: saveJob } = useSavedJob();
+  const { data: appliedJob } = useGetCurrentUserAppliedJob();
+  const { data: savedJobs } = useGetCurrentUserSaveJobs();
 
-  const isApplied = !!applicant;
-  const isSaved = !!savedJob;
+  const isApplied = appliedJob?.some(
+    (applicant) => applicant.job_id === job.id,
+  );
+  const isSaved = savedJobs?.some((save) => save.job_id === job.id);
 
   const handleApplyJob = () => {
     applyJob(
@@ -167,11 +169,10 @@ const HeaderCard = ({ job }: { job: Job }) => {
                   onClick={handleSaveJob}
                 >
                   {isSaved ? (
-                    <BookmarkCheck className="w-4 h-4 mr-2" />
+                    <BookmarkCheck className="w-4 h-4" />
                   ) : (
-                    !isSaved && <Bookmark className="w-4 h-4 mr-2" />
+                    <Bookmark className="w-4 h-4" />
                   )}
-                  {isSaving ? "Saving..." : "Save Job"}
                 </Button>
               </motion.div>
             </motion.div>

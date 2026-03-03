@@ -60,6 +60,7 @@ export type Job = {
   updated_at: string;
 };
 
+// jobs sidebar filters type
 export interface JobFiltersType {
   search?: string;
   location?: string;
@@ -71,4 +72,17 @@ export interface JobFiltersType {
   page?: number;
   limit?: number;
   sort?: "recent" | "salary-high" | "salary-low";
+}
+
+// save job types
+
+interface SavedJob {
+  id: string;
+  job_id: string;
+  saved_at?: string;
+  employer: Employer;
+  location?: string;
+  salary_min?: number;
+  salary_max?: number;
+  currency?: string;
 }

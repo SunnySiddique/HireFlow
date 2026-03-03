@@ -8,12 +8,12 @@ export function cn(...inputs: ClassValue[]) {
 
 // avatar for the proifle
 export const getInitials = (name: string) => {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) {
-    return parts[0][0].toUpperCase();
-  }
-
-  return (parts[0][0] + parts[1][0]).toUpperCase();
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 };
 
 export const getResumeFileName = (url: string) => {
@@ -49,6 +49,15 @@ export const formatSalary = (min: number, max: number, currency: string) => {
   return `${format(min)} - ${format(max)} ${currency.toUpperCase()}`;
 };
 
+// fromate date
+export const formatDate = (dateStr: string) => {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
 // formatLabel
 export const formatLabel = (value: string): string => {
   switch (value) {
@@ -69,4 +78,17 @@ export const formatDeadline = (dateStr: string) => {
     day: "numeric",
     year: "numeric",
   });
+};
+
+// time diff
+export const timeAgo = (dateStr: string) => {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const days = Math.floor(diff / 86400000);
+  if (days === 0) return "Today";
+  if (days === 1) return "1 day ago";
+  if (days < 30) return `${days} days ago`;
+  if (days >= 365) {
+    const years = Math.floor(days / 365);
+    return `${years} year${years > 1 ? "s" : ""} ago`;
+  }
 };

@@ -11,6 +11,7 @@ export const JOB_CATEGORY = [
 export const EMPLOYMENT_TYPES = [
   { label: "Full Time", value: "full_time" },
   { label: "Part Time", value: "part_time" },
+  { label: "Remote", value: "remote" },
   { label: "Contract", value: "contract" },
   { label: "Freelance", value: "freelance" },
   { label: "Internship", value: "internship" },

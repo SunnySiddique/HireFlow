@@ -256,17 +256,30 @@ export const useApplyJob = () => {
       jobId: string;
       coverLetter: string;
     }) => applyJob(jobId, coverLetter),
-    onSuccess: () => {
-      toast.success("Job Applied Successfully");
-      queryClient.invalidateQueries({ queryKey: ["getSingleApplicant"] });
+    onSuccess: (data) => {
+      if (data === "applied") {
+        toast.success("Job applied successfully!");
+      } else if (data === "already_applied") {
+        toast.error("You have already applied for this job.");
+      } else if (data === "job_closed") {
+        toast.error("Sorry, this job is closed.");
+      }
+
+      if (data === "applied") {
+        queryClient.invalidateQueries({ queryKey: ["getAllApplicants"] });
+      }
+    },
+
+    onError: (error: any) => {
+      toast.error(error?.message || "Failed to apply for job");
     },
   });
 };
 
-// get single applicants
-export const useGetSingleApplicant = (jobId: string) => {
+// get all applicants
+export const useGetCurrentUserAppliedJob = () => {
   return useQuery({
-    queryKey: ["getSingleApplicant", jobId],
+    queryKey: ["getAllApplicants"],
     queryFn: async () => {
       const supabase = createClient();
 
@@ -286,23 +299,61 @@ export const useGetSingleApplicant = (jobId: string) => {
 
       const { data, error } = await supabase
         .from("applicants")
-        .select("*")
-        .eq("user_id", jobSeeker.id)
-        .eq("job_id", jobId)
-        .maybeSingle();
+        .select(
+          `
+    id,
+    job_id,
+    status,
+    cover_letter,
+    job:job_id (
+      job_title,
+      location,
+      salary_min,
+      salary_max,
+      status,
+      job_slug,
+      employment_type,
+      skills_required,
+      created_at,
+      currency,
+      employer:employer_id (
+        id,
+        company_name,
+        company_logo_url,
+        website
+      )
+    )
+  `,
+        )
+        .eq("user_id", jobSeeker.id);
 
       if (error) throw error;
 
-      return data;
+      return data.map((appliedJob: any) => ({
+        id: appliedJob.id,
+        job_id: appliedJob.job_id,
+        application_status: appliedJob.status,
+        cover_letter: appliedJob.cover_letter,
+        job_title: appliedJob.job?.job_title,
+        location: appliedJob.job?.location ?? null,
+        salary_min: appliedJob.job?.salary_min ?? null,
+        salary_max: appliedJob.job?.salary_max ?? null,
+        job_status: appliedJob.job?.status ?? null,
+        job_slug: appliedJob.job?.job_slug ?? null,
+        skills_required: appliedJob.job?.skills_required ?? null,
+        employment_type: appliedJob.job?.employment_type ?? null,
+        created_at: appliedJob.job?.created_at ?? null,
+        currency: appliedJob.job?.currency ?? null,
+        employer: appliedJob.job?.employer ?? null,
+      }));
     },
-    enabled: !!jobId,
   });
 };
 
-// get single save job
-export const useGetSingleSaveJob = (jobId: string) => {
+// get all save jobs
+export const useGetCurrentUserSaveJobs = () => {
   return useQuery({
-    queryKey: ["getSingleSaveJob", jobId],
+    queryKey: ["getAllSaveJobs"],
     queryFn: async () => {
       const supabase = createClient();
 
@@ -322,16 +373,50 @@ export const useGetSingleSaveJob = (jobId: string) => {
 
       const { data, error } = await supabase
         .from("save_jobs")
-        .select("*")
-        .eq("user_id", jobSeeker.id)
-        .eq("job_id", jobId)
-        .maybeSingle();
+        .select(
+          `
+    id,
+    job_id,
+    saved_at,
+    job:job_id (
+      job_title,
+      location,
+      salary_min,
+      salary_max,
+      currency,
+      status,
+      job_slug,
+      application_deadline,
+      employment_type,
+      employer:employer_id (
+        id,
+        company_name,
+        company_logo_url,
+        website
+      )
+    )
+  `,
+        )
+        .eq("user_id", jobSeeker.id);
 
       if (error) throw error;
 
-      return data;
+      return data.map((saveJob: any) => ({
+        id: saveJob.id,
+        job_id: saveJob.job_id,
+        saved_at: saveJob.saved_at,
+        job_title: saveJob.job?.job_title,
+        location: saveJob.job?.location ?? null,
+        salary_min: saveJob.job?.salary_min ?? null,
+        salary_max: saveJob.job?.salary_max ?? null,
+        currency: saveJob.job?.currency ?? null,
+        status: saveJob.job?.status ?? null,
+        job_slug: saveJob.job?.job_slug ?? null,
+        application_deadline: saveJob.job?.application_deadline ?? null,
+        employment_type: saveJob.job?.employment_type ?? null,
+        employer: saveJob.job?.employer ?? null,
+      }));
     },
-    enabled: !!jobId,
   });
 };
 
@@ -342,7 +427,7 @@ export const useSavedJob = () => {
   return useMutation({
     mutationFn: (jobId: string) => savedJob(jobId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getSingleSaveJob"] });
+      queryClient.invalidateQueries({ queryKey: ["getAllSaveJobs"] });
       toast.success("Job Saved Successfully");
     },
   });

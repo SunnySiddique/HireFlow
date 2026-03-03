@@ -4,7 +4,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { formatLabel } from "@/lib/utils";
+import { useGetCurrentUserSaveJobs, useSavedJob } from "@/hooks/useJobs";
+import {
+  formatDate,
+  formatLabel,
+  formatSalary,
+  getInitials,
+  timeAgo,
+} from "@/lib/utils";
 import {
   Bookmark,
   BookmarkCheck,
@@ -58,46 +65,6 @@ interface JobCardProps {
   href?: string;
 }
 
-function formatSalary(min: number, max: number, currency: string) {
-  const sym =
-    currency.toLowerCase() === "usd" ? "$" : currency.toUpperCase() + " ";
-  const fmt = (n: number) =>
-    n >= 1000 ? `${sym}${(n / 1000).toFixed(0)}k` : `${sym}${n}`;
-  return `${fmt(min)} – ${fmt(max)}`;
-}
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const days = Math.floor(diff / 86400000);
-  if (days === 0) return "Today";
-  if (days === 1) return "1 day ago";
-  if (days < 30) return `${days} days ago`;
-  if (days >= 365) {
-    const years = Math.floor(days / 365);
-    return `${years} year${years > 1 ? "s" : ""} ago`;
-  }
-  if (days >= 30) {
-    const months = Math.floor(days / 30);
-  }
-}
-
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
-
 const statusStyle: Record<string, string> = {
   open: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800",
   closed: "bg-muted text-muted-foreground border-border",
@@ -105,10 +72,17 @@ const statusStyle: Record<string, string> = {
 };
 
 const JobCard = ({ job, variant = "browse", href }: JobCardProps) => {
-  const [saved, setSaved] = useState(false);
+  const { mutate: saveJob } = useSavedJob();
+  const { data: savedJobs } = useGetCurrentUserSaveJobs();
+
+  const isSaved = savedJobs?.some((save) => save.job_id === job.id);
   const [hovered, setHovered] = useState(false);
 
   const detailHref = href ?? `/job-seeker/jobs/${job.job_slug}`;
+
+  const handleSaveJob = () => {
+    saveJob(job.id);
+  };
 
   return (
     <Card
@@ -122,7 +96,6 @@ const JobCard = ({ job, variant = "browse", href }: JobCardProps) => {
       />
 
       <div className="p-5 flex flex-col gap-4">
-        {/* Logo + Title + Company + Status + Save */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 flex-1 min-w-0">
             <Avatar className="h-11 w-11 flex-shrink-0 rounded-lg border border-border">
@@ -155,25 +128,22 @@ const JobCard = ({ job, variant = "browse", href }: JobCardProps) => {
           <div className="flex items-center gap-1.5 flex-shrink-0">
             {variant === "browse" && (
               <Badge
-                className={`text-[10px] px-1.5 py-0 rounded-sm border capitalize ${statusStyle[formatLabel(job.status)] ?? statusStyle.draft}`}
+                className={`text-[10px] px-1.5 py-0 rounded-sm border capitalize bg-green-600/100 ${statusStyle[job.status] ?? statusStyle.draft}`}
               >
                 {job.status}
               </Badge>
             )}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setSaved((s) => !s);
-              }}
-              className={`p-1.5 rounded-md transition-colors duration-150 hover:bg-muted ${saved ? "text-primary" : "text-muted-foreground"}`}
-              aria-label={saved ? "Unsave job" : "Save job"}
+            <Button
+              variant="outline"
+              className={`border-border transition-all duration-200 ${isSaved ? "border-primary/50 text-primary bg-primary/5" : "text-foreground hover:bg-muted"}`}
+              onClick={handleSaveJob}
             >
-              {saved ? (
-                <BookmarkCheck className="h-4 w-4" />
+              {isSaved ? (
+                <BookmarkCheck className="w-4 h-4" />
               ) : (
-                <Bookmark className="h-4 w-4" />
+                <Bookmark className="w-4 h-4" />
               )}
-            </button>
+            </Button>
           </div>
         </div>
 
