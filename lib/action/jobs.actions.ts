@@ -1,6 +1,7 @@
 "use server";
 
 import { jobFormData, JobFormValues, jobUpdateFormData } from "@/types/jobs";
+import { revalidatePath } from "next/cache";
 import { createClient } from "../supabase/server";
 import { createSlug } from "../utils";
 
@@ -184,32 +185,27 @@ export async function applyJob(jobId: string, coverLetter: string) {
     const supabase = await createClient();
     const {
       data: { user },
-      error: userError,
     } = await supabase.auth.getUser();
 
-    if (userError || !user) throw new Error("User not found");
+    if (!user) throw new Error("Unauthorized");
 
-    const { data: jobSeeker, error: jobSeekerError } = await supabase
+    const { data: jobSeeker } = await supabase
       .from("job_seekers")
       .select("id")
       .eq("auth_id", user.id)
       .single();
 
-    if (jobSeekerError || !jobSeeker)
-      throw new Error("Job seeker profile not found");
+    if (!jobSeeker) throw new Error("Job seeker profile not found");
 
-    const { error } = await supabase
-      .from("applicants")
-      .insert({
-        job_id: jobId,
-        user_id: jobSeeker.id,
-        cover_letter: coverLetter,
-      })
-      .maybeSingle();
+    const { data, error } = await supabase.rpc("apply_to_job", {
+      p_user_id: jobSeeker.id,
+      p_job_id: jobId,
+      p_cover_letter: coverLetter,
+    });
 
     if (error) throw error;
 
-    return { success: true, message: "Job applied successfully" };
+    return data;
   } catch (error) {
     console.error("Error in applyJob:", error);
     throw new Error("Failed to execute applyJob");
@@ -220,6 +216,7 @@ export async function savedJob(jobId: string) {
   try {
     const supabase = await createClient();
 
+    // get auth user
     const {
       data: { user },
       error: userError,
@@ -227,21 +224,26 @@ export async function savedJob(jobId: string) {
 
     if (userError || !user) throw new Error("User not found");
 
-    const { data: jobSeeker, error: jobSeekerError } = await supabase
+    // Get Job Seeker Profile
+    const { data: jobSeeker, error: profileError } = await supabase
       .from("job_seekers")
       .select("id")
       .eq("auth_id", user.id)
       .single();
 
-    if (jobSeekerError || !jobSeeker)
+    if (profileError || !jobSeeker)
       throw new Error("Job seeker profile not found");
 
-    const { error } = await supabase
-      .from("save_jobs")
-      .insert({ job_id: jobId, user_id: jobSeeker.id })
-      .maybeSingle();
+    const { data, error } = await supabase.rpc("toggle_saved_job", {
+      p_user_id: jobSeeker.id,
+      p_job_id: jobId,
+    });
 
-    if (error) throw error;
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    revalidatePath("/jobs");
 
     return { success: true, message: "Job saved successfully" };
   } catch (error) {

@@ -132,9 +132,12 @@ export const AUTH_TABS = [
 
 export const jobSeekerLinks = [
   { label: "Browse Jobs", href: "/job-seeker/jobs", icon: Briefcase },
-  { label: "My Applications", href: "/job-seeker/applications", icon: Users },
+  {
+    label: "My Applications",
+    href: "/job-seeker/applications",
+    icon: Users,
+  },
   { label: "Saved Jobs", href: "/job-seeker/saved-jobs", icon: Heart },
-  { label: "My Jobs", href: "/jobs", icon: LayoutDashboard },
   {
     label: "Profile",
     href: (slug: string) => `/job-seeker/${slug}`,
@@ -220,38 +223,5 @@ export const notifications = [
     timestamp: "1 day ago",
     icon: Briefcase,
     unread: false,
-  },
-];
-
-export const DUMMY_SAVED_JOBS = [
-  {
-    id: "1",
-    title: "Senior Frontend Developer",
-    companyName: "Tech Solutions Inc.",
-    companyLogo: "/images/company-logo-1.png",
-    location: "San Francisco, CA",
-    jobType: "Full-time",
-    locationType: "Remote",
-    postedAt: "2 days ago",
-  },
-  {
-    id: "2",
-    title: "UX/UI Designer",
-    companyName: "Creative Minds LLC",
-    companyLogo: "/images/company-logo-2.png",
-    location: "New York, NY",
-    jobType: "Contract",
-    locationType: "On-site",
-    postedAt: "5 days ago",
-  },
-  {
-    id: "3",
-    title: "Data Scientist",
-    companyName: "Data Insights Co.",
-    companyLogo: "/images/company-logo-3.png",
-    location: "Austin, TX",
-    jobType: "Full-time",
-    locationType: "Hybrid",
-    postedAt: "1 week ago",
   },
 ];
