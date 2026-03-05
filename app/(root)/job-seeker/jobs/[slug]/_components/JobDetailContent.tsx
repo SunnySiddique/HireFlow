@@ -6,8 +6,6 @@ import { CheckCircle } from "lucide-react";
 import { useRef } from "react";
 import { AnimatedSection, fadeUp, stagger } from "./animation";
 
-// ── Sub-components ────
-
 function CheckList({ items }: { items: string[] }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });

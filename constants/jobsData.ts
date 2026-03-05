@@ -31,3 +31,29 @@ export const SALARY_RANGES = [
   { label: "$100k - $150k", min: 100000, max: 150000 },
   { label: "$150k+", min: 150000, max: undefined },
 ];
+
+export const appStatusConfig: Record<
+  string,
+  { label: string; className: string }
+> = {
+  pending: {
+    label: "Pending",
+    className:
+      "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/30 dark:text-yellow-400 dark:border-yellow-800",
+  },
+  reviewed: {
+    label: "Reviewed",
+    className:
+      "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800",
+  },
+  rejected: {
+    label: "Rejected",
+    className:
+      "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-800",
+  },
+  accepted: {
+    label: "Accepted",
+    className:
+      "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800",
+  },
+};

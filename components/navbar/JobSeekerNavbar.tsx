@@ -1,56 +1,80 @@
-import { Button } from "@/components/ui/button";
-import { Bell, Menu } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
+import { useGetJobSeekerProfile } from "@/hooks/useJobSeeker";
+import { Bell, Search, Sparkles } from "lucide-react";
+import Link from "next/link";
 
-interface JobHeaderProps {
-  jobSeekerProfile?: { full_name?: string };
-  setSidebarOpen: (open: boolean) => void;
-}
-
-const JobHeader = ({ jobSeekerProfile, setSidebarOpen }: JobHeaderProps) => {
+const JobSeekerNavbar = () => {
+  const { data: jobSeekerProfile } = useGetJobSeekerProfile();
   return (
-    <nav className="bg-background border-b border-border sticky top-0 z-20">
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between px-4 lg:px-8 py-4 lg:h-20 gap-4 lg:gap-0">
-        {/* Left Section */}
-        <div className="flex items-center justify-between w-full lg:w-auto gap-4">
-          <div className="flex flex-col">
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">
-              Good morning, {jobSeekerProfile?.full_name || "Job Seeker"} 👋
-            </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground hidden lg:block">
-              You have 3 new job matches and 1 interview scheduled today.
-            </p>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden text-foreground cursor-pointer p-2 rounded hover:bg-muted"
-            onClick={() => setSidebarOpen(true)}
-            aria-label="Open sidebar menu"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+    <div className="px-4 lg:px-8 py-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {/* Welcome Text */}
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-1">
+            Welcome back,{" "}
+            <span className="text-primary">
+              {jobSeekerProfile?.full_name ?? "Jhon"}!
+            </span>
+          </h1>
+          <p className="text-sm lg:text-base text-muted-foreground">
+            Here&apos;s what&apos;s happening with your job search today.
+          </p>
         </div>
 
-        {/* Right Section */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 lg:gap-4 w-full lg:w-auto flex-wrap">
-          {/* Notifications */}
-          <Button
-            variant="ghost"
-            className="flex items-center justify-center text-foreground text-sm sm:text-base flex-1 sm:flex-none gap-1 sm:gap-2 min-w-[120px]"
-          >
-            <Bell className="w-4 sm:w-5 h-4 sm:h-5" />
-            <span className="hidden sm:inline">Notifications</span>
-          </Button>
+        {/* Quick Search & Notifications */}
+        <div className="flex items-center gap-3">
+          {/* Search Button */}
+          <Link href="/job-seeker/jobs">
+            <Card className="p-2 lg:p-3 bg-background border border-border hover:border-primary cursor-pointer transition-colors">
+              <Search className="w-5 h-5 text-muted-foreground" />
+            </Card>
+          </Link>
 
-          {/* Browse Jobs */}
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base flex-1 sm:flex-none min-w-[120px]">
-            <span className="hidden sm:inline">Browse Jobs</span>
-            <span className="sm:hidden">Browse</span>
-          </Button>
+          {/* Notifications */}
+          <Card className="p-2 lg:p-3 bg-background border border-border relative cursor-pointer hover:border-primary transition-colors">
+            <Bell className="w-5 h-5 text-muted-foreground" />
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
+              3
+            </span>
+          </Card>
+
+          {/* User Avatar */}
+          <Link href={`/job-seeker/${jobSeekerProfile?.slug}`}>
+            <Avatar className="h-10 w-10 lg:h-12 lg:w-12 border-2 border-primary cursor-pointer hover:scale-105 transition-transform">
+              <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+                JD
+              </AvatarFallback>
+            </Avatar>
+          </Link>
         </div>
       </div>
-    </nav>
+
+      {/* Tips Card */}
+      <Card className="mt-4 p-3 lg:p-4 bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 lg:w-10 lg:h-10 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+            <Sparkles className="w-4 lg:w-5 h-4 lg:h-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-sm lg:text-base font-semibold text-foreground mb-1">
+              💡 Interview Tip of the Day
+            </h3>
+            <p className="text-xs lg:text-sm text-muted-foreground">
+              Prepare for your upcoming interviews by researching company
+              culture and practicing common questions.{" "}
+              <Link
+                href="/job-seeker/resources"
+                className="text-primary hover:underline font-medium"
+              >
+                Learn more →
+              </Link>
+            </p>
+          </div>
+        </div>
+      </Card>
+    </div>
   );
 };
 
-export default JobHeader;
+export default JobSeekerNavbar;

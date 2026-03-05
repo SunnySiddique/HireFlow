@@ -32,33 +32,31 @@ type Employer = {
   description: string;
 };
 
-//  jobs types
-
-export type Job = {
+export interface Job {
   id: string;
   job_title: string;
   job_slug: string;
   employer_id: string;
-  employer: Employer;
+  employer?: Employer | null; // if you join employer data
   job_description: string;
-  category: string;
-  employment_type: "full_time" | "part_time" | "contract" | "freelance";
-  experience_level: "junior" | "mid" | "senior" | "lead";
-  salary_min: number;
-  salary_max: number;
-  currency: string;
-  location: string;
-  remote_option: "remote" | "on_site" | "hybrid";
-  skills_required: string[];
-  benefits: string[];
-  application_deadline: string;
-  open_positions: number;
-  status: "open" | "closed" | "draft";
-  requirements: string[];
-  responsibilities: string[];
-  created_at: string;
-  updated_at: string;
-};
+  category?: string | null;
+  employment_type?: string | null;
+  experience_level?: string | null;
+  salary_min?: number | null;
+  salary_max?: number | null;
+  currency?: string | null;
+  location?: string | null;
+  remote_option?: string | null;
+  skills_required?: string[] | null;
+  benefits?: string[] | null;
+  application_deadline?: string | null; // ISO string
+  open_positions?: number | null;
+  status?: string | null;
+  requirements?: Record<string, any> | null; // JSONB
+  created_at?: string | null; // ISO string
+  updated_at?: string | null; // ISO string
+  responsibilities?: Record<string, any> | null; // JSONB
+}
 
 // jobs sidebar filters type
 export interface JobFiltersType {
@@ -71,11 +69,10 @@ export interface JobFiltersType {
   salaryMax?: number;
   page?: number;
   limit?: number;
-  sort?: "recent" | "salary-high" | "salary-low";
+  sort?: "recent" | "salary-high" | "salary-low" | "all";
 }
 
 // save job types
-
 interface SavedJob {
   id: string;
   job_id: string;
@@ -85,4 +82,23 @@ interface SavedJob {
   salary_min?: number;
   salary_max?: number;
   currency?: string;
+}
+
+// Add TypeScript schema for jobs with employer subset
+export interface JobWithEmployer {
+  id: string;
+  job_title: string;
+  location?: string | null;
+  salary_min?: number | null;
+  salary_max?: number | null;
+  currency?: string | null;
+  employment_type?: string | null; // note: fix spelling from 'employement_type'
+  job_slug: string;
+  created_at?: string | null; // ISO string
+  skills_required?: string[] | null;
+  status?: string | null;
+  employer?: {
+    company_name: string;
+    company_logo_url?: string | null;
+  } | null;
 }

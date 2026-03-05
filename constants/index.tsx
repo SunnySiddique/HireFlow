@@ -131,6 +131,7 @@ export const AUTH_TABS = [
 // <--- JOB SEEKER PROFILE ---> //
 
 export const jobSeekerLinks = [
+  { label: "Dashboard", href: "/job-seeker/dashboard", icon: LayoutDashboard },
   { label: "Browse Jobs", href: "/job-seeker/jobs", icon: Briefcase },
   {
     label: "My Applications",

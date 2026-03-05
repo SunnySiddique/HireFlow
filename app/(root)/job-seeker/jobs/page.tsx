@@ -26,7 +26,7 @@ const BrowseJobs = () => {
     salaryMax: undefined,
     page: 1,
     limit: 10,
-    sort: "recent",
+    sort: "all",
   });
   const [salaryLabel, setSalaryLabel] = useState("");
 
