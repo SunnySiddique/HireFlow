@@ -95,7 +95,7 @@ const JobSeekerSidebar = ({
             </p>
 
             <div className="space-y-2">
-              {jobSeekerLinks.slice(0, 2).map((link) => {
+              {jobSeekerLinks.slice(0, 3).map((link) => {
                 const href =
                   typeof link.href === "function"
                     ? link.href(jobSeekerProfile?.slug ?? "")
@@ -120,7 +120,7 @@ const JobSeekerSidebar = ({
               Manage
             </p>
             <div className="space-y-2">
-              {jobSeekerLinks.slice(2).map((link) => {
+              {jobSeekerLinks.slice(3).map((link) => {
                 const href =
                   typeof link.href === "function"
                     ? link.href(jobSeekerProfile?.slug ?? "")

@@ -11,7 +11,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import {
   useApplyJob,
-  useGetCurrentUserAppliedJob,
+  useGetCurrentUserAppliedJobs,
   useGetCurrentUserSaveJobs,
   useSavedJob,
 } from "@/hooks/useJobs";
@@ -34,7 +34,7 @@ const HeaderCard = ({ job }: { job: Job }) => {
   const [coverLetter, setCoverLetter] = useState("");
   const { mutate: applyJob, isPending: isApplying } = useApplyJob();
   const { mutate: saveJob } = useSavedJob();
-  const { data: appliedJob } = useGetCurrentUserAppliedJob();
+  const { data: appliedJob } = useGetCurrentUserAppliedJobs();
   const { data: savedJobs } = useGetCurrentUserSaveJobs();
 
   const isApplied = appliedJob?.some(

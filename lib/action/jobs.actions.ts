@@ -51,7 +51,10 @@ export async function CreateJobPost(jobData: jobFormData) {
       .eq("auth_id", user?.id)
       .single();
 
-    if (isEmployerError) return { success: false, error: "User not found" };
+    if (isEmployerError) {
+      console.error("[DEBUG] Employer lookup error:", isEmployerError);
+      return { success: false, error: "User not found" };
+    }
 
     if (employerExist.auth_id.toString() !== user.id.toString())
       return {
@@ -61,11 +64,13 @@ export async function CreateJobPost(jobData: jobFormData) {
 
     const { error } = await supabase.from("jobs").insert([jobData]);
 
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      return { success: false, error: error.message };
+    }
 
     return { success: true, message: "Job Created Successfully" };
   } catch (error) {
-    console.error("Error in CreateJobPost:", error);
+    console.error("[DEBUG] Error in CreateJobPost:", error);
     throw new Error("Failed to execute CreateJobPost");
   }
 }

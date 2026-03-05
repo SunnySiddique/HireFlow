@@ -38,7 +38,7 @@ export default function JobSeekerLayout({
             </Link>
           </div>
         )}
-        <JobSeekerNavbar setSidebarOpen={setSidebarOpen} />
+        <JobSeekerNavbar />
         <main className="flex-1 overflow-y-auto p-8 bg-background">
           {children}
         </main>

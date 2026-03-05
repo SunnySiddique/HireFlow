@@ -114,7 +114,7 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
         employer_id: currentEmployerProfile.id,
         job_slug: jobSlug,
         job_title: data.jobTitle,
-        job_type: data.category,
+        category: data.category,
         employment_type: data.employmentType,
         experience_level: data.experienceLevel,
         open_positions: data.numberOfPositions,
@@ -133,15 +133,22 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
         skills_required: data.skills.length > 0 ? data.skills : [],
       };
 
-      await createJobPost(payload, {
-        onSuccess: () => {
+      try {
+        const result = await createJobPost(payload as any);
+
+        if (result?.success) {
           toast.success("Post Created Successfully");
           form.reset();
-        },
-        onSettled: () => {
           router.push("/employer/jobs");
-        },
-      });
+        } else {
+          toast.error(result?.error || "Failed to create job");
+        }
+      } catch (error: unknown) {
+        console.error("[DEBUG] Job creation error:", error);
+        const errMsg =
+          error instanceof Error ? error.message : "Failed to create job";
+        toast.error(errMsg);
+      }
     } else {
       await updateJobPost(
         {
@@ -192,10 +199,12 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
     }
   };
 
-  const onInvalid = (errors: any) => {
-    const firstError = Object.values(errors)[0] as any;
+  const onInvalid = (errors: unknown) => {
+    const firstError = Object.values(errors as Record<string, unknown>)[0] as
+      | Record<string, unknown>
+      | undefined;
     if (firstError?.message) {
-      toast.error(firstError.message);
+      toast.error(firstError.message as string);
     }
   };
 

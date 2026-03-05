@@ -6,8 +6,14 @@ import {
   updateJobPost,
   updateJobStatus,
 } from "@/lib/action/jobs.actions";
+import { invalidateQuery } from "@/lib/react-query/invalidateQueries";
 import { createClient } from "@/lib/supabase/client";
-import { JobFiltersType, jobFormData, jobUpdateFormData } from "@/types/jobs";
+import {
+  JobFiltersType,
+  jobFormData,
+  jobUpdateFormData,
+  JobWithEmployer,
+} from "@/types/jobs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
@@ -34,8 +40,14 @@ export const useCreateJob = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (jobData: jobFormData) => CreateJobPost(jobData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getEmployerJobs"] });
+
+    onError: (error: Error | { message?: string; error?: string }) => {
+      console.error("[DEBUG] useCreateJob onError:", error);
+      // Error is already logged, component should handle displaying it
+    },
+    onSuccess: (data) => {
+      console.log("[DEBUG] useCreateJob onSuccess:", data);
+      invalidateQuery(queryClient, ["getEmployerJobs"]);
     },
   });
 };
@@ -51,7 +63,7 @@ export const useUpdateJob = () => {
       jobData: jobUpdateFormData;
     }) => updateJobPost(job_slug, jobData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getEmployerJobs"] });
+      invalidateQuery(queryClient, ["getEmployerJobs"]);
     },
   });
 };
@@ -63,7 +75,7 @@ export const useUpdateJobStatus = () => {
     mutationFn: ({ jobId, status }: { jobId: string; status: string }) =>
       updateJobStatus(jobId, status),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getEmployerJobs"] });
+      invalidateQuery(queryClient, ["getEmployerJobs"]);
     },
   });
 };
@@ -82,38 +94,38 @@ export const useDeleteJob = () => {
   });
 };
 
-// get applicants
-export const useGetAllApplicatns = (empId: string) => {
-  return useQuery({
-    queryKey: ["allApplicants"],
-    queryFn: async () => {
-      const supabase = createClient();
+// // get applicants
+// export const useGetAllApplicatns = (empId: string) => {
+//   return useQuery({
+//     queryKey: ["allApplicants"],
+//     queryFn: async () => {
+//       const supabase = createClient();
 
-      const { data, error } = await supabase
-        .from("applicants")
-        .select(
-          `
-          id,
-          status,
-          applied_at,
-          jobs:!inner(
-          id,
-          title,
-          employer_id
-          ),
-          job_seekers(
-          id,
-          full_name,
-          email
-          )
-          `,
-        )
-        .eq("jobs.employer_id", empId)
-        .order("applied_at", { ascending: false });
-    },
-    enabled: !!empId,
-  });
-};
+//       const { data, error } = await supabase
+//         .from("applicants")
+//         .select(
+//           `
+//           id,
+//           status,
+//           applied_at,
+//           jobs:!inner(
+//           id,
+//           title,
+//           employer_id
+//           ),
+//           job_seekers(
+//           id,
+//           full_name,
+//           email
+//           )
+//           `,
+//         )
+//         .eq("jobs.employer_id", empId)
+//         .order("applied_at", { ascending: false });
+//     },
+//     enabled: !!empId,
+//   });
+// };
 
 // get all jobs for jobseeker
 export const useGetAllJobsForJobSeeker = (filters: JobFiltersType) => {
@@ -163,20 +175,27 @@ export const useGetAllJobsForJobSeeker = (filters: JobFiltersType) => {
         query = query.ilike("location", `%${filters.location}%`);
       }
 
-      if (filters.sort) {
-        switch (filters.sort) {
-          case "recent":
-            query = query.order("created_at", { ascending: false });
-            break;
-          case "salary-high":
-            query = query.order("salary_max", { ascending: false });
-            break;
+      /* ---------------- SORTING ---------------- */
+      query = query.order("created_at", { ascending: false });
 
-          case "salary-low":
-            query = query.order("salary_max", { ascending: true });
-            break;
-          default:
-            query = query.order("created_at", { ascending: false });
+      if (filters.sort !== "all") {
+        if (filters.sort === "recent") {
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+          query = query
+            .gte("created_at", sevenDaysAgo.toISOString())
+            .order("created_at", { ascending: false });
+        } else if (filters.sort === "salary-high") {
+          query = query.order("salary_max", {
+            ascending: false,
+            nullsFirst: false,
+          });
+        } else if (filters.sort === "salary-low") {
+          query = query.order("salary_max", {
+            ascending: true,
+            nullsFirst: false,
+          });
         }
       }
 
@@ -266,7 +285,8 @@ export const useApplyJob = () => {
       }
 
       if (data === "applied") {
-        queryClient.invalidateQueries({ queryKey: ["getAllApplicants"] });
+        invalidateQuery(queryClient, ["applicationStats"]);
+        invalidateQuery(queryClient, ["getAllApplicants"]);
       }
     },
 
@@ -276,8 +296,8 @@ export const useApplyJob = () => {
   });
 };
 
-// get all applicants
-export const useGetCurrentUserAppliedJob = () => {
+// get all applied jobs for current user
+export const useGetCurrentUserAppliedJobs = () => {
   return useQuery({
     queryKey: ["getAllApplicants"],
     queryFn: async () => {
@@ -305,6 +325,8 @@ export const useGetCurrentUserAppliedJob = () => {
     job_id,
     status,
     cover_letter,
+    employer_notes,
+    applied_at,
     job:job_id (
       job_title,
       location,
@@ -333,7 +355,10 @@ export const useGetCurrentUserAppliedJob = () => {
         id: appliedJob.id,
         job_id: appliedJob.job_id,
         application_status: appliedJob.status,
+        employer_notes: appliedJob.employer_notes,
         cover_letter: appliedJob.cover_letter,
+        applied_at: appliedJob.applied_at,
+
         job_title: appliedJob.job?.job_title,
         location: appliedJob.job?.location ?? null,
         salary_min: appliedJob.job?.salary_min ?? null,
@@ -350,7 +375,7 @@ export const useGetCurrentUserAppliedJob = () => {
   });
 };
 
-// get all save jobs
+// get all save jobs for current user
 export const useGetCurrentUserSaveJobs = () => {
   return useQuery({
     queryKey: ["getAllSaveJobs"],
@@ -427,8 +452,119 @@ export const useSavedJob = () => {
   return useMutation({
     mutationFn: (jobId: string) => savedJob(jobId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getAllSaveJobs"] });
+      invalidateQuery(queryClient, ["getAllSaveJobs"]);
+      invalidateQuery(queryClient, ["applicationStats"]);
       toast.success("Job Saved Successfully");
+    },
+  });
+};
+
+// get recent jobs for job seeker
+export const useGetRecentJobs = () => {
+  return useQuery<JobWithEmployer[]>({
+    queryKey: ["recentJobs"],
+    queryFn: async () => {
+      const supabase = createClient();
+
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      const { data, error: jobError } = await supabase
+        .from("jobs")
+        .select(
+          `
+  id,
+  job_title,
+  location,
+  salary_min,
+  salary_max,
+  currency,
+  employment_type,
+  job_slug,
+  created_at,
+  status,
+  employer:employer_id (
+    company_name,
+    company_logo_url
+  )
+`,
+        )
+        .eq("status", "open")
+        .gte("created_at", sevenDaysAgo.toISOString())
+        .order("created_at", { ascending: false })
+        .limit(4);
+
+      if (jobError) throw jobError;
+      return data;
+    },
+  });
+};
+
+// recommanded jobs
+export const useRecommandedJobs = () => {
+  return useQuery<JobWithEmployer[]>({
+    queryKey: ["recomandedJobs"],
+    queryFn: async (): Promise<JobWithEmployer[]> => {
+      const supabase = createClient();
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError || !user) throw new Error("User not found");
+
+      const { data: jobSeeker, error: jobSeekerError } = await supabase
+        .from("job_seekers")
+        .select("*")
+        .eq("auth_id", user.id)
+        .single();
+
+      if (jobSeekerError || !jobSeeker) throw new Error("Job seeker not found");
+
+      const userSkills: string[] = jobSeeker.skills || [];
+      if (userSkills.length === 0) return [];
+
+      const { data: jobs, error: jobsError } = await supabase
+        .from("jobs")
+        .select(
+          `
+                id,
+                job_title,
+                location,
+                salary_min,
+                salary_max,
+                currency,
+                employment_type,
+                job_slug,
+                created_at,
+                skills_required,
+           employer:employer_id (
+             id,
+             company_name,
+             company_logo_url,
+             website
+           )`,
+        )
+        .neq("status", "closed")
+        .overlaps("skills_required", userSkills);
+
+      if (jobsError || !jobs) throw new Error("Jobs not found");
+
+      const jobsWithScore = jobs.map((job) => {
+        const jobSkills: string[] = job.skills_required || [];
+        const matchScore = jobSkills.filter((skill) =>
+          userSkills.includes(skill),
+        ).length;
+
+        return {
+          ...job,
+          matchScore,
+        };
+      });
+
+      jobsWithScore.sort((a, b) => b.matchScore - a.matchScore);
+
+      return jobsWithScore;
     },
   });
 };

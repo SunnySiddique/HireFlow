@@ -31,13 +31,14 @@ const JobTopBar = ({
 
       <div className="flex items-center justify-between gap-3">
         <Select
-          value={sort ?? "recent"}
+          value={sort ?? "all"}
           onValueChange={(val) => onSortChange(val as JobFiltersType["sort"])}
         >
           <SelectTrigger className="w-48 bg-background border border-border text-foreground">
-            <SelectValue placeholder="Most Recent" />
+            <SelectValue placeholder="Sort" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">All</SelectItem>
             <SelectItem value="recent">Most Recent</SelectItem>
             <SelectItem value="salary-high">Highest Salary</SelectItem>
             <SelectItem value="salary-low">Lowest Salary</SelectItem>

@@ -1,10 +1,8 @@
-"use client";
-
-import { appStatusConfig } from "@/app/(root)/job-seeker/applications/page";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { appStatusConfig } from "@/constants/jobsData";
 import { formatDate, formatSalary, getInitials } from "@/lib/utils";
 import {
   CalendarDays,
@@ -12,9 +10,8 @@ import {
   ExternalLink,
   FileText,
   MapPin,
+  MessageSquare,
 } from "lucide-react";
-
-// ── Types ─────────────────────────────────────────────────────────────────────
 
 const jobStatusConfig: Record<string, string> = {
   open: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800",
@@ -92,6 +89,20 @@ const ApplicationCard = ({ app }: { app: any }) => {
           <div className="flex items-start gap-1.5 text-[11px] text-muted-foreground bg-muted/50 rounded-lg p-2.5 border border-border">
             <FileText className="h-3 w-3 text-primary/70 flex-shrink-0 mt-0.5" />
             <p className="line-clamp-2 leading-relaxed">{app.cover_letter}</p>
+          </div>
+        )}
+
+        {app.employer_notes && (
+          <div className="flex items-start gap-1.5 text-[11px] text-muted-foreground bg-muted/50 rounded-lg p-2.5 border border-border">
+            <MessageSquare className="h-3 w-3 text-primary/70 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[10px] text-primary font-medium mb-0.5">
+                Employer Note
+              </p>
+              <p className="line-clamp-2 leading-relaxed">
+                {app.employer_notes}
+              </p>
+            </div>
           </div>
         )}
 
