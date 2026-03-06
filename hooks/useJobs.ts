@@ -247,6 +247,7 @@ export const useGetSimilarJobs = (jobId: string) => {
             employer:employer_id (
             id,
             company_name,
+            slug,
             company_logo_url,
             website
         )

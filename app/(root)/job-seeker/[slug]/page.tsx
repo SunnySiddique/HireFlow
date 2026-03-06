@@ -36,34 +36,41 @@ import { z } from "zod";
 
 const profileSchema = z
   .object({
-    fullName: z.string().min(2, "Full name must be at least 2 characters"),
-    headline: z.string().min(5, "Headline must be at least 5 characters"),
+    fullName: z
+      .string()
+      .min(2, "Full name must be at least 2 characters")
+      .optional(),
+    headline: z
+      .string()
+      .min(5, "Headline must be at least 5 characters")
+      .optional(),
     bio: z
       .string()
       .min(10, "Bio must be at least 10 characters long")
-      .max(150, "Bio must not exceed 150 characters"),
+      .max(150, "Bio must not exceed 150 characters")
+      .optional()
+      .or(z.literal("")), // optional, allow empty string
     about: z
       .string()
-      .min(10, "Bio must be at least 10 characters")
+      .min(10, "About must be at least 10 characters")
+      .max(500, "About cannot exceed 500 characters")
       .optional()
-      .or(z.literal("")),
-    expectedSalaryMin: z
-      .number()
-      .min(0, "Minimum salary cannot be negative")
-      .optional()
-      .or(z.literal("")),
-    expectedSalaryMax: z
-      .number()
-      .min(0, "Maximum salary cannot be negative")
-      .optional()
-      .or(z.literal("")),
-    desiredRole: z.string().optional(),
-    preferredLocations: z.string().optional(),
+      .or(z.literal("")), // optional, allow empty string
+    expectedSalaryMin: z.preprocess((val) => {
+      if (val === "" || val === null || val === undefined) return undefined;
+      return Number(val);
+    }, z.number().min(0, "Minimum salary cannot be negative").optional()),
+    expectedSalaryMax: z.preprocess((val) => {
+      if (val === "" || val === null || val === undefined) return undefined;
+      return Number(val);
+    }, z.number().min(0, "Maximum salary cannot be negative").optional()),
+    desiredRole: z.string().optional().or(z.literal("")),
+    preferredLocations: z.string().optional().or(z.literal("")),
     portfolioUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
-    openToWork: z.boolean(),
-    jobType: z.string().optional(),
-    profile_path: z.string().optional(),
-    resume_path: z.string().optional(),
+    openToWork: z.boolean().optional(),
+    jobType: z.string().optional().or(z.literal("")),
+    profile_path: z.string().optional().or(z.literal("")),
+    resume_path: z.string().optional().or(z.literal("")),
   })
   .refine(
     (data) =>
@@ -117,9 +124,12 @@ const ProfilePage = () => {
   )?.id;
 
   const onValid = async (data: ProfileFormData) => {
-    if (!jobSeekerProfile?.profile?.auth_id) return;
+    console.log("called");
+    console.log(jobSeekerProfile);
+    if (!jobSeekerProfile?.auth_id) return;
 
     setIsSubmitting(true);
+    console.log("called");
 
     try {
       let profileUrl: string | undefined;
@@ -135,7 +145,7 @@ const ProfilePage = () => {
           const result = await uploadImage({
             bucketName: "job_seeker_profile",
             file: profileFile,
-            currentFilePath: profile?.profile_path || undefined,
+            currentFilePath: jobSeekerProfile?.profile_path || undefined,
           });
 
           if (result.success) {
@@ -160,7 +170,7 @@ const ProfilePage = () => {
           const result = await uploadImage({
             bucketName: "resumes",
             file: resumeFile,
-            currentFilePath: profile?.resume_path || undefined,
+            currentFilePath: jobSeekerProfile?.resume_path || undefined,
           });
 
           if (result.success) {
@@ -186,10 +196,8 @@ const ProfilePage = () => {
         portfolio_url: data.portfolioUrl?.trim(),
         open_to_work: data.openToWork,
         preferred_job_type: data.jobType,
-        profile_url:
-          profileUrl || jobSeekerProfile.profile.profile_url || undefined,
-        resume_url:
-          resumeUrl || jobSeekerProfile.profile.resume_url || undefined,
+        profile_url: profileUrl || jobSeekerProfile.profile_url || undefined,
+        resume_url: resumeUrl || jobSeekerProfile.resume_url || undefined,
         profile_path: profilePath || "",
         resume_path: resumePath || "",
         experience: experiences.length
@@ -200,6 +208,7 @@ const ProfilePage = () => {
           : null,
         skills: skills.length ? skills : [],
       };
+      console.log("called");
 
       await saveProfile(payload, {
         onSuccess: () => {
@@ -251,6 +260,8 @@ const ProfilePage = () => {
   }, [jobSeekerProfile, editMode, form]);
 
   const onInvalid = (errors: any) => {
+    console.log("errors:", errors);
+
     const firstError = Object.values(errors)[0] as any;
     if (firstError?.message) {
       toast.error(firstError.message);

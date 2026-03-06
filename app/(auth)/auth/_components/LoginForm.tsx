@@ -14,8 +14,8 @@ import { loginUser } from "@/lib/action/auth.actions";
 import { createClient } from "@/lib/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Chrome, Github } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
@@ -41,6 +41,8 @@ export function LoginForm() {
     "job_seeker",
   );
   const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+
   const router = useRouter();
   const jobSeekerForm = useForm<JobSeekerFormData>({
     resolver: zodResolver(jobSeekerSchema),
@@ -61,6 +63,7 @@ export function LoginForm() {
     activeTab === "job_seeker"
       ? "/job-seeker/dashboard"
       : "/employer/dashboard";
+
   const onJobSeekerSubmit = async (data: JobSeekerFormData) => {
     try {
       setIsLoading(true);
@@ -102,10 +105,23 @@ export function LoginForm() {
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.origin}/auth/callback?next=${path}`,
+        redirectTo: `${window.origin}/auth/callback?role=${activeTab}&next=${path}`,
       },
     });
   };
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error === "role_mismatch") {
+      // Show toast
+      toast.error(
+        "This email is registered with a different account type. Please login with the correct tab.",
+      );
+
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, "", cleanUrl);
+    }
+  }, [searchParams]);
 
   return (
     <div className="w-full max-w-md">

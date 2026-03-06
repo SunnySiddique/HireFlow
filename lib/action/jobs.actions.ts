@@ -15,6 +15,7 @@ export async function getJobPostBySlug(jobSlug: string) {
         `*,
         employer:employer_id(
       id,
+      slug,
       company_name,
       company_logo_url,
       website,

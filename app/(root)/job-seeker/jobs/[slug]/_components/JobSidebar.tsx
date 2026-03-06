@@ -15,6 +15,7 @@ import {
   Wifi,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRef } from "react";
 import { AnimatedSection, fadeUp, stagger } from "./animation";
 
@@ -57,10 +58,10 @@ const JobSidebar = ({ job }: { job: Job }) => {
     margin: "-40px",
   });
 
-  const categoryLabel = formatLabel(job.category);
-  const employmentLabel = formatLabel(job.employment_type);
-  const remoteLabel = formatLabel(job.remote_option);
-  const expLabel = formatLabel(job.experience_level);
+  const categoryLabel = formatLabel(job.category as string);
+  const employmentLabel = formatLabel(job.employment_type as string);
+  const remoteLabel = formatLabel(job.remote_option as string);
+  const expLabel = formatLabel(job.experience_level as string);
 
   return (
     <>
@@ -106,7 +107,7 @@ const JobSidebar = ({ job }: { job: Job }) => {
                 <OverviewRow
                   icon={MapPin}
                   label="Location"
-                  value={job.location}
+                  value={job.location as string}
                   delay={4}
                 />
                 <OverviewRow
@@ -138,27 +139,29 @@ const JobSidebar = ({ job }: { job: Job }) => {
                 About the Company
               </h3>
               <div className="flex items-center gap-3 mb-4">
-                <Avatar className="h-12 w-12 rounded-lg">
-                  {job.employer.company_logo_url ? (
-                    <Image
-                      src={job.employer.company_logo_url}
-                      alt={job.employer.company_name}
-                      fill
-                      sizes="56px"
-                      className="object-contain "
-                    />
-                  ) : (
-                    <AvatarFallback className="rounded-lg text-white font-bold">
-                      {getInitials(job.employer.company_name)}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
+                <Link href={`/company/${job?.employer?.slug}`}>
+                  <Avatar className="h-12 w-12 rounded-lg">
+                    {job?.employer?.company_logo_url ? (
+                      <Image
+                        src={job.employer.company_logo_url}
+                        alt={job.employer.company_name}
+                        fill
+                        sizes="56px"
+                        className="object-contain "
+                      />
+                    ) : (
+                      <AvatarFallback className="rounded-lg text-white font-bold">
+                        {getInitials(job.employer.company_name)}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                </Link>
                 <div>
                   <h4 className="font-semibold text-foreground">
-                    {job.employer.company_name}
+                    {job?.employer?.company_name}
                   </h4>
                   <a
-                    href={job.employer.website}
+                    href={job?.employer?.website}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-primary hover:underline flex items-center gap-1"
@@ -169,7 +172,7 @@ const JobSidebar = ({ job }: { job: Job }) => {
                 </div>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                {job.employer.description}
+                {job?.employer?.description}
               </p>
             </Card>
           </AnimatedSection>

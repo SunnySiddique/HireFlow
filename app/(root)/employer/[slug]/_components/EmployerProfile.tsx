@@ -152,7 +152,6 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
   };
 
   const isSaving = isEmployerProfleUpdating || isLogoUploading;
-  console.log("emp:", employerProfile);
 
   useEffect(() => {
     if (employerProfile) {
