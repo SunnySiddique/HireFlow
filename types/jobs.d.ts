@@ -26,6 +26,7 @@ export type JobFormValues = z.infer<typeof jobFormSchema>;
 
 type Employer = {
   id: string;
+  slug: string;
   company_logo_url: string;
   company_name: string;
   website: string;

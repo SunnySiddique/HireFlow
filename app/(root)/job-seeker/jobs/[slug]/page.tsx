@@ -5,7 +5,6 @@ import JobDetailClient from "../../../../../components/jobs/JobDetailClient";
 interface JobDetailsPageProps {
   params: Promise<{ slug: string }>;
 }
-//TODO after done the jobseeker detail page fix the employer job detail
 
 const JobDetailsPage = async ({ params }: JobDetailsPageProps) => {
   const { slug } = await params;
