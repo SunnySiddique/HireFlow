@@ -103,3 +103,27 @@ export interface JobWithEmployer {
     company_logo_url?: string | null;
   } | null;
 }
+
+// employer applicant type
+export type Seeker = {
+  id: string;
+  email: string;
+  full_name: string;
+  profile_url: string;
+  resume_url: string;
+};
+
+export type Job = {
+  id: string;
+  job_title: string;
+};
+
+export type ApplicantType = {
+  id: string;
+  status: "pending" | "reviewing" | "shortlisted" | "rejected" | "accepted";
+  applied_at: string;
+  cover_letter: string | null;
+  employer_notes: string | null;
+  job: Job;
+  seeker: Seeker;
+};

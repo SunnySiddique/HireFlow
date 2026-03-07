@@ -185,6 +185,30 @@ export async function deleteJobPost(jobSlug: string) {
   }
 }
 
+// update applicant status and employer_notes
+export async function updateApplicantStatus(
+  applicantId: string,
+  status: string,
+  employer_notes: string,
+) {
+  try {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+      .from("applicants")
+      .update({ status, employer_notes })
+      .eq("id", applicantId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error("Error in updateApplicantStatus:", error);
+    throw new Error("Failed to execute updateApplicantStatus");
+  }
+}
+
 // Apply job for job seeker
 export async function applyJob(jobId: string, coverLetter: string) {
   try {
@@ -218,6 +242,7 @@ export async function applyJob(jobId: string, coverLetter: string) {
   }
 }
 
+// save job for job seeker
 export async function savedJob(jobId: string) {
   try {
     const supabase = await createClient();

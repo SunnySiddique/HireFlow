@@ -1,6 +1,5 @@
 "use client";
 
-import DashboardQuickActions from "./_components/DashboardQuickActions";
 import DashboardStats from "./_components/DashboardStats";
 import ProfileCompletion from "./_components/ProfileCompletion";
 import RecentApplications from "./_components/RecentApplications";
@@ -34,11 +33,6 @@ const JobSeekerDashboardPage = () => {
           {/* Profile Completion */}
           <section>
             <ProfileCompletion />
-          </section>
-
-          {/* Quick Actions */}
-          <section>
-            <DashboardQuickActions />
           </section>
         </div>
       </div>

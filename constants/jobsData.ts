@@ -41,8 +41,13 @@ export const appStatusConfig: Record<
     className:
       "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/30 dark:text-yellow-400 dark:border-yellow-800",
   },
-  reviewed: {
-    label: "Reviewed",
+  reviewing: {
+    label: "reviewing",
+    className:
+      "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800",
+  },
+  shortlisted: {
+    label: "shortlisted",
     className:
       "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800",
   },

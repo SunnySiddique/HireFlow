@@ -10,7 +10,9 @@ import {
 } from "@/lib/utils";
 import { Bookmark, Building2, Clock, Loader, MapPin, Wifi } from "lucide-react";
 import Link from "next/link";
+import EmptyState from "./EmptyState";
 
+//TODO complete the emlpoyer dahsboard and show the job-seeker profile form employer view
 const RecommendedJobs = () => {
   const { data: recommendedJobs = [], isLoading } = useRecommandedJobs();
 
@@ -18,11 +20,11 @@ const RecommendedJobs = () => {
 
   return (
     <>
-      {recommendedJobs.length > 0 && (
+      {recommendedJobs.length > 0 ? (
         <>
           <div className="flex items-center justify-between mb-4 lg:mb-6">
             <h2 className="text-base lg:text-lg font-bold text-foreground">
-              Recommended Jobs
+              Recommended Jobs {recommendedJobs.length}
             </h2>
             <Link
               href="/job-seeker/jobs"
@@ -144,6 +146,8 @@ const RecommendedJobs = () => {
             })}
           </div>
         </>
+      ) : (
+        <EmptyState msg={"Recommended"} />
       )}
     </>
   );

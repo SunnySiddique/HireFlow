@@ -18,6 +18,7 @@ import {
   MapPin,
 } from "lucide-react";
 import Link from "next/link";
+import EmptyState from "./EmptyState";
 
 const applications = [
   {
@@ -85,11 +86,11 @@ const RecentApplications = () => {
   if (isLoading) return <Loader />;
   return (
     <>
-      {jobs.length > 0 && (
+      {jobs.length > 0 ? (
         <>
           <div className="flex items-center justify-between mb-4 lg:mb-6">
             <h2 className="text-base lg:text-lg font-bold text-foreground">
-              Recent Applications
+              Recent Applications {jobs.length}
             </h2>
             <Link
               href="/job-seeker/jobs"
@@ -195,6 +196,8 @@ const RecentApplications = () => {
             })}
           </Card>
         </>
+      ) : (
+        <EmptyState msg={"Recent"} />
       )}
     </>
   );
