@@ -3,6 +3,7 @@ import {
   CreateJobPost,
   deleteJobPost,
   savedJob,
+  updateApplicantStatus,
   updateJobPost,
   updateJobStatus,
 } from "@/lib/action/jobs.actions";
@@ -94,38 +95,70 @@ export const useDeleteJob = () => {
   });
 };
 
-// // get applicants
-// export const useGetAllApplicatns = (empId: string) => {
-//   return useQuery({
-//     queryKey: ["allApplicants"],
-//     queryFn: async () => {
-//       const supabase = createClient();
+// get employer all applicants
+export const useGetAllApplicants = () => {
+  return useQuery({
+    queryKey: ["allApplicants"],
+    queryFn: async () => {
+      const supabase = createClient();
 
-//       const { data, error } = await supabase
-//         .from("applicants")
-//         .select(
-//           `
-//           id,
-//           status,
-//           applied_at,
-//           jobs:!inner(
-//           id,
-//           title,
-//           employer_id
-//           ),
-//           job_seekers(
-//           id,
-//           full_name,
-//           email
-//           )
-//           `,
-//         )
-//         .eq("jobs.employer_id", empId)
-//         .order("applied_at", { ascending: false });
-//     },
-//     enabled: !!empId,
-//   });
-// };
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const { data: employer, error: empError } = await supabase
+        .from("employers")
+        .select("id")
+        .eq("auth_id", user.id)
+        .single();
+
+      if (empError) throw empError;
+
+      const { data, error } = await supabase
+        .from("applicants")
+        .select(
+          `
+          id,
+          status,
+          applied_at,
+          cover_letter,
+          employer_notes,
+          job:job_id(id, job_title),
+          seeker:user_id(id, full_name, email, profile_url, resume_url)
+        `,
+        )
+        .eq("employer_id", employer.id)
+        .order("applied_at", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+};
+
+// update applicant status and employer_notes
+export const useUpdateApplicantStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      applicantId,
+      status,
+      employer_notes,
+    }: {
+      applicantId: string;
+      status: string;
+      employer_notes: string;
+    }) => updateApplicantStatus(applicantId, status, employer_notes),
+    onSuccess: () => {
+      invalidateQuery(queryClient, ["allApplicants"]);
+    },
+    onError: (error: any) => {
+      toast.error("Failed to update applicant status:", error);
+    },
+  });
+};
 
 // get all jobs for jobseeker
 export const useGetAllJobsForJobSeeker = (filters: JobFiltersType) => {
