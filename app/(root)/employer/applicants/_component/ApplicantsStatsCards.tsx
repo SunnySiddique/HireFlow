@@ -1,8 +1,13 @@
 import { Card } from "@/components/ui/card";
+import { ApplicantType } from "@/types/jobs";
 
 import { CheckCircle, Clock, Users, XCircle } from "lucide-react";
 
-const ApplicantsStatsCards = ({ applicants }: { applicants: any }) => {
+const ApplicantsStatsCards = ({
+  applicants,
+}: {
+  applicants: ApplicantType[];
+}) => {
   const stats = [
     {
       label: "Total Applicants",
@@ -12,19 +17,23 @@ const ApplicantsStatsCards = ({ applicants }: { applicants: any }) => {
     },
     {
       label: "Pending",
-      value: applicants.filter((a) => a.status === "Pending").length,
+      value: applicants.filter((applicant) => applicant.status === "pending")
+        .length,
       icon: <Clock className="w-5 h-5" />,
       color: "text-secondary",
     },
     {
       label: "Shortlisted",
-      value: applicants.filter((a) => a.status === "Shortlisted").length,
+      value: applicants.filter(
+        (applicant) => applicant.status === "shortlisted",
+      ).length,
       icon: <CheckCircle className="w-5 h-5" />,
       color: "text-primary",
     },
     {
       label: "Rejected",
-      value: applicants.filter((a) => a.status === "Rejected").length,
+      value: applicants.filter((applicant) => applicant.status === "rejected")
+        .length,
       icon: <XCircle className="w-5 h-5" />,
       color: "text-destructive",
     },
