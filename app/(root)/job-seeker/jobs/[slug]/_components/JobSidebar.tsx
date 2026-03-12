@@ -139,19 +139,19 @@ const JobSidebar = ({ job }: { job: Job }) => {
                 About the Company
               </h3>
               <div className="flex items-center gap-3 mb-4">
-                <Link href={`/company/${job?.employer?.slug}`}>
+                <Link href={`/profile/company/${job?.employer?.slug}`}>
                   <Avatar className="h-12 w-12 rounded-lg">
                     {job?.employer?.company_logo_url ? (
                       <Image
-                        src={job.employer.company_logo_url}
-                        alt={job.employer.company_name}
+                        src={job?.employer?.company_logo_url}
+                        alt={job?.employer?.company_name}
                         fill
                         sizes="56px"
                         className="object-contain "
                       />
                     ) : (
                       <AvatarFallback className="rounded-lg text-white font-bold">
-                        {getInitials(job.employer.company_name)}
+                        {getInitials(job?.employer?.company_name)}
                       </AvatarFallback>
                     )}
                   </Avatar>

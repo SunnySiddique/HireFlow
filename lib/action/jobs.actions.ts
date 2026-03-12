@@ -265,7 +265,7 @@ export async function savedJob(jobId: string) {
     if (profileError || !jobSeeker)
       throw new Error("Job seeker profile not found");
 
-    const { data, error } = await supabase.rpc("toggle_saved_job", {
+    const { error } = await supabase.rpc("toggle_saved_job", {
       p_user_id: jobSeeker.id,
       p_job_id: jobId,
     });
@@ -280,5 +280,21 @@ export async function savedJob(jobId: string) {
   } catch (error) {
     console.error("Error in savedJob:", error);
     throw new Error("Failed to execute savedJob");
+  }
+}
+
+// update archive field
+export async function archiveApplicant(appId: string, isArchived: boolean) {
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("applicants")
+      .update({ archived: isArchived })
+      .eq("id", appId);
+
+    if (error) throw new Error(error.message);
+  } catch (error) {
+    console.error("Error in archiveApplicant:", error);
+    throw new Error("Failed to execute archiveApplicant");
   }
 }

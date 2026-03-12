@@ -20,6 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useUpdateApplicantStatus } from "@/hooks/useJobs";
 import { formatDate, getInitials } from "@/lib/utils";
 import { ApplicantType } from "@/types/jobs";
+import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -207,13 +208,20 @@ const ApplicantDialog = ({
         </div>
 
         <DialogFooter className="gap-2 flex-col sm:flex sm:gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setIsOpen(false)}
-            className="w-full sm:w-1/2"
+          <a
+            href={`/profile/job-seeker/${applicant.seeker?.slug || ""}`}
+            target="_blank"
+            className="w-full"
           >
-            Cancel
-          </Button>
+            <Button
+              variant="outline"
+              className="w-full text-primary hover:text-primary/80"
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              View Full Profile
+            </Button>
+          </a>
+
           <Button
             onClick={handleUpdateApplicant}
             className="w-full sm:w-1/2 bg-primary hover:bg-primary/90 text-primary-foreground"

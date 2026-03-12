@@ -54,6 +54,9 @@ export async function updateSession(request: NextRequest) {
     else userRole = undefined; // User exists but has no role
   }
 
+  // Check if route is a public profile route (accessible to everyone)
+  const isPublicProfileRoute = pathname.startsWith("/profile/");
+
   // 1️⃣ Logged-in users should not access auth pages or home
   if (user && isAuthRoute) {
     const redirectPath =
@@ -65,7 +68,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // 2️⃣ Unauthenticated users cannot access protected routes
+  // 2️⃣ Unauthenticated users cannot access protected routes (but can access public profiles)
   if (!user && (isJobSeekerRoute || isEmployerRoute)) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/signin";
@@ -79,8 +82,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // 4️⃣ Role-based route protection
-  if (user && userRole) {
+  // 4️⃣ Role-based route protection (skip public profile routes)
+  if (user && userRole && !isPublicProfileRoute) {
     // Job seeker trying to access employer routes
     if (isEmployerRoute && userRole !== "employer") {
       const url = request.nextUrl.clone();

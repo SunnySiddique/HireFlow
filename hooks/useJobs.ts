@@ -1,5 +1,6 @@
 import {
   applyJob,
+  archiveApplicant,
   CreateJobPost,
   deleteJobPost,
   savedJob,
@@ -124,8 +125,9 @@ export const useGetAllApplicants = () => {
           applied_at,
           cover_letter,
           employer_notes,
+          archived,
           job:job_id(id, job_title),
-          seeker:user_id(id, full_name, email, profile_url, resume_url)
+          seeker:user_id(id, full_name, email, profile_url, resume_url, slug)
         `,
         )
         .eq("employer_id", employer.id)
@@ -133,6 +135,23 @@ export const useGetAllApplicants = () => {
 
       if (error) throw error;
       return data;
+    },
+  });
+};
+
+// update archive
+export const useArchiveApplicant = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      applicationId,
+      isArchived,
+    }: {
+      applicationId: string;
+      isArchived: boolean;
+    }) => archiveApplicant(applicationId, isArchived),
+    onSuccess: () => {
+      invalidateQuery(queryClient, ["allApplicants"]);
     },
   });
 };

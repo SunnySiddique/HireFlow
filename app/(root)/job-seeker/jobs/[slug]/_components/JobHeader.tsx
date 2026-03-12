@@ -91,9 +91,9 @@ const HeaderCard = ({ job }: { job: Job }) => {
                 className="flex flex-wrap gap-2 mb-4"
               >
                 {[
-                  formatLabel(job.category),
-                  formatLabel(job.employment_type),
-                  formatLabel(job.experience_level),
+                  formatLabel(job.category as string),
+                  formatLabel(job.employment_type as string),
+                  formatLabel(job.experience_level as string),
                 ].map((b) => (
                   <motion.div key={b} variants={fadeUp}>
                     <Badge className="bg-background border border-border text-muted-foreground rounded-sm hover:border-primary/40 transition-colors">
@@ -105,7 +105,7 @@ const HeaderCard = ({ job }: { job: Job }) => {
                   <Badge
                     className={`rounded-sm ${job.status === "open" ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-muted border border-border text-muted-foreground"}`}
                   >
-                    {formatLabel(job.status)}
+                    {formatLabel(job.status as string)}
                   </Badge>
                 </motion.div>
               </motion.div>
@@ -121,15 +121,15 @@ const HeaderCard = ({ job }: { job: Job }) => {
                   {
                     icon: DollarSign,
                     text: formatSalary(
-                      job.salary_min,
-                      job.salary_max,
-                      job.currency,
+                      job.salary_min as number,
+                      job.salary_max as number,
+                      job.currency as string,
                     ),
                   },
                   { icon: Users, text: `${job.open_positions} open positions` },
                   {
                     icon: CalendarX,
-                    text: `Deadline: ${formatDeadline(job.application_deadline)}`,
+                    text: `Deadline: ${formatDeadline(job.application_deadline as string)}`,
                   },
                 ].map(({ icon: Icon, text }) => (
                   <motion.div
@@ -152,11 +152,14 @@ const HeaderCard = ({ job }: { job: Job }) => {
               className="flex gap-2 flex-shrink-0 h-fit"
             >
               {isApplied ? (
-                <Button variant={"outline"}>Applied</Button>
+                <Button disabled variant={"outline"}>
+                  Applied
+                </Button>
               ) : (
                 <Button
                   className="bg-primary text-primary-foreground"
                   onClick={() => setOpen(true)}
+                  disabled={isApplying}
                 >
                   Apply Now
                 </Button>
