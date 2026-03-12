@@ -65,6 +65,7 @@ interface JobCardProps {
   href?: string;
 }
 
+
 const statusStyle: Record<string, string> = {
   open: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800",
   closed: "bg-muted text-muted-foreground border-border",

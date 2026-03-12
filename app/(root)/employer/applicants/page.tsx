@@ -1,87 +1,35 @@
 "use client";
 
 import Loader from "@/components/Loader";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useGetAllApplicants } from "@/hooks/useJobs";
+import { useState } from "react";
 import ApplicantsSearchBar from "./_component/ApplicantsSearchBar";
 import ApplicantsStatsCards from "./_component/ApplicantsStatsCards";
 import ApplicantsTable from "./_component/ApplicantsTable";
 
-// Mock data
-const mockApplicants = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    email: "sarah.johnson@email.com",
-    jobTitle: "Senior Frontend Developer",
-    appliedDate: "2024-02-20",
-    status: "Shortlisted",
-    avatar: "SJ",
-    gradient: "from-blue-400 to-blue-600",
-    resumeUrl: "#",
-    coverLetter:
-      "I am excited to apply for the Senior Frontend Developer position. With 5+ years of experience in React and modern web technologies...",
-    notes: "Strong portfolio, excellent communication skills",
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    email: "michael.chen@email.com",
-    jobTitle: "Product Manager",
-    appliedDate: "2024-02-19",
-    status: "Reviewing",
-    avatar: "MC",
-    gradient: "from-green-400 to-green-600",
-    resumeUrl: "#",
-    coverLetter:
-      "I bring 7 years of product management experience at leading tech companies...",
-    notes: "Good background, needs technical skills assessment",
-  },
-  {
-    id: 3,
-    name: "Emily Rodriguez",
-    email: "emily.rodriguez@email.com",
-    jobTitle: "UX/UI Designer",
-    appliedDate: "2024-02-18",
-    status: "Pending",
-    avatar: "ER",
-    gradient: "from-purple-400 to-purple-600",
-    resumeUrl: "#",
-    coverLetter:
-      "Passionate designer with expertise in user-centered design...",
-    notes: "",
-  },
-  {
-    id: 4,
-    name: "David Park",
-    email: "david.park@email.com",
-    jobTitle: "Senior Frontend Developer",
-    appliedDate: "2024-02-17",
-    status: "Rejected",
-    avatar: "DP",
-    gradient: "from-orange-400 to-orange-600",
-    resumeUrl: "#",
-    coverLetter:
-      "Experienced developer with 3 years in JavaScript frameworks...",
-    notes: "Limited experience with required tech stack",
-  },
-  {
-    id: 5,
-    name: "Lisa Wang",
-    email: "lisa.wang@email.com",
-    jobTitle: "Backend Engineer",
-    appliedDate: "2024-02-16",
-    status: "Shortlisted",
-    avatar: "LW",
-    gradient: "from-pink-400 to-pink-600",
-    resumeUrl: "#",
-    coverLetter:
-      "Backend specialist with expertise in Node.js and databases...",
-    notes: "Great problem-solving skills, strong system design knowledge",
-  },
-];
-
 const ApplicantsPage = () => {
+  const [filters, setFilters] = useState({
+    search: "",
+    status: "all",
+  });
+  const debouncedSearch = useDebounce(filters.search, 500);
+
   const { data: applicants, isLoading } = useGetAllApplicants();
+
+  const filteredApplicants = applicants?.filter((applicant) => {
+    const search = debouncedSearch.toLowerCase();
+
+    const searchFilter =
+      applicant.seeker?.full_name?.toLowerCase().includes(search) ||
+      applicant.job?.job_title?.toLowerCase().includes(search);
+
+    const statusFilter =
+      filters.status === "all" ||
+      applicant.status?.toLowerCase() === filters.status.toLowerCase();
+
+    return searchFilter && statusFilter;
+  });
 
   if (isLoading) return <Loader />;
 
@@ -99,17 +47,17 @@ const ApplicantsPage = () => {
         </div>
 
         {/* Search and Filter Bar */}
-        <ApplicantsSearchBar />
+        <ApplicantsSearchBar filters={filters} setFilters={setFilters} />
       </div>
 
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto bg-background">
         <div className="p-3 sm:p-4 md:p-5 lg:p-6 space-y-4 sm:space-y-6">
           {/* Stats Cards */}
-          <ApplicantsStatsCards applicants={mockApplicants} />
+          <ApplicantsStatsCards applicants={applicants} />
 
           {/* Applicants Table */}
-          <ApplicantsTable applicants={applicants} />
+          <ApplicantsTable applicants={filteredApplicants} />
         </div>
       </div>
     </div>

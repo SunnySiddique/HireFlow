@@ -75,74 +75,78 @@ const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {applicants.map((applicant) => (
-                <TableRow
-                  key={applicant.id}
-                  className="border-b border-border hover:bg-accent/50 transition"
-                >
-                  <TableCell className="py-2 sm:py-3 lg:py-4">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <Avatar className="h-12 w-12 rounded-lg">
-                        {applicant?.seeker?.profile_url ? (
-                          <Image
-                            src={applicant?.seeker?.profile_url}
-                            alt={applicant?.seeker?.full_name}
-                            fill
-                            sizes="56px"
-                            className="object-contain "
-                          />
-                        ) : (
-                          <AvatarFallback className="rounded-lg text-white font-bold">
-                            {getInitials(applicant?.seeker?.full_name)}
-                          </AvatarFallback>
-                        )}
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs sm:text-sm font-medium text-foreground truncate">
-                          {applicant?.seeker?.full_name}
-                        </p>
-                        <p className="text-[10px] sm:text-xs text-muted-foreground truncate hidden xs:block">
-                          {applicant.seeker.email}
-                        </p>
+              {applicants.length > 0 ? (
+                applicants.map((applicant) => (
+                  <TableRow
+                    key={applicant.id}
+                    className="border-b border-border hover:bg-accent/50 transition"
+                  >
+                    <TableCell className="py-2 sm:py-3 lg:py-4">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <Avatar className="h-12 w-12 rounded-lg">
+                          {applicant?.seeker?.profile_url ? (
+                            <Image
+                              src={applicant?.seeker?.profile_url}
+                              alt={applicant?.seeker?.full_name}
+                              fill
+                              sizes="56px"
+                              className="object-contain "
+                            />
+                          ) : (
+                            <AvatarFallback className="rounded-lg text-white font-bold">
+                              {getInitials(applicant?.seeker?.full_name)}
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs sm:text-sm font-medium text-foreground truncate">
+                            {applicant?.seeker?.full_name}
+                          </p>
+                          <p className="text-[10px] sm:text-xs text-muted-foreground truncate hidden xs:block">
+                            {applicant.seeker.email}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm text-foreground hidden sm:table-cell truncate max-w-[120px] sm:max-w-[150px] md:max-w-[200px]">
-                    {applicant.job.job_title}
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm text-muted-foreground hidden md:table-cell whitespace-nowrap">
-                    {formatDate(applicant.applied_at)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      className={`${statusColors[applicant.status.toLowerCase()]} text-[10px] sm:text-xs whitespace-nowrap`}
-                    >
-                      <span className="mr-1">
-                        {statusIcons[applicant.status.toLowerCase()]}
-                      </span>
-                      {applicant.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => {
-                          setSelectedApplicant(applicant);
-                          setIsOpen(true);
-                        }}
+                    </TableCell>
+                    <TableCell className="text-xs sm:text-sm text-foreground hidden sm:table-cell truncate max-w-[120px] sm:max-w-[150px] md:max-w-[200px]">
+                      {applicant.job.job_title}
+                    </TableCell>
+                    <TableCell className="text-xs sm:text-sm text-muted-foreground hidden md:table-cell whitespace-nowrap">
+                      {formatDate(applicant.applied_at)}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        className={`${statusColors[applicant.status.toLowerCase()]} text-[10px] sm:text-xs whitespace-nowrap`}
                       >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+                        <span className="mr-1">
+                          {statusIcons[applicant.status.toLowerCase()]}
+                        </span>
+                        {applicant.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => {
+                            setSelectedApplicant(applicant);
+                            setIsOpen(true);
+                          }}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <h1>there is no applciant found</h1>
+              )}
             </TableBody>
           </Table>
         </div>

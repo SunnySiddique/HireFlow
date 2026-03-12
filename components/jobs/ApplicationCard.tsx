@@ -22,6 +22,7 @@ const ApplicationCard = ({ app }: { app: any }) => {
   const appStatus =
     appStatusConfig[app.application_status] ?? appStatusConfig.pending;
 
+
   return (
     <Card className="group border border-border bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200 rounded-xl overflow-hidden">
       <div className="p-4 flex flex-col gap-3">
