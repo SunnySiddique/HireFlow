@@ -1,8 +1,11 @@
 "use client";
 
 import Loader from "@/components/Loader";
+import { Button } from "@/components/ui/button";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetAllApplicants } from "@/hooks/useJobs";
+import { exportToExcel } from "@/lib/utils/excel";
+import { Download } from "lucide-react";
 import { useState } from "react";
 import ApplicantsSearchBar from "./_component/ApplicantsSearchBar";
 import ApplicantsStatsCards from "./_component/ApplicantsStatsCards";
@@ -17,7 +20,7 @@ const ApplicantsPage = () => {
 
   const { data: applicants, isLoading } = useGetAllApplicants();
 
-  const filteredApplicants = applicants?.filter((applicant) => {
+  const filteredApplicants = (applicants ?? []).filter((applicant) => {
     const search = debouncedSearch.toLowerCase();
 
     const searchFilter =
@@ -47,7 +50,18 @@ const ApplicantsPage = () => {
         </div>
 
         {/* Search and Filter Bar */}
-        <ApplicantsSearchBar filters={filters} setFilters={setFilters} />
+        <div className="px-3 sm:px-4 md:px-6 lg:px-8 pb-3 sm:pb-4 md:pb-5 lg:pb-6 flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center">
+          <ApplicantsSearchBar filters={filters} setFilters={setFilters} />
+
+          <Button
+            onClick={() => exportToExcel(filteredApplicants)}
+            className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-sm gap-2"
+            disabled={filteredApplicants.length === 0}
+          >
+            <Download className="w-4 h-4" />
+            <span className="sm:hidden md:inline">Export</span>
+          </Button>
+        </div>
       </div>
 
       {/* Main Content */}
