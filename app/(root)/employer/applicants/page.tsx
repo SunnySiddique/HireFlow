@@ -2,6 +2,7 @@
 
 import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetAllApplicants } from "@/hooks/useJobs";
 import { exportToExcel } from "@/lib/utils/excel";
@@ -16,6 +17,7 @@ const ApplicantsPage = () => {
     search: "",
     status: "all",
   });
+  const [activeTab, setActiveTab] = useState("active");
   const debouncedSearch = useDebounce(filters.search, 500);
 
   const { data: applicants, isLoading } = useGetAllApplicants();
@@ -31,7 +33,12 @@ const ApplicantsPage = () => {
       filters.status === "all" ||
       applicant.status?.toLowerCase() === filters.status.toLowerCase();
 
-    return searchFilter && statusFilter;
+    const archivedFilter =
+      activeTab === "active"
+        ? !(applicant as any).archived
+        : (applicant as any).archived;
+
+    return searchFilter && statusFilter && archivedFilter;
   });
 
   if (isLoading) return <Loader />;
@@ -67,11 +74,32 @@ const ApplicantsPage = () => {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto bg-background">
         <div className="p-3 sm:p-4 md:p-5 lg:p-6 space-y-4 sm:space-y-6">
-          {/* Stats Cards */}
-          <ApplicantsStatsCards applicants={applicants} />
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="active">Active Applicants</TabsTrigger>
+              <TabsTrigger value="archived">Archived</TabsTrigger>
+            </TabsList>
 
-          {/* Applicants Table */}
-          <ApplicantsTable applicants={filteredApplicants} />
+            <TabsContent value="active" className="space-y-4 sm:space-y-6">
+              {/* Stats Cards */}
+              <ApplicantsStatsCards applicants={filteredApplicants} />
+
+              {/* Applicants Table */}
+              <ApplicantsTable applicants={filteredApplicants} />
+            </TabsContent>
+
+            <TabsContent value="archived" className="space-y-4 sm:space-y-6">
+              {/* Stats Cards */}
+              <ApplicantsStatsCards applicants={filteredApplicants} />
+
+              {/* Applicants Table */}
+              <ApplicantsTable applicants={filteredApplicants} />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

@@ -3,6 +3,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Table,
   TableBody,
   TableCell,
@@ -10,12 +17,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useArchiveApplicant } from "@/hooks/useJobs";
 import { formatDate, getInitials } from "@/lib/utils";
 import { ApplicantType } from "@/types/jobs";
 import {
+  Archive,
   CheckCircle,
   Clock,
   Eye,
+  Inbox,
   MoreVertical,
   Users,
   XCircle,
@@ -41,9 +51,14 @@ const statusIcons: Record<string, React.ReactNode> = {
 };
 
 const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
+  const { mutate: archiveApplicant } = useArchiveApplicant();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedApplicant, setSelectedApplicant] =
     useState<ApplicantType | null>(null);
+
+  const handleArchive = (applicantId: string, isArchived: boolean) => {
+    archiveApplicant({ applicationId: applicantId, isArchived });
+  };
 
   return (
     <>
@@ -137,15 +152,57 @@ const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 hover:bg-destructive/10"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleArchive(applicant.id, !applicant.archived)
+                              }
+                              className="flex items-center gap-2 cursor-pointer"
+                            >
+                              <Archive className="w-4 h-4" />
+                              <span>
+                                {applicant.archived ? "Unarchive" : "Archive"}
+                              </span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-xs text-muted-foreground cursor-default">
+                              More options coming soon
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
-                <h1>there is no applciant found</h1>
+                <TableRow>
+                  <TableCell colSpan={5} className="h-64">
+                    <div className="flex flex-col items-center justify-center h-full gap-4">
+                      <div className="rounded-full bg-muted p-4">
+                        <Inbox className="w-8 h-8 text-muted-foreground" />
+                      </div>
+                      <div className="text-center space-y-2">
+                        <h3 className="text-lg font-semibold text-foreground">
+                          No Applicants Found
+                        </h3>
+                        <p className="text-sm text-muted-foreground max-w-xs">
+                          There are no applicants yet. When candidates apply to
+                          your jobs, they will appear here.
+                        </p>
+                      </div>
+                    </div>
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>
