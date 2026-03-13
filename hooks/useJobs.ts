@@ -223,7 +223,8 @@ export const useActiveJobs = () => {
         `,
         )
         .eq("employer_id", empProfile.id)
-        .eq("status", "open");
+        .eq("status", "open")
+        .limit(5);
 
       if (error) throw error;
       return data;
@@ -267,11 +268,68 @@ export const useRecentApplicants = () => {
           `,
         )
         .eq("employer_id", empProfile.id)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(5);
 
       if (error) throw error;
 
       return data;
+    },
+  });
+};
+
+export const useChartApplicants = () => {
+  return useQuery({
+    queryKey: ["chartApplicants"],
+    queryFn: async () => {
+      const supabase = createClient();
+
+      // 1. Get authenticated user
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        throw new Error("User not found");
+      }
+
+      // 2. Get employer profile
+      const { data: empProfile, error: empError } = await supabase
+        .from("employers")
+        .select("id")
+        .eq("auth_id", user.id)
+        .maybeSingle();
+
+      if (empError || !empProfile) {
+        throw new Error("Employer profile not found");
+      }
+
+      // 3. Get all applicants for this employer
+      const { data, error } = await supabase
+        .from("applicants")
+        .select("applied_at")
+        .eq("employer_id", empProfile.id);
+
+      if (error) throw error;
+
+      // 4. Create weekday counters
+      const counts = [0, 0, 0, 0, 0, 0, 0];
+
+      data?.forEach((app) => {
+        const day = new Date(app.applied_at).getDay(); //2
+        counts[day]++;
+      });
+
+      // 5. Convert to chart structure
+      const labels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+      const chartData = labels.map((day, i) => ({
+        day,
+        applicants: counts[i],
+      }));
+
+      return chartData;
     },
   });
 };
