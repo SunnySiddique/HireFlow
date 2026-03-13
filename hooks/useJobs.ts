@@ -19,6 +19,8 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
+// ---- EMPLOHYER ----
+
 export const useGetEmployerJobs = (empId: string) => {
   return useQuery({
     queryKey: ["getEmployerJobs", empId],
@@ -85,10 +87,11 @@ export const useUpdateJobStatus = () => {
 export const useDeleteJob = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (jobSlug: string) => deleteJobPost(jobSlug),
+    mutationFn: (jobId: string) => deleteJobPost(jobId),
     onSuccess: () => {
       toast.success("Job deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["getEmployerJobs"] });
+      invalidateQuery(queryClient, ["getEmployerJobs"]);
+      invalidateQuery(queryClient, ["activeJobs"]);
     },
     onError: (error: any) => {
       toast.error("Failed to delete job:", error);
@@ -139,7 +142,7 @@ export const useGetAllApplicants = () => {
   });
 };
 
-// update archive
+// update archive EMPLOYER
 export const useArchiveApplicant = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -156,7 +159,7 @@ export const useArchiveApplicant = () => {
   });
 };
 
-// update applicant status and employer_notes
+// update applicant status and employer_notes EMPLOYER
 export const useUpdateApplicantStatus = () => {
   const queryClient = useQueryClient();
 
@@ -178,6 +181,103 @@ export const useUpdateApplicantStatus = () => {
     },
   });
 };
+
+// active jobs
+
+export const useActiveJobs = () => {
+  return useQuery({
+    queryKey: ["activeJobs"],
+    queryFn: async () => {
+      const supabase = createClient();
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError || !user) {
+        throw new Error("User not found");
+      }
+
+      const { data: empProfile, error: empError } = await supabase
+        .from("employers")
+        .select("id")
+        .eq("auth_id", user?.id)
+        .maybeSingle();
+
+      if (empError || !empProfile) {
+        throw new Error("Employer profile not found");
+      }
+
+      const { data, error } = await supabase
+        .from("jobs")
+        .select(
+          `
+        id,
+        job_title,
+        status,
+        created_at,
+        job_slug,
+        employment_type,
+        remote_option,
+        applicants(count)  
+        `,
+        )
+        .eq("employer_id", empProfile.id)
+        .eq("status", "open");
+
+      if (error) throw error;
+      return data;
+    },
+  });
+};
+
+// recent applicants for employer
+export const useRecentApplicants = () => {
+  return useQuery({
+    queryKey: ["recentApplicants"],
+    queryFn: async () => {
+      const supabase = createClient();
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError || !user) {
+        throw new Error("User not found");
+      }
+
+      const { data: empProfile, error: empError } = await supabase
+        .from("employers")
+        .select("id")
+        .eq("auth_id", user?.id)
+        .maybeSingle();
+
+      if (empError || !empProfile) {
+        throw new Error("Employer profile not found");
+      }
+
+      const { data, error } = await supabase
+        .from("applicants")
+        .select(
+          `
+          id,
+          applied_at,
+          seeker:user_id(full_name, profile_url),
+          job:job_id(job_title)
+          `,
+        )
+        .eq("employer_id", empProfile.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      return data;
+    },
+  });
+};
+// ---- EMPLOHYER ----
+
+// ------- JOB-SEEKER -----
 
 // get all jobs for jobseeker
 export const useGetAllJobsForJobSeeker = (filters: JobFiltersType) => {
@@ -340,6 +440,7 @@ export const useApplyJob = () => {
       if (data === "applied") {
         invalidateQuery(queryClient, ["applicationStats"]);
         invalidateQuery(queryClient, ["getAllApplicants"]);
+        invalidateQuery(queryClient, ["empApplicantionStats"]);
       }
     },
 
@@ -519,9 +620,6 @@ export const useGetRecentJobs = () => {
     queryFn: async () => {
       const supabase = createClient();
 
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
       const { data, error: jobError } = await supabase
         .from("jobs")
         .select(
@@ -543,7 +641,6 @@ export const useGetRecentJobs = () => {
 `,
         )
         .eq("status", "open")
-        .gte("created_at", sevenDaysAgo.toISOString())
         .order("created_at", { ascending: false })
         .limit(4);
 
@@ -598,7 +695,7 @@ export const useRecommandedJobs = () => {
              website
            )`,
         )
-        .neq("status", "closed")
+        .eq("status", "open")
         .overlaps("skills_required", userSkills);
 
       if (jobsError || !jobs) throw new Error("Jobs not found");
@@ -621,3 +718,4 @@ export const useRecommandedJobs = () => {
     },
   });
 };
+// ------- JOB-SEEKER -----

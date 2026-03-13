@@ -153,7 +153,7 @@ export async function updateJobStatus(jobId: string, status: string) {
 }
 
 // Delete job for employer
-export async function deleteJobPost(jobSlug: string) {
+export async function deleteJobPost(jobId: string) {
   try {
     const supabase = await createClient();
     const {
@@ -173,10 +173,7 @@ export async function deleteJobPost(jobSlug: string) {
         success: false,
         error: "You are not authorized to delete job post",
       };
-    const { error } = await supabase
-      .from("jobs")
-      .delete()
-      .eq("job_slug", jobSlug);
+    const { error } = await supabase.from("jobs").delete().eq("id", jobId);
     if (error) return { success: false, error: error.message };
     return { success: true, message: "Job Deleted Successfully" };
   } catch (error) {

@@ -62,9 +62,9 @@ const ManageJobsPage = () => {
   const [jobToDelete, setJobToDelete] = useState<string | null>(null);
   const [jobs, setJobs] = useState<Job[]>(empJobs || []);
 
-  const handleDeleteJob = async (jobSlug: string) => {
-    setJobToDelete(jobSlug);
-    await deleteJobPost(jobSlug, { onSettled: () => setJobToDelete(null) });
+  const handleDeleteJob = async (jobId: string) => {
+    setJobToDelete(jobId);
+    await deleteJobPost(jobId, { onSettled: () => setJobToDelete(null) });
   };
 
   const handleChangeJobStatus = (jobId: string, newStatus: string) => {
@@ -240,7 +240,7 @@ const ManageJobsPage = () => {
                         variant="outline"
                         size="sm"
                         className="flex-1 border-destructive/40 text-destructive hover:bg-destructive/10 hover:border-destructive text-xs transition-colors"
-                        onClick={() => handleDeleteJob(job.job_slug)}
+                        onClick={() => handleDeleteJob(job.id)}
                       >
                         {isDeletingJob && jobToDelete === job.job_slug ? (
                           <LoaderCircle className="w-3.5 h-3.5 animate-spin" />

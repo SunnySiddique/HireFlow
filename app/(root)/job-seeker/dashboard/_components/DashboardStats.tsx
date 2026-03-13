@@ -2,7 +2,7 @@
 
 import Loader from "@/components/Loader";
 import { Card } from "@/components/ui/card";
-import { useGetApplicationStats } from "@/hooks/useDashboard";
+import { useGetJobSeekerApplicationStats } from "@/hooks/useDashboard";
 import {
   Clock,
   EyeIcon,
@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 const DashboardStats = () => {
-  const { data, isLoading } = useGetApplicationStats();
+  const { data, isLoading } = useGetJobSeekerApplicationStats();
   const totalApplications = data?.totalApplications ?? 0;
   const thisWeekApplications = data?.thisWeekApplications ?? 0;
 

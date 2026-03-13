@@ -92,3 +92,12 @@ export const timeAgo = (dateStr: string) => {
     return `${years} year${years > 1 ? "s" : ""} ago`;
   }
 };
+
+// past week
+
+export const pastWeek = () => {
+  const pastWeek = new Date();
+  pastWeek.setDate(pastWeek.getDate() - 7);
+
+  return pastWeek.toISOString();
+};

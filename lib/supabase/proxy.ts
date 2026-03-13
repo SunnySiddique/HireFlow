@@ -21,77 +21,65 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // Get logged-in user from Supabase
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
 
-  const authRoutes = ["/", "/auth/signin", "/auth/signup"];
-  const isAuthRoute = authRoutes.includes(pathname);
+  const isAuthRoute = ["/", "/auth/signin", "/auth/signup"].includes(pathname);
   const isJobSeekerRoute = pathname.startsWith("/job-seeker");
   const isEmployerRoute = pathname.startsWith("/employer");
+  const isProtectedRoute = isJobSeekerRoute || isEmployerRoute;
 
+  // 1️⃣ Unauthenticated users cannot access protected routes
+  if (!user && isProtectedRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/signin";
+    return NextResponse.redirect(url);
+  }
+
+  // 2️⃣ Fetch role only if user is logged in
   let userRole: "job_seeker" | "employer" | undefined;
 
   if (user) {
-    // Fetch the role from your database tables
-    const { data: jobSeekerData, error: jsError } = await supabase
+    const { data: jobSeekerData } = await supabase
       .from("job_seekers")
       .select("id")
       .eq("auth_id", user.id)
       .single();
 
-    const { data: employerData, error: empError } = await supabase
-      .from("employers")
-      .select("id")
-      .eq("auth_id", user.id)
-      .single();
+    if (jobSeekerData) {
+      userRole = "job_seeker";
+    } else {
+      const { data: employerData } = await supabase
+        .from("employers")
+        .select("id")
+        .eq("auth_id", user.id)
+        .single();
 
-    if (jobSeekerData) userRole = "job_seeker";
-    else if (employerData) userRole = "employer";
-    else userRole = undefined; // User exists but has no role
+      if (employerData) userRole = "employer";
+    }
   }
 
-  // Check if route is a public profile route (accessible to everyone)
-  const isPublicProfileRoute = pathname.startsWith("/profile/");
-
-  // 1️⃣ Logged-in users should not access auth pages or home
-  if (user && isAuthRoute) {
-    const redirectPath =
+  // 3️⃣ Logged-in users with a role should not access auth pages
+  if (user && userRole && isAuthRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname =
       userRole === "job_seeker"
         ? "/job-seeker/dashboard"
         : "/employer/dashboard";
-    const url = request.nextUrl.clone();
-    url.pathname = redirectPath;
     return NextResponse.redirect(url);
   }
 
-  // 2️⃣ Unauthenticated users cannot access protected routes (but can access public profiles)
-  if (!user && (isJobSeekerRoute || isEmployerRoute)) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/auth/signin";
-    return NextResponse.redirect(url);
-  }
-
-  // 3️⃣ Users with missing or invalid roles
-  if (user && !userRole) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/auth/signin";
-    return NextResponse.redirect(url);
-  }
-
-  // 4️⃣ Role-based route protection (skip public profile routes)
-  if (user && userRole && !isPublicProfileRoute) {
-    // Job seeker trying to access employer routes
+  // 4️⃣ Role-based route protection
+  if (user && userRole) {
     if (isEmployerRoute && userRole !== "employer") {
       const url = request.nextUrl.clone();
       url.pathname = "/job-seeker/dashboard";
       return NextResponse.redirect(url);
     }
 
-    // Employer trying to access job seeker routes
     if (isJobSeekerRoute && userRole !== "job_seeker") {
       const url = request.nextUrl.clone();
       url.pathname = "/employer/dashboard";
