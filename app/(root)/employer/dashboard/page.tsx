@@ -1,3 +1,5 @@
+"use client";
+
 import JobListings from "./_components/JobListings";
 import QuickActions from "./_components/QuickActions";
 import RecentApplicants from "./_components/RecentApplicants";

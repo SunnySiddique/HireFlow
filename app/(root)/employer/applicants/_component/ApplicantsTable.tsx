@@ -195,7 +195,7 @@ const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
                         <h3 className="text-lg font-semibold text-foreground">
                           No Applicants Found
                         </h3>
-                        <p className="text-sm text-muted-foreground max-w-xs">
+                        <p className="text-sm text-muted-foreground">
                           There are no applicants yet. When candidates apply to
                           your jobs, they will appear here.
                         </p>
