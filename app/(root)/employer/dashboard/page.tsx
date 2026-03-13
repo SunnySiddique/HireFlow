@@ -1,7 +1,6 @@
 "use client";
 
 import JobListings from "./_components/JobListings";
-import QuickActions from "./_components/QuickActions";
 import RecentApplicants from "./_components/RecentApplicants";
 import StatsCard from "./_components/StatsCard";
 import WeeklyApplicationsChart from "./_components/WeeklyApplicationsChart";
@@ -11,15 +10,12 @@ const EmployerDashboardPage = () => {
     <>
       <StatsCard />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-        <JobListings />
+      <JobListings />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8  mt-10">
+        {/* Weekly Applications Chart */}
+        <WeeklyApplicationsChart />
         <RecentApplicants />
       </div>
-      {/* Quick Actions */}
-      <QuickActions />
-
-      {/* Weekly Applications Chart */}
-      <WeeklyApplicationsChart />
     </>
   );
 };
