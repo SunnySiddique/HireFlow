@@ -5,8 +5,6 @@ export const useCompanyProfile = (slug: string) => {
   return useQuery({
     queryKey: ["company", slug],
     queryFn: async () => {
-      console.log("slug", slug);
-
       const supabase = createClient();
       const { data: company, error: companyError } = await supabase
         .from("employers")

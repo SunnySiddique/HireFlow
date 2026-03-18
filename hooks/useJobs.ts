@@ -1,7 +1,7 @@
 import {
   applyJob,
   archiveApplicant,
-  CreateJobPost,
+  createJobPost,
   deleteJobPost,
   savedJob,
   updateApplicantStatus,
@@ -43,15 +43,18 @@ export const useGetEmployerJobs = (empId: string) => {
 export const useCreateJob = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (jobData: jobFormData) => CreateJobPost(jobData),
+    mutationFn: (jobData: jobFormData) => createJobPost(jobData),
 
-    onError: (error: Error | { message?: string; error?: string }) => {
-      console.error("[DEBUG] useCreateJob onError:", error);
-      // Error is already logged, component should handle displaying it
-    },
-    onSuccess: (data) => {
-      console.log("[DEBUG] useCreateJob onSuccess:", data);
+    onSuccess: ({ notified = 0 }) => {
+      toast.success(
+        notified > 0
+          ? `Job posted! ${notified} seekers notified.`
+          : "Job posted!",
+      );
       invalidateQuery(queryClient, ["getEmployerJobs"]);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
     },
   });
 };
@@ -66,8 +69,16 @@ export const useUpdateJob = () => {
       job_slug: string;
       jobData: jobUpdateFormData;
     }) => updateJobPost(job_slug, jobData),
-    onSuccess: () => {
+    onSuccess: ({ notified = 0 }) => {
+      toast.success(
+        notified > 0
+          ? `Job updated! ${notified} new seekers notified.`
+          : "Job updated!",
+      );
       invalidateQuery(queryClient, ["getEmployerJobs"]);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
     },
   });
 };
@@ -278,6 +289,7 @@ export const useRecentApplicants = () => {
   });
 };
 
+// chat week applicants
 export const useChartApplicants = () => {
   return useQuery({
     queryKey: ["chartApplicants"],

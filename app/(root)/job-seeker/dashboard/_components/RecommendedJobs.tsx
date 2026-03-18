@@ -12,7 +12,6 @@ import { Bookmark, Building2, Clock, Loader, MapPin, Wifi } from "lucide-react";
 import Link from "next/link";
 import EmptyState from "./EmptyState";
 
-//TODO complete the emlpoyer dahsboard and show the job-seeker profile form employer view
 const RecommendedJobs = () => {
   const { data: recommendedJobs = [], isLoading } = useRecommandedJobs();
 

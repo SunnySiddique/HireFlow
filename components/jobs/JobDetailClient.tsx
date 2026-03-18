@@ -1,7 +1,10 @@
 "use client";
 
+import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
 import { useGetSimilarJobs } from "@/hooks/useJobs";
+import { useTrackJobView } from "@/hooks/useViews";
 import { Job } from "@/types/jobs";
+import { useEffect } from "react";
 import { AnimatedSection } from "../../app/(root)/job-seeker/jobs/[slug]/_components/animation";
 import JobDetailContent from "../../app/(root)/job-seeker/jobs/[slug]/_components/JobDetailContent";
 import HeaderCard from "../../app/(root)/job-seeker/jobs/[slug]/_components/JobHeader";
@@ -11,6 +14,15 @@ import JobCard from "./JobCard";
 
 const JobDetailClient = ({ job }: { job: Job }) => {
   const { data: similarJobs = [], isLoading } = useGetSimilarJobs(job.id);
+  const { data: currentUser } = useGetCurrentUser();
+  const { mutate: trackView } = useTrackJobView();
+
+  useEffect(() => {
+    if (!job?.id) return;
+    if (!currentUser) return;
+
+    trackView(job.id);
+  }, [job?.id]);
 
   if (isLoading) return <Loader />;
   return (

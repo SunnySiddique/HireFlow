@@ -14,7 +14,9 @@ export const useSaveJobSeekerProfile = () => {
       toast.success("Profile saved successfully");
       queryClient.invalidateQueries({ queryKey: ["jobSeekerProfile"] });
     },
-    onError: () => toast.error("Something went wrong. Please try again"),
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
   });
 };
 

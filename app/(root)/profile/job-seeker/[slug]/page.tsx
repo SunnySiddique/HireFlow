@@ -2,11 +2,13 @@
 
 import Loader from "@/components/Loader";
 import NavigationSidebar from "@/components/NavigationSidebar";
+import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
 import { useGetJobSeekerProfileBySlug } from "@/hooks/useJobSeeker";
+import { useTrackSeekerProfileView } from "@/hooks/useViews";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import About from "./_components/About";
 import Documents from "./_components/Documents";
 import Education from "./_components/Education";
@@ -17,10 +19,21 @@ import Skills from "./_components/Skills";
 
 const PublicProfilePage = () => {
   const { slug } = useParams();
+
+  const { data: currentUser } = useGetCurrentUser();
+  const { mutate: trackView } = useTrackSeekerProfileView();
+
   const { data: jobSeekerProfile, isLoading: isJobSeekerProfileLoading } =
     useGetJobSeekerProfileBySlug(slug as string);
 
   const [activeSection, setActiveSection] = useState("about");
+
+  useEffect(() => {
+    if (!jobSeekerProfile?.id) return;
+    if (!currentUser) return;
+
+    trackView(jobSeekerProfile.id);
+  }, [jobSeekerProfile?.id]);
 
   if (isJobSeekerProfileLoading) return <Loader />;
   return (

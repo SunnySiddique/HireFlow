@@ -37,10 +37,14 @@ export const getReadableError = (message: string) => {
 
 // slug
 export const createSlug = (title: string) => {
-  return title
+  const base = title
     .toLowerCase()
     .replace(/\s+/g, "-")
     .replace(/[^\w-]/g, "");
+
+  const uniqueSuffix = Math.random().toString(36).slice(2, 7);
+
+  return `${base}-${uniqueSuffix}`;
 };
 
 // job salaery formate
