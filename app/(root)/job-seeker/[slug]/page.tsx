@@ -11,7 +11,6 @@ import JobPreferences from "./_components/JobPreferences";
 import Skills from "./_components/Skills";
 
 import Loader from "@/components/Loader";
-import { jobSeekerSections } from "@/constants";
 import {
   useGetJobSeekerProfileBySlug,
   useSaveJobSeekerProfile,
@@ -43,7 +42,8 @@ const profileSchema = z
     headline: z
       .string()
       .min(5, "Headline must be at least 5 characters")
-      .optional(),
+      .optional()
+      .or(z.literal("")),
     bio: z
       .string()
       .min(10, "Bio must be at least 10 characters long")
@@ -68,7 +68,7 @@ const profileSchema = z
     preferredLocations: z.string().optional().or(z.literal("")),
     portfolioUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
     openToWork: z.boolean().optional(),
-    jobType: z.string().optional().or(z.literal("")),
+    preferred_job_type: z.string().optional().or(z.literal("")),
     profile_path: z.string().optional().or(z.literal("")),
     resume_path: z.string().optional().or(z.literal("")),
   })
@@ -88,6 +88,7 @@ const ProfilePage = () => {
   // Job seeker profile from useJobSeeker.ts
   const { data: jobSeekerProfile, isLoading: isJobSeekerProfileLoading } =
     useGetJobSeekerProfileBySlug(slug as string);
+
   //states
   const [editMode, setEditMode] = useState(false);
   const [activeSection, setActiveSection] = useState("about");
@@ -115,21 +116,14 @@ const ProfilePage = () => {
       preferredLocations: jobSeekerProfile?.preferred_locations || "",
       portfolioUrl: jobSeekerProfile?.portfolio_url || "",
       openToWork: jobSeekerProfile?.open_to_work || true,
-      jobType: jobSeekerProfile?.preferred_job_type || "",
+      preferred_job_type: jobSeekerProfile?.preferred_job_type || "",
     },
   });
 
-  const preferencesId = jobSeekerSections.find(
-    (s) => s.label === "Job Preferences",
-  )?.id;
-
   const onValid = async (data: ProfileFormData) => {
-    console.log("called");
-    console.log(jobSeekerProfile);
     if (!jobSeekerProfile?.auth_id) return;
 
     setIsSubmitting(true);
-    console.log("called");
 
     try {
       let profileUrl: string | undefined;
@@ -195,7 +189,7 @@ const ProfilePage = () => {
         preferred_locations: data.preferredLocations?.trim(),
         portfolio_url: data.portfolioUrl?.trim(),
         open_to_work: data.openToWork,
-        preferred_job_type: data.jobType,
+        preferred_job_type: data.preferred_job_type,
         profile_url: profileUrl || jobSeekerProfile.profile_url || undefined,
         resume_url: resumeUrl || jobSeekerProfile.resume_url || undefined,
         profile_path: profilePath || "",
@@ -206,9 +200,8 @@ const ProfilePage = () => {
         education: education.length
           ? education.map(({ id, ...rest }) => rest)
           : null,
-        skills: skills.length ? skills : [],
+        skills: skills.map((s) => s.toLowerCase()),
       };
-      console.log("called");
 
       await saveProfile(payload, {
         onSuccess: () => {
@@ -255,13 +248,11 @@ const ProfilePage = () => {
       preferredLocations: jobSeekerProfile.preferred_locations ?? "",
       portfolioUrl: jobSeekerProfile.portfolio_url ?? "",
       openToWork: jobSeekerProfile.open_to_work ?? true,
-      jobType: jobSeekerProfile.preferred_job_type ?? "",
+      preferred_job_type: jobSeekerProfile.preferred_job_type ?? "",
     });
   }, [jobSeekerProfile, editMode, form]);
 
   const onInvalid = (errors: any) => {
-    console.log("errors:", errors);
-
     const firstError = Object.values(errors)[0] as any;
     if (firstError?.message) {
       toast.error(firstError.message);

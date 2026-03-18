@@ -5,7 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
 import { useCompanyProfile } from "@/hooks/usePublicProfile";
+import { useTrackEmployerProfileView } from "@/hooks/useViews";
 import { formatDate } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -23,7 +25,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CompanyPositionsModal from "./CompanyPositionsModal";
 
 interface CompanyViewProps {
@@ -33,6 +35,15 @@ interface CompanyViewProps {
 const CompanyView = ({ slug }: CompanyViewProps) => {
   const { data, isLoading } = useCompanyProfile(slug);
   const [isPositionsModalOpen, setIsPositionsModalOpen] = useState(false);
+  const { data: currentUser } = useGetCurrentUser();
+  const { mutate: trackView } = useTrackEmployerProfileView();
+
+  useEffect(() => {
+    if (!data?.company?.id) return;
+    if (!currentUser) return;
+
+    trackView(data.company.id);
+  }, [data?.company?.id]);
 
   if (isLoading) {
     return (

@@ -2,6 +2,8 @@
 
 import { jobFormData, JobFormValues, jobUpdateFormData } from "@/types/jobs";
 import { revalidatePath } from "next/cache";
+import { toError } from "../errors";
+import { sendJobMatchNotifications } from "../notifications.helper";
 import { createClient } from "../supabase/server";
 import { createSlug } from "../utils";
 
@@ -36,43 +38,32 @@ export async function getJobPostBySlug(jobSlug: string) {
 }
 
 // Create job for employer
-export async function CreateJobPost(jobData: jobFormData) {
+export async function createJobPost(jobData: jobFormData) {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: isAuthError,
-    } = await supabase.auth.getUser();
-    if (isAuthError) throw isAuthError.message;
-    if (!user) return;
 
-    const { data: employerExist, error: isEmployerError } = await supabase
-      .from("employers")
-      .select("id,auth_id")
-      .eq("auth_id", user?.id)
+    const { data: job, error } = await supabase
+      .from("jobs")
+      .insert([jobData])
+      .select()
       .single();
 
-    if (isEmployerError) {
-      console.error("[DEBUG] Employer lookup error:", isEmployerError);
-      return { success: false, error: "User not found" };
-    }
+    if (error) throw new Error(error.message);
+    if (!job) throw new Error("Failed to create job");
 
-    if (employerExist.auth_id.toString() !== user.id.toString())
-      return {
-        success: false,
-        error: "You are not authrized to create job post",
-      };
+    const jobSkills: string[] = (job.skills_required as string[]) || [];
 
-    const { error } = await supabase.from("jobs").insert([jobData]);
+    const notified = await sendJobMatchNotifications(
+      supabase,
+      job.job_title,
+      jobSkills,
+      job.job_slug,
+    );
 
-    if (error) {
-      return { success: false, error: error.message };
-    }
-
-    return { success: true, message: "Job Created Successfully" };
+    return { notified };
   } catch (error) {
-    console.error("[DEBUG] Error in CreateJobPost:", error);
-    throw new Error("Failed to execute CreateJobPost");
+    console.error("[createJobPost]", error);
+    throw toError(error);
   }
 }
 
@@ -80,28 +71,9 @@ export async function CreateJobPost(jobData: jobFormData) {
 export async function updateJobPost(jobSlug: string, jobData: JobFormValues) {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: isAuthError,
-    } = await supabase.auth.getUser();
-    if (isAuthError) throw isAuthError.message;
-    if (!user) return;
-
-    const { data: employerExist, error: isEmployerError } = await supabase
-      .from("employers")
-      .select("id,auth_id")
-      .eq("auth_id", user?.id)
-      .single();
-
-    if (isEmployerError) return { success: false, error: "User not found" };
-
-    if (employerExist.auth_id.toString() !== user.id.toString())
-      return {
-        success: false,
-        error: "You are not authorized to update job post",
-      };
 
     const updatedSlug = createSlug(jobData.jobTitle);
+
     const payload: jobUpdateFormData = {
       job_slug: updatedSlug,
       job_title: jobData.jobTitle,
@@ -124,17 +96,30 @@ export async function updateJobPost(jobSlug: string, jobData: JobFormValues) {
       skills_required: jobData.skills ?? [],
     };
 
-    const { error } = await supabase
+    const { data: updatedJob, error } = await supabase
       .from("jobs")
       .update(payload)
-      .eq("job_slug", jobSlug);
+      .eq("job_slug", jobSlug)
+      .select()
+      .single();
 
-    if (error) return { success: false, error: error.message };
+    if (error) throw new Error(error.message);
 
-    return { success: true, message: "Job Updated Successfully" };
+    if (!updatedJob) throw new Error("Falied to update job");
+
+    const jobSkills: string[] = (updatedJob.skills_required as string[]) || [];
+
+    const notified = await sendJobMatchNotifications(
+      supabase,
+      updatedJob.job_title,
+      jobSkills,
+      updatedJob.job_slug,
+    );
+
+    return { notified };
   } catch (error) {
-    console.error("Error in updateJobPost:", error);
-    throw new Error("Failed to execute updateJobPost");
+    console.error("[updateJObPost]", error);
+    throw toError(error);
   }
 }
 

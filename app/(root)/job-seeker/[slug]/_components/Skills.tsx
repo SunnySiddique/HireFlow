@@ -5,13 +5,13 @@ import { Plus, X, Zap } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface EducationProps {
+interface SkillsProps {
   editMode: boolean;
   skills: string[];
   setSkills: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const Skills = ({ skills, setSkills, editMode }: EducationProps) => {
+const Skills = ({ skills, setSkills, editMode }: SkillsProps) => {
   const [showAddSkill, setShowAddSkill] = useState(false);
   const [newSkill, setNewSkill] = useState<string>("");
 

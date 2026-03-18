@@ -62,8 +62,7 @@ interface CreateJobFormProps {
 
 const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
   const { data: currentEmployerProfile } = useEmployerProfile();
-  const { mutateAsync: createJobPost, isPending: isJobCreating } =
-    useCreateJob();
+  const { mutateAsync: createJob, isPending: isJobCreating } = useCreateJob();
   const { mutateAsync: updateJobPost, isPending: isJobUpdating } =
     useUpdateJob();
 
@@ -108,11 +107,9 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
     if (!currentEmployerProfile) return;
 
     if (fromType === "create") {
-      const jobSlug = createSlug(data.jobTitle);
-
       const payload: JobFormValues = {
         employer_id: currentEmployerProfile.id,
-        job_slug: jobSlug,
+        job_slug: createSlug(data.jobTitle),
         job_title: data.jobTitle,
         category: data.category,
         employment_type: data.employmentType,
@@ -123,41 +120,27 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
         salary_min: data.minimumSalary,
         salary_max: data.maximumSalary,
         currency: data.currency,
-        benefits: data.benefits.length > 0 ? data.benefits : [],
+        benefits: data.benefits || [],
         job_description: data.jobDescription,
-        requirements: data.requirements.length > 0 ? data.requirements : [],
-        responsibilities:
-          data.responsibilities.length > 0 ? data.responsibilities : [],
+        requirements: data.requirements || [],
+        responsibilities: data.responsibilities || [],
         application_deadline: data.applicationDeadline || null,
         status: data.status,
-        skills_required: data.skills.length > 0 ? data.skills : [],
+        skills_required: data.skills.map((s: string) => s.toLowerCase()),
       };
 
-      try {
-        const result = await createJobPost(payload as any);
-
-        if (result?.success) {
-          toast.success("Post Created Successfully");
+      createJob(payload, {
+        onSuccess: () => {
           form.reset();
           router.push("/employer/jobs");
-        } else {
-          toast.error(result?.error || "Failed to create job");
-        }
-      } catch (error: unknown) {
-        console.error("[DEBUG] Job creation error:", error);
-        const errMsg =
-          error instanceof Error ? error.message : "Failed to create job";
-        toast.error(errMsg);
-      }
+        },
+      });
     } else {
       await updateJobPost(
-        {
-          job_slug: initialData.job_slug,
-          jobData: data,
-        },
+        { job_slug: initialData.job_slug, jobData: data },
         {
           onSuccess: () => {
-            toast.success("Job Updated successfully");
+            toast.success("Job updated successfully");
             form.reset();
           },
           onSettled: () => {
