@@ -33,6 +33,7 @@ export async function saveProfile(profileData: JobSeekerProfile) {
       supabase,
       updatedProfile.auth_id,
       updatedProfile.profile_completion as number,
+      updatedProfile.slug as string,
     );
     return { success: true };
   } catch (error) {

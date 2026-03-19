@@ -39,8 +39,7 @@ const HeroProfile = ({
     }
   };
 
-  const isJobSeeker = user?.id?.toString() === profile?.auth_id?.toString();
-
+  const imageSrc = profileImage || profile.profile_url;
   return (
     <FormProvider {...form}>
       <div className="bg-gradient-to-br from-primary/10 via-background to-background border-b border-border">
@@ -51,9 +50,9 @@ const HeroProfile = ({
               {/* Profile Image Upload */}
               <div className="relative group">
                 <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-muted border-2 border-border overflow-hidden">
-                  {profileImage || profile.profile_url ? (
+                  {imageSrc ? (
                     <Image
-                      src={profileImage || profile.profile_url}
+                      src={imageSrc}
                       alt="Profile image"
                       fill
                       className="object-cover"
@@ -144,38 +143,31 @@ const HeroProfile = ({
 
             {/* Edit/Save Button */}
 
-            {isJobSeeker && (
-              <div className="flex justify-end items-center gap-3">
-                <Button
-                  variant={editMode ? "outline" : "ghost"}
-                  className={`px-6 py-5 rounded-lg font-bold transition-all flex items-center gap-2 shadow-md hover:shadow-lg transform whitespace-nowrap disabled:bg-muted disabled:cursor-not-allowed`}
-                  onClick={
-                    editMode ? handleProfileSave : () => setEditMode(true)
-                  }
-                  disabled={isPending}
-                >
-                  {editMode ? (
-                    <div className="flex items-center gap-2">
-                      <Save className="w-4 h-4" />
-                      {isPending ? "Saving..." : "Save Changes"}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Edit2 className="w-4 h-4" />
-                      Edit Profile
-                    </div>
-                  )}
-                </Button>
-                {editMode && (
-                  <Button
-                    variant={"outline"}
-                    onClick={() => setEditMode(false)}
-                  >
-                    Cancel
-                  </Button>
+            <div className="flex justify-end items-center gap-3">
+              <Button
+                variant={editMode ? "outline" : "ghost"}
+                className={`px-6 py-5 rounded-lg font-bold transition-all flex items-center gap-2 shadow-md hover:shadow-lg transform whitespace-nowrap disabled:bg-muted disabled:cursor-not-allowed`}
+                onClick={editMode ? handleProfileSave : () => setEditMode(true)}
+                disabled={isPending}
+              >
+                {editMode ? (
+                  <div className="flex items-center gap-2">
+                    <Save className="w-4 h-4" />
+                    {isPending ? "Saving..." : "Save Changes"}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Edit2 className="w-4 h-4" />
+                    Edit Profile
+                  </div>
                 )}
-              </div>
-            )}
+              </Button>
+              {editMode && (
+                <Button variant={"outline"} onClick={() => setEditMode(false)}>
+                  Cancel
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Open to Work Badge */}

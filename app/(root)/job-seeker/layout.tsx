@@ -1,7 +1,7 @@
 "use client";
 
-import JobSeekerNavbar from "@/components/navbar/JobSeekerNavbar";
-import JobSeekerSidebar from "@/components/sidebar/JobSeekerSidebar";
+import DashboardNavbar from "@/components/navbar/DashboardNavbar";
+import DashboardSidebar from "@/components/sidebar/DashboardSidebar";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -20,9 +20,10 @@ export default function JobSeekerLayout({
   return (
     <div className="flex h-screen bg-background">
       {!isJobs && (
-        <JobSeekerSidebar
+        <DashboardSidebar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
+          role="job-seeker"
         />
       )}
 
@@ -38,7 +39,11 @@ export default function JobSeekerLayout({
             </Link>
           </div>
         )}
-        <JobSeekerNavbar />
+        <DashboardNavbar
+          role="job-seeker"
+          onMenuClick={() => setSidebarOpen((prev) => !prev)}
+          isSidebarOpen={sidebarOpen}
+        />
         <main className="flex-1 overflow-y-auto p-8 bg-background">
           {children}
         </main>
