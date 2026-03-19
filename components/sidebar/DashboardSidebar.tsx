@@ -18,7 +18,8 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { jobSeekerLinks } from "@/constants";
+import { employerLinks, jobSeekerLinks } from "@/constants";
+import { useEmployerProfile } from "@/hooks/useEmployer";
 import { useGetJobSeekerProfile } from "@/hooks/useJobSeeker";
 import { createClient } from "@/lib/supabase/client";
 import { getInitials } from "@/lib/utils";
@@ -29,19 +30,22 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface JobSeekerSidebarProps {
+interface DashboardSidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
+  role: "job-seeker" | "employer";
 }
 
-const JobSeekerSidebar = ({
+const DashboardSidebar = ({
   sidebarOpen,
   setSidebarOpen,
-}: JobSeekerSidebarProps) => {
+  role,
+}: DashboardSidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const { theme, setTheme } = useTheme();
   const { data: jobSeekerProfile } = useGetJobSeekerProfile();
+  const { data: employerProfile } = useEmployerProfile();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -57,11 +61,13 @@ const JobSeekerSidebar = ({
     return pathname === href;
   };
 
+  const links = role === "job-seeker" ? jobSeekerLinks : employerLinks;
+
   return (
     <>
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/75 bg-opacity-50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/75 bg-opacity-50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -95,16 +101,21 @@ const JobSeekerSidebar = ({
             </p>
 
             <div className="space-y-2">
-              {jobSeekerLinks.slice(0, 3).map((link) => {
+              {links.slice(0, 3).map((link) => {
                 const href =
                   typeof link.href === "function"
-                    ? link.href(jobSeekerProfile?.slug ?? "")
+                    ? link.href(
+                        role === "job-seeker"
+                          ? (jobSeekerProfile?.slug ?? "")
+                          : (employerProfile?.slug ?? ""),
+                      )
                     : link.href;
                 return (
                   <Link
                     key={link.label}
                     href={href}
                     className={`${isActive(href) ? "bg-sidebar border-l-4 border-sidebar-primary text-sidebar-primary" : "hover:bg-muted-foreground/10"} flex items-center gap-3 px-4 py-3 rounded-md cursor-pointer`}
+                    onClick={() => setSidebarOpen(false)}
                   >
                     {link.icon && <link.icon className="w-4 h-4" />}
                     <span className="text-sm font-medium">{link.label}</span>
@@ -120,16 +131,21 @@ const JobSeekerSidebar = ({
               Manage
             </p>
             <div className="space-y-2">
-              {jobSeekerLinks.slice(3).map((link) => {
+              {links.slice(3).map((link) => {
                 const href =
                   typeof link.href === "function"
-                    ? link.href(jobSeekerProfile?.slug ?? "")
+                    ? link.href(
+                        role === "job-seeker"
+                          ? (jobSeekerProfile?.slug ?? "")
+                          : (employerProfile?.slug ?? ""),
+                      )
                     : link.href;
                 return (
                   <Link
                     key={link.label}
                     href={href}
                     className={`${isActive(href) ? "bg-sidebar border-l-4 border-sidebar-primary text-sidebar-primary" : "hover:bg-muted-foreground/10"} flex items-center gap-3 px-4 py-3 rounded-md cursor-pointer`}
+                    onClick={() => setSidebarOpen(false)}
                   >
                     {link.icon && <link.icon className="w-4 h-4" />}
                     <span className="text-sm font-medium">{link.label}</span>
@@ -147,23 +163,47 @@ const JobSeekerSidebar = ({
                 variant="ghost"
                 className="w-full h-auto px-3 py-2 rounded-lg justify-start hover:bg-sidebar-accent transition-colors"
               >
-                <Avatar className="h-10 w-10 flex-shrink-0">
-                  {jobSeekerProfile?.profile_url ? (
-                    <AvatarImage
-                      src={jobSeekerProfile?.profile_url || "/placeholder.svg"}
-                      alt={jobSeekerProfile?.full_name || "User Profile"}
-                    />
-                  ) : (
-                    <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                      {getInitials(jobSeekerProfile?.full_name ?? "User")}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
+                {role === "job-seeker" ? (
+                  <Avatar className="h-10 w-10 flex-shrink-0">
+                    {jobSeekerProfile?.profile_url ? (
+                      <AvatarImage
+                        src={
+                          jobSeekerProfile?.profile_url || "/placeholder.svg"
+                        }
+                        alt={jobSeekerProfile?.full_name || "User Profile"}
+                      />
+                    ) : (
+                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                        {getInitials(jobSeekerProfile?.full_name ?? "User")}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                ) : (
+                  <Avatar className="h-10 w-10 flex-shrink-0">
+                    {employerProfile?.company_logo_url ? (
+                      <AvatarImage
+                        src={
+                          employerProfile?.company_logo_url ||
+                          "/placeholder.svg"
+                        }
+                        alt={employerProfile?.company_name || "User Profile"}
+                      />
+                    ) : (
+                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                        {getInitials(employerProfile?.company_name ?? "User")}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                )}
                 <div className="flex-1 text-left ml-3 min-w-0">
                   <p className="text-sm font-semibold text-foreground truncate">
-                    {jobSeekerProfile?.full_name || "John Doe"}
+                    {role === "job-seeker"
+                      ? (jobSeekerProfile?.full_name ?? "John Doe")
+                      : (employerProfile?.company_name ?? "John Doe")}
                   </p>
-                  <p className="text-xs text-muted-foreground">Job Seeker</p>
+                  <p className="text-xs text-muted-foreground">
+                    {role === "job-seeker" ? "Job Seeker" : "Employer"}
+                  </p>
                 </div>
                 <MoreVertical className="w-4 h-4 flex-shrink-0 ml-2" />
               </Button>
@@ -172,21 +212,44 @@ const JobSeekerSidebar = ({
             <DropdownMenuContent align="end" className="w-56">
               {/* User Info */}
               <div className="flex items-center gap-3 px-2 py-3">
-                <Avatar className="h-10 w-10">
-                  {jobSeekerProfile?.profile_url ? (
-                    <AvatarImage
-                      src={jobSeekerProfile?.profile_url || "/placeholder.svg"}
-                      alt={jobSeekerProfile?.full_name || "User Profile"}
-                    />
-                  ) : (
-                    <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                      {getInitials(jobSeekerProfile?.full_name ?? "User")}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
+                {role === "job-seeker" ? (
+                  <Avatar className="h-10 w-10 flex-shrink-0">
+                    {jobSeekerProfile?.profile_url ? (
+                      <AvatarImage
+                        src={
+                          jobSeekerProfile?.profile_url || "/placeholder.svg"
+                        }
+                        alt={jobSeekerProfile?.full_name || "User Profile"}
+                      />
+                    ) : (
+                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                        {getInitials(jobSeekerProfile?.full_name ?? "User")}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                ) : (
+                  <Avatar className="h-10 w-10 flex-shrink-0">
+                    {employerProfile?.company_logo_url ? (
+                      <AvatarImage
+                        src={
+                          employerProfile?.company_logo_url ||
+                          "/placeholder.svg"
+                        }
+                        alt={employerProfile?.company_name || "User Profile"}
+                      />
+                    ) : (
+                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                        {getInitials(employerProfile?.company_name ?? "User")}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                )}
+
                 <div className="flex flex-col gap-0.5">
                   <p className="text-sm font-semibold text-foreground">
-                    {jobSeekerProfile?.full_name}
+                    {role === "job-seeker"
+                      ? (jobSeekerProfile?.full_name ?? "JB")
+                      : (employerProfile?.company_name ?? "CM")}
                   </p>
                 </div>
               </div>
@@ -260,4 +323,4 @@ const JobSeekerSidebar = ({
   );
 };
 
-export default JobSeekerSidebar;
+export default DashboardSidebar;

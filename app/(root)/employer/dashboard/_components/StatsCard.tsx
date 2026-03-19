@@ -3,8 +3,8 @@
 import { Card } from "@/components/ui/card";
 import { useGetEmployerApplicationStats } from "@/hooks/useDashboard";
 import {
+  BarChart3,
   Briefcase,
-  CheckCircle,
   EyeIcon,
   TrendingDown,
   TrendingUp,
@@ -15,6 +15,8 @@ const StatsCard = () => {
   const { data } = useGetEmployerApplicationStats();
   const totalActiveJobs = data?.totalActiveJobs ?? 0;
   const totalApplicants = data?.thisWeekApplicants ?? 0;
+  const thisWeekTotalViews = data?.totalProfileViews ?? 0;
+  const thisWeekJobViews = data?.thisWeekJobViews ?? 0;
 
   const statsData = [
     {
@@ -45,28 +47,34 @@ const StatsCard = () => {
     },
     {
       title: "Profile Views",
-      value: "1.2k",
-      change: "↑ 8% vs last week",
-      arrowIcon: TrendingUp,
-      arrowColor: "text-green-600",
+      value: thisWeekTotalViews,
+      change:
+        thisWeekTotalViews > 0
+          ? `+${thisWeekTotalViews} new`
+          : "No profile views this week",
+      arrowIcon: thisWeekTotalViews > 0 ? TrendingUp : TrendingDown,
+      arrowColor: thisWeekTotalViews > 0 ? "text-green-600" : "text-red-600",
       icon: EyeIcon,
       iconBg: "bg-purple-500/10",
       iconColor: "text-purple-500",
     },
     {
-      title: "Hired This Month",
-      value: 4,
-      change: "↓ 1 vs last month",
-      arrowIcon: TrendingDown,
-      arrowColor: "text-red-600",
-      icon: CheckCircle,
-      iconBg: "bg-green-500/10",
-      iconColor: "text-green-500",
+      title: "Job Views",
+      value: thisWeekJobViews,
+      change:
+        thisWeekJobViews > 0
+          ? `+${thisWeekJobViews} this week`
+          : "No job views this week",
+      arrowIcon: thisWeekJobViews > 0 ? TrendingUp : TrendingDown,
+      arrowColor: thisWeekJobViews > 0 ? "text-green-600" : "text-red-600",
+      icon: BarChart3,
+      iconBg: "bg-blue-500/10",
+      iconColor: "text-blue-500",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 mb-10">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 mb-10">
       {statsData.map((stat) => {
         const Icon = stat.icon;
         const ArrowIcon = stat.arrowIcon;

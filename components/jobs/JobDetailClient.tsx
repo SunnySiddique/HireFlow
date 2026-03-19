@@ -22,6 +22,7 @@ const JobDetailClient = ({ job }: { job: Job }) => {
     if (!currentUser) return;
 
     trackView(job.id);
+    console.log("logded");
   }, [job?.id]);
 
   if (isLoading) return <Loader />;

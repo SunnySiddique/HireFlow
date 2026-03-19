@@ -1,6 +1,7 @@
+import { toError } from "../errors";
 import { createClient } from "../supabase/client";
 
-// seeker profile view
+// job-seeker view
 export async function trackSeekerProfileView(seekerId: string) {
   try {
     const supabase = createClient();
@@ -13,32 +14,23 @@ export async function trackSeekerProfileView(seekerId: string) {
 
     const { data: employer } = await supabase
       .from("employers")
-      .select("id")
+      .select("id, slug, company_name")
       .eq("auth_id", user.id)
       .single();
 
     if (!employer) return;
 
-    if (employer.id === seekerId) return;
+    // record view
+    const { error: viewError } = await supabase.from("profile_views").insert({
+      target_id: seekerId,
+      target_type: "seeker",
+      viewer_id: employer.id,
+    });
 
-    const { data: existing } = await supabase
-      .from("seeker_profile_views")
-      .select("id")
-      .eq("seeker_id", seekerId)
-      .eq("viewer_id", employer.id)
-      .single();
-
-    if (existing) return;
-
-    const { error: viewError } = await supabase
-      .from("seeker_profile_views")
-      .insert({
-        seeker_id: seekerId,
-        viewer_id: employer.id,
-      });
-
+    if (viewError?.code === "23505") return;
     if (viewError) throw new Error(viewError.message);
 
+    // notify seeker
     const { data: seeker } = await supabase
       .from("job_seekers")
       .select("auth_id")
@@ -51,18 +43,19 @@ export async function trackSeekerProfileView(seekerId: string) {
       user_id: seeker.auth_id,
       type: "profile_view",
       title: "New Profile View!",
-      message: "An employer viewed your profile",
+      message: `${employer.company_name} viewed your profile`,
+      reference_id: employer.slug,
       is_read: false,
     });
 
-    // ✅ log notification error
-    console.log("[trackSeekerProfileView] notifError:", notifError);
+    if (notifError) throw new Error(notifError.message);
   } catch (error) {
-    console.log("[seekerProfileViews]", error);
+    console.error("[trackSeekerProfileView]", error);
+    throw toError(error);
   }
 }
 
-// employer profile view
+// employer profile veiw
 export async function trackEmployerProfileView(employerId: string) {
   try {
     const supabase = createClient();
@@ -73,34 +66,28 @@ export async function trackEmployerProfileView(employerId: string) {
     } = await supabase.auth.getUser();
     if (authError || !user) return;
 
+    // current user must be a seeker
     const { data: seeker } = await supabase
       .from("job_seekers")
-      .select("id")
+      .select("id, slug, full_name")
       .eq("auth_id", user.id)
       .single();
 
     if (!seeker) return;
 
-    if (seeker.id === employerId) return;
+    // check already viewed
 
-    const { data: existing } = await supabase
-      .from("employer_profile_views")
-      .select("id")
-      .eq("employer_id", employerId)
-      .eq("viewer_id", seeker.id)
-      .single();
+    // record view
+    const { error: viewError } = await supabase.from("profile_views").insert({
+      target_id: employerId,
+      target_type: "employer",
+      viewer_id: seeker.id,
+    });
 
-    if (existing) return;
-
-    const { error: viewError } = await supabase
-      .from("employer_profile_views")
-      .insert({
-        employer_id: employerId,
-        viewer_id: seeker.id,
-      });
-
+    if (viewError?.code === "23505") return;
     if (viewError) throw new Error(viewError.message);
 
+    // notify employer
     const { data: employer } = await supabase
       .from("employers")
       .select("auth_id")
@@ -109,15 +96,19 @@ export async function trackEmployerProfileView(employerId: string) {
 
     if (!employer) return;
 
-    await supabase.from("notifications").insert({
+    const { error: notifError } = await supabase.from("notifications").insert({
       user_id: employer.auth_id,
       type: "profile_view",
       title: "New Profile View!",
-      message: "An Job Seeker viewed your profile",
+      message: `${seeker.full_name} viewed your profile`,
+      reference_id: seeker.slug,
       is_read: false,
     });
+
+    if (notifError) throw new Error(notifError.message);
   } catch (error) {
-    console.log("[trackEmployerProfileView]", error);
+    console.error("[trackEmployerProfileView]", error);
+    throw toError(error);
   }
 }
 
@@ -137,31 +128,23 @@ export async function trackJobView(jobId: string) {
       .from("job_seekers")
       .select("id")
       .eq("auth_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!seeker) return;
-
-    const { data: existing } = await supabase
-      .from("job_views")
-      .select("id")
-      .eq("job_id", jobId)
-      .eq("viewer_id", seeker.id)
-      .single();
-
-    if (existing) return;
 
     const { error: viewError } = await supabase.from("job_views").insert({
       job_id: jobId,
       viewer_id: seeker.id,
     });
 
+    if (viewError?.code === "23505") return;
     if (viewError) throw new Error(viewError.message);
 
     const { data: job } = await supabase
       .from("jobs")
-      .select("employer_id, job_title")
+      .select("employer_id, job_title, job_slug")
       .eq("id", jobId)
-      .single();
+      .maybeSingle();
 
     if (!job) return;
 
@@ -169,7 +152,7 @@ export async function trackJobView(jobId: string) {
       .from("employers")
       .select("auth_id")
       .eq("id", job.employer_id)
-      .single();
+      .maybeSingle();
 
     if (!employer) return;
 
@@ -178,6 +161,7 @@ export async function trackJobView(jobId: string) {
       type: "job_view",
       title: "New Job View!",
       message: `A job seeker viewed your "${job.job_title}" posting`,
+      reference_id: job.job_slug,
       is_read: false,
     });
   } catch (error) {

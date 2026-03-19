@@ -13,7 +13,7 @@ export async function sendJobMatchNotifications(
 
   const { data: seekers, error: seekersError } = await supabase
     .from("job_seekers")
-    .select("skills, auth_id")
+    .select("id, skills, auth_id")
     .overlaps("skills", jobSkills);
 
   if (seekersError || !seekers?.length) return 0;
@@ -59,6 +59,7 @@ export async function sendJobMatchNotifications(
       type: "job_match",
       title: "New Job Match!",
       message: `A new ${jobTitle} position matches your profile`,
+      reference_id: jobSlug,
       is_read: false,
     })),
   );
@@ -75,12 +76,14 @@ export async function sendProfileCompletionNotifications(
   supabase: SupabaseClient,
   userId: string,
   profileCompletion: number,
+  slug: string,
 ) {
   const { error } = await supabase.from("notifications").insert({
     user_id: userId,
     type: "system",
     title: "Profile Updated!",
     message: `Your profile is now ${profileCompletion}% complete.`,
+    reference_id: slug,
     is_read: false,
   });
 

@@ -8,6 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 // avatar for the proifle
 export const getInitials = (name: string) => {
+  console.log("name:", name);
   return name
     .split(" ")
     .map((w) => w[0])

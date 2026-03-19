@@ -1,7 +1,7 @@
 "use client";
 
-import EmployerNavbar from "@/components/navbar/EmployerNavbar";
-import EmployerSidebar from "@/components/sidebar/EmployerSidebar";
+import DashboardNavbar from "@/components/navbar/DashboardNavbar";
+import DashboardSidebar from "@/components/sidebar/DashboardSidebar";
 import { useState } from "react";
 
 export default function EmployerLayout({
@@ -13,13 +13,18 @@ export default function EmployerLayout({
 
   return (
     <div className="flex h-screen bg-background">
-      <EmployerSidebar
+      <DashboardSidebar
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
+        role="employer"
       />
 
       <div className="flex flex-col flex-1">
-        <EmployerNavbar setSidebarOpen={setSidebarOpen} />
+        <DashboardNavbar
+          role="employer"
+          onMenuClick={() => setSidebarOpen((prev) => !prev)}
+          isSidebarOpen={sidebarOpen}
+        />
         <main className="flex-1 overflow-y-auto p-8 bg-background">
           {children}
         </main>

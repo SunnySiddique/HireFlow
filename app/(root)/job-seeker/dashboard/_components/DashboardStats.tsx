@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { useGetJobSeekerApplicationStats } from "@/hooks/useDashboard";
 import {
   Clock,
-  EyeIcon,
+  Eye,
   FileText,
   Heart,
   TrendingDown,
@@ -14,15 +14,15 @@ import {
 
 const DashboardStats = () => {
   const { data, isLoading } = useGetJobSeekerApplicationStats();
-  const totalApplications = data?.totalApplications ?? 0;
   const thisWeekApplications = data?.thisWeekApplications ?? 0;
+  const totalProfileViews = data?.thisWeekProfileviews ?? 0;
 
   const thisMonthSavedJobs = data?.thisMonthSavedJobs ?? 0;
 
   const statsData = [
     {
       title: "Applications Sent",
-      value: totalApplications,
+      value: thisWeekApplications,
       change:
         thisWeekApplications > 0
           ? `+${thisWeekApplications} this week`
@@ -57,12 +57,16 @@ const DashboardStats = () => {
     },
     {
       title: "Profile Views",
-      value: "156",
-      change: "+12% vs last week",
-      changeType: "positive",
-      icon: EyeIcon,
-      iconBg: "bg-purple-50",
-      iconColor: "text-purple-500",
+      value: totalProfileViews,
+      change:
+        totalProfileViews > 0
+          ? `+${totalProfileViews} this week`
+          : "No views this week",
+      arrowIcon: totalProfileViews > 0 ? TrendingUp : TrendingDown,
+      arrowColor: totalProfileViews > 0 ? "text-green-600" : "text-red-600",
+      icon: Eye,
+      iconBg: "bg-red-50",
+      iconColor: "text-red-500",
     },
   ];
 
