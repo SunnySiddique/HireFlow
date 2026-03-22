@@ -45,6 +45,12 @@ const HomeNavbar = () => {
             >
               Resources
             </a>
+            <a
+              href="/billing"
+              className="text-foreground text-sm font-semibold hover:text-primary transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary hover:after:w-full after:transition-all"
+            >
+              Billing
+            </a>
           </div>
           <div className="flex items-center gap-3">
             <DropdownMenu>

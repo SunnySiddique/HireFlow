@@ -1,20 +1,16 @@
 "use client";
 
-import CTA from "@/components/home/CTA";
-import FeaturedJobs from "@/components/home/FeaturedJobs";
-import Footer from "@/components/home/Footer";
-import HeroSection from "@/components/home/HeroSection";
-import HomeNavbar from "@/components/home/HomeNavbar";
-import QuickStats from "@/components/home/QuickStats";
-import TalentHub from "@/components/home/TalentHub";
-import Testimonials from "@/components/home/Testimonials";
+import CTA from "@/app/(landing)/_components/CTA";
+import FeaturedJobs from "@/app/(landing)/_components/FeaturedJobs";
+import Footer from "@/app/(landing)/_components/Footer";
+import HeroSection from "@/app/(landing)/_components/HeroSection";
+import QuickStats from "@/app/(landing)/_components/QuickStats";
+import TalentHub from "@/app/(landing)/_components/TalentHub";
+import Testimonials from "@/app/(landing)/_components/Testimonials";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-      {/* Navigation */}
-
-      <HomeNavbar />
       {/* Hero Section with Search */}
       <HeroSection />
 

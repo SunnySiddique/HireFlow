@@ -2,6 +2,7 @@ import {
   Briefcase,
   Building2,
   CheckCircle,
+  CreditCard,
   FileText,
   Globe,
   GraduationCap,
@@ -139,6 +140,7 @@ export const jobSeekerLinks = [
     icon: Users,
   },
   { label: "Saved Jobs", href: "/job-seeker/saved-jobs", icon: Heart },
+  { label: "Billing", href: "/job-seeker/billing", icon: CreditCard },
   {
     label: "Profile",
     href: (slug: string) => `/job-seeker/${slug}`,
@@ -166,6 +168,7 @@ export const employerLinks = [
   { label: "Manage Jobs", href: "/employer/jobs", icon: Briefcase },
   { label: "Applicants", href: "/employer/applicants", icon: Users },
   { label: "Post a Job", href: "/employer/jobs/create", icon: PlusCircle },
+  { label: "Billing", href: "/employer/billing", icon: CreditCard },
   {
     label: "Profile",
     href: (slug: string) => `/employer/${slug}`,
