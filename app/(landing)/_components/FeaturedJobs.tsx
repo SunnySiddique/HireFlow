@@ -1,7 +1,7 @@
 import { featuredJobs } from "@/constants";
 import { ArrowRight, DollarSign, MapPinIcon } from "lucide-react";
 import Link from "next/link";
-import { Button } from "../ui/button";
+import { Button } from "../../../components/ui/button";
 
 const FeaturedJobs = () => {
   return (
