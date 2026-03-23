@@ -1,10 +1,13 @@
 "use client";
 
+import Checkout from "@/components/Checkout";
 import { seekerPlans } from "@/constants/BillingData";
+import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Check, Info, Star } from "lucide-react";
+import { Check, Info, Star } from "lucide-react";
 
-export default function PricingPage() {
+const JobSeekerBillingPage = () => {
+  const { data: subscription } = useGetCurrentUserSubscription();
   return (
     <>
       {/* Background Decoration */}
@@ -32,7 +35,7 @@ export default function PricingPage() {
 
         {/* Pricing Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-          {seekerPlans.map((plan, index) => (
+          {seekerPlans.map((plan) => (
             <div
               key={plan.name}
               className={cn(
@@ -69,17 +72,14 @@ export default function PricingPage() {
                 </p>
               </div>
 
-              <button
-                className={cn(
-                  "w-full py-3 px-4 rounded-xl font-bold text-sm transition-all duration-200 mb-8 flex items-center justify-center gap-2 group",
-                  plan.popular
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20"
-                    : "bg-muted text-foreground hover:bg-accent border border-border",
-                )}
-              >
-                {plan.cta}
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </button>
+              <Checkout
+                key={plan.name}
+                cta={plan.cta}
+                isPopular={plan.popular}
+                planName={plan.name.toLowerCase()}
+                userRole="jobseeker"
+                subscription={subscription}
+              />
 
               <div className="space-y-4 flex-grow">
                 <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">
@@ -182,4 +182,5 @@ export default function PricingPage() {
       </footer>
     </>
   );
-}
+};
+export default JobSeekerBillingPage;

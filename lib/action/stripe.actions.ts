@@ -32,6 +32,13 @@ export async function createCheckoutSession(
 
   let stripeCustomerId = existingSubscription?.stripe_customer_id;
 
+  const priceId =
+    userRole === "employer"
+      ? PRICE_IDS.employer[planName as EmployerPlanKey]
+      : PRICE_IDS.jobseeker[planName as JobSeekerPlanKey];
+
+  if (!priceId) throw new Error("Invalid plan selected");
+
   if (!stripeCustomerId) {
     const customer = await stripe.customers.create({
       email: user.email,
@@ -46,13 +53,6 @@ export async function createCheckoutSession(
     });
   }
 
-  const priceId =
-    userRole === "employer"
-      ? PRICE_IDS.employer[planName as EmployerPlanKey]
-      : PRICE_IDS.jobseeker[planName as JobSeekerPlanKey];
-
-  if (!priceId) throw new Error("Invalid plan selected");
-
   const session = await stripe.checkout.sessions.create({
     customer: stripeCustomerId,
     payment_method_types: ["card"],
@@ -63,7 +63,7 @@ export async function createCheckoutSession(
       userRole: userRole,
       planKey: planName,
     },
-    success_url: `${process.env.NEXT_PUBLIC_DOMAIN}/${userRole}/dashboard?success=true`,
+    success_url: `${process.env.NEXT_PUBLIC_DOMAIN}/${userRole === "employer" ? "employer" : "job-seeker"}/dashboard?success=true`,
     cancel_url: `${process.env.NEXT_PUBLIC_DOMAIN}/${userRole === "employer" ? "employer" : "job-seeker"}/billing`,
   });
 

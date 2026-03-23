@@ -1,11 +1,20 @@
 "use client";
 
 import { employerPlans } from "@/constants/BillingData";
+import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
 import { cn } from "@/lib/utils";
 import { Check, Info } from "lucide-react";
-import Checkout from "./_components/Checkout";
+import Checkout from "../../../../components/Checkout";
 
 const EmployerBillingPage = () => {
+  const { data: subscription } = useGetCurrentUserSubscription();
+  // console.log("subscription:", subscription);
+  // const formattedDate = format(
+  //   subscription?.plan_expires_at as string,
+  //   "MMMM dd, yyyy hh:mm a",
+  // );
+  // const formattedDate1 = format(new Date(), "MMMM dd, yyyy hh:mm a");
+
   return (
     <>
       {/* Background Decoration */}
@@ -75,6 +84,8 @@ const EmployerBillingPage = () => {
                 cta={plan.cta}
                 isPopular={plan.popular}
                 planName={plan.name.toLowerCase()}
+                userRole="employer"
+                subscription={subscription}
               />
 
               <div className="space-y-4 flex-grow">
