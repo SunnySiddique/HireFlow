@@ -10,20 +10,21 @@ const SavedJobsPage = () => {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 p-8">
       <div className="space-y-8">
         {/* Header */}
         <div>
           <h1 className="text-4xl font-bold text-foreground">Saved Jobs</h1>
           <p className="text-muted-foreground mt-2">
-            {savedJobs.length} job{savedJobs.length !== 1 ? "s" : ""} saved
+            {(savedJobs ?? []).length} job
+            {(savedJobs ?? []).length !== 1 ? "s" : ""} saved
           </p>
         </div>
 
         {/* List */}
-        {savedJobs.length > 0 ? (
+        {(savedJobs ?? []).length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-            {savedJobs.map((job) => (
+            {(savedJobs ?? []).map((job) => (
               <SavedJobCard job={job} key={job.id} />
             ))}
           </div>

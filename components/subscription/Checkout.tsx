@@ -1,7 +1,8 @@
 import { createCheckoutSession } from "@/lib/action/stripe.actions";
+import { hasAccess } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 import { useTransition } from "react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 const Checkout = ({
   cta,
@@ -17,8 +18,10 @@ const Checkout = ({
   subscription: any;
 }) => {
   const [isPending, startTransition] = useTransition();
-  const isSubscribed = subscription?.subscription_status === "active";
-
+  const isSubscribed = hasAccess(
+    subscription?.subscription_status as string,
+    subscription?.plan_expires_at as string,
+  );
   const handleCheckout = () => {
     startTransition(async () => {
       await createCheckoutSession(planName, userRole);
@@ -38,7 +41,7 @@ const Checkout = ({
           : isPending
             ? "Subscribing..."
             : isSubscribed
-              ? "Update Plan"
+              ? "Upgrade Plan"
               : cta}
         <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
       </Button>

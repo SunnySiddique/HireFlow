@@ -18,11 +18,17 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { employerLinks, jobSeekerLinks } from "@/constants";
+import {
+  EMPLOYER_UNSUBSCRIBE_LINKS,
+  employerLinks,
+  JOBSEEKER_UNSUBSCRIBE_LINKS,
+  jobSeekerLinks,
+} from "@/constants";
 import { useEmployerProfile } from "@/hooks/useEmployer";
 import { useGetJobSeekerProfile } from "@/hooks/useJobSeeker";
+import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
 import { createClient } from "@/lib/supabase/client";
-import { getInitials } from "@/lib/utils";
+import { getInitials, hasAccess } from "@/lib/utils";
 import { Check, MonitorIcon, Moon, PaletteIcon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
@@ -41,11 +47,17 @@ const DashboardSidebar = ({
   setSidebarOpen,
   role,
 }: DashboardSidebarProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const { theme, setTheme } = useTheme();
+  // hook
   const { data: jobSeekerProfile } = useGetJobSeekerProfile();
   const { data: employerProfile } = useEmployerProfile();
+  const { data: subscription } = useGetCurrentUserSubscription();
+  const isSubscribed = hasAccess(
+    subscription?.subscription_status as string,
+    subscription?.plan_expires_at as string,
+  );
+
+  const [isOpen, setIsOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -61,7 +73,14 @@ const DashboardSidebar = ({
     return pathname === href;
   };
 
-  const links = role === "job-seeker" ? jobSeekerLinks : employerLinks;
+  let links;
+  if (role === "employer") {
+    links = isSubscribed ? employerLinks : EMPLOYER_UNSUBSCRIBE_LINKS;
+  } else if (role === "job-seeker") {
+    links = isSubscribed ? jobSeekerLinks : JOBSEEKER_UNSUBSCRIBE_LINKS;
+  } else {
+    links = [];
+  }
 
   return (
     <>
@@ -127,9 +146,18 @@ const DashboardSidebar = ({
 
           {/* Manage Section */}
           <div>
-            <p className="text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-3 px-2">
-              Manage
-            </p>
+            {!isSubscribed && role === "job-seeker" && (
+              <p className="text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-3 px-2">
+                Manage
+              </p>
+            )}
+
+            {isSubscribed && (
+              <p className="text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-3 px-2">
+                Manage
+              </p>
+            )}
+
             <div className="space-y-2">
               {links.slice(3).map((link) => {
                 const href =

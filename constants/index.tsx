@@ -148,6 +148,17 @@ export const jobSeekerLinks = [
   },
 ];
 
+export const JOBSEEKER_UNSUBSCRIBE_LINKS = [
+  { label: "Dashboard", href: "/job-seeker/dashboard", icon: LayoutDashboard },
+  { label: "Billing", href: "/job-seeker/billing", icon: CreditCard },
+  { label: "Browse Jobs", href: "/job-seeker/jobs", icon: Briefcase },
+  {
+    label: "Profile",
+    href: (slug: string) => `/job-seeker/${slug}`,
+    icon: User,
+  },
+];
+
 export const jobType = ["Full-time", "Contract", "Remote"];
 
 export const jobSeekerSections = [
@@ -157,6 +168,7 @@ export const jobSeekerSections = [
   { id: "skills", label: "Skills", icon: Zap },
   { id: "preferences", label: "Job Preferences", icon: Target },
   { id: "documents", label: "Documents", icon: FileText },
+  { id: "billing", label: "Billing", icon: CreditCard },
 ];
 
 // <---  JOB SEEKER PROFILE  ---> //
@@ -176,12 +188,24 @@ export const employerLinks = [
   },
 ];
 
+// ep unsubscribe links
+export const EMPLOYER_UNSUBSCRIBE_LINKS = [
+  { label: "Dashboard", href: "/employer/dashboard", icon: LayoutDashboard },
+  { label: "Billing", href: "/employer/billing", icon: CreditCard },
+  {
+    label: "Profile",
+    href: (slug: string) => `/employer/${slug}`,
+    icon: Building2,
+  },
+];
+
 export const employerSections = [
   { id: "about", label: "About", icon: Building2 },
   { id: "positions", label: "Open Positions", icon: Briefcase },
   { id: "culture", label: "Culture", icon: Heart },
   { id: "locations", label: "Locations", icon: MapPin },
   { id: "social", label: "Social Links", icon: Globe },
+  { id: "billing", label: "Billing", icon: CreditCard },
 ];
 
 export const employerHiringStatus = [

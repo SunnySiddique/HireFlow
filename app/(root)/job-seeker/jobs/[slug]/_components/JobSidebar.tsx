@@ -2,7 +2,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { formatLabel, getInitials } from "@/lib/utils";
 import { Job } from "@/types/jobs";
-import { motion, useInView } from "framer-motion";
 import {
   BarChart2,
   Briefcase,
@@ -16,8 +15,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef } from "react";
-import { AnimatedSection, fadeUp, stagger } from "./animation";
 
 // ── Sub-components ─────────
 
@@ -25,7 +22,6 @@ function OverviewRow({
   icon: Icon,
   label,
   value,
-  delay,
 }: {
   icon: React.ElementType;
   label: string;
@@ -33,11 +29,7 @@ function OverviewRow({
   delay: number;
 }) {
   return (
-    <motion.div
-      variants={fadeUp}
-      custom={delay}
-      className="flex items-center gap-3 text-sm group"
-    >
+    <div className="flex items-center gap-3 text-sm group">
       <div className="p-2 rounded-md bg-muted group-hover:bg-primary/10 transition-colors duration-200">
         <Icon className="w-4 h-4 text-primary" />
       </div>
@@ -47,17 +39,17 @@ function OverviewRow({
         </p>
         <p className="font-medium text-foreground text-sm">{value}</p>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
-const JobSidebar = ({ job }: { job: Job }) => {
-  const overviewRef = useRef(null);
-  const overviewInView = useInView(overviewRef, {
-    once: true,
-    margin: "-40px",
-  });
-
+const JobSidebar = ({
+  job,
+  isSubscribed,
+}: {
+  job: Job;
+  isSubscribed: boolean;
+}) => {
   const categoryLabel = formatLabel(job.category as string);
   const employmentLabel = formatLabel(job.employment_type as string);
   const remoteLabel = formatLabel(job.remote_option as string);
@@ -68,72 +60,64 @@ const JobSidebar = ({ job }: { job: Job }) => {
       <div className="lg:col-span-1">
         <div className="space-y-6">
           {/* Job Overview */}
-          <AnimatedSection delay={1}>
-            <Card className="p-6 border border-border hover:border-primary/30 transition-colors duration-200">
-              <h3 className="text-lg font-bold text-foreground mb-4">
-                Job Overview
-              </h3>
-              <motion.div
-                ref={overviewRef}
-                initial="hidden"
-                animate={overviewInView ? "visible" : "hidden"}
-                variants={stagger}
-                className="space-y-3"
-              >
-                <OverviewRow
-                  icon={Briefcase}
-                  label="Category"
-                  value={categoryLabel}
-                  delay={0}
-                />
-                <OverviewRow
-                  icon={Clock}
-                  label="Employment"
-                  value={employmentLabel}
-                  delay={1}
-                />
-                <OverviewRow
-                  icon={BarChart2}
-                  label="Experience"
-                  value={expLabel}
-                  delay={2}
-                />
-                <OverviewRow
-                  icon={Wifi}
-                  label="Remote"
-                  value={remoteLabel}
-                  delay={3}
-                />
-                <OverviewRow
-                  icon={MapPin}
-                  label="Location"
-                  value={job.location as string}
-                  delay={4}
-                />
-                <OverviewRow
-                  icon={Users}
-                  label="Open Positions"
-                  value={job.open_positions}
-                  delay={5}
-                />
-                <OverviewRow
-                  icon={CalendarX}
-                  label="Deadline"
-                  value="Apr 22, 1964"
-                  delay={6}
-                />
-                <OverviewRow
-                  icon={CalendarCheck}
-                  label="Posted"
-                  value="Feb 22, 2026"
-                  delay={7}
-                />
-              </motion.div>
-            </Card>
-          </AnimatedSection>
+          <Card className="p-6 border border-border hover:border-primary/30 transition-colors duration-200">
+            <h3 className="text-lg font-bold text-foreground mb-4">
+              Job Overview
+            </h3>
+            <div className="space-y-3">
+              <OverviewRow
+                icon={Briefcase}
+                label="Category"
+                value={categoryLabel}
+                delay={0}
+              />
+              <OverviewRow
+                icon={Clock}
+                label="Employment"
+                value={employmentLabel}
+                delay={1}
+              />
+              <OverviewRow
+                icon={BarChart2}
+                label="Experience"
+                value={expLabel}
+                delay={2}
+              />
+              <OverviewRow
+                icon={Wifi}
+                label="Remote"
+                value={remoteLabel}
+                delay={3}
+              />
+              <OverviewRow
+                icon={MapPin}
+                label="Location"
+                value={job.location as string}
+                delay={4}
+              />
+              <OverviewRow
+                icon={Users}
+                label="Open Positions"
+                value={job.open_positions}
+                delay={5}
+              />
+              <OverviewRow
+                icon={CalendarX}
+                label="Deadline"
+                value="Apr 22, 1964"
+                delay={6}
+              />
+              <OverviewRow
+                icon={CalendarCheck}
+                label="Posted"
+                value="Feb 22, 2026"
+                delay={7}
+              />
+            </div>
+          </Card>
 
           {/* About Company */}
-          <AnimatedSection delay={2}>
+          {isSubscribed && (
             <Card className="p-6 border border-border hover:border-primary/30 transition-colors duration-200">
               <h3 className="text-lg font-bold text-foreground mb-4">
                 About the Company
@@ -175,7 +159,7 @@ const JobSidebar = ({ job }: { job: Job }) => {
                 {job?.employer?.description}
               </p>
             </Card>
-          </AnimatedSection>
+          )}
         </div>
       </div>
     </>

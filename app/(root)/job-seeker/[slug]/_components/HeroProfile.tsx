@@ -1,8 +1,7 @@
 import CustomField from "@/components/CustomField";
 import { Button } from "@/components/ui/button";
-import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
 import { ProfileFormData } from "@/types/job-seeker";
-import { Edit2, Save, Upload, User } from "lucide-react";
+import { Edit2, Save, Star, Upload, User } from "lucide-react";
 import Image from "next/image";
 import { ChangeEvent, useRef, useState } from "react";
 import { FormProvider, UseFormReturn } from "react-hook-form";
@@ -26,7 +25,6 @@ const HeroProfile = ({
   setProfileFile,
   jobSeekerProfile: profile,
 }: HeroProifleProps) => {
-  const { data: user } = useGetCurrentUser();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const profileImageRef = useRef<null>(null);
 
@@ -116,6 +114,12 @@ const HeroProfile = ({
                     <h1 className="text-3xl sm:text-4xl font-black mb-2">
                       {profile?.full_name}
                     </h1>
+                    {profile.is_featured && (
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-xs font-bold uppercase tracking-widest border border-amber-500/20">
+                        <Star className="w-3.5 h-3.5 fill-amber-500" />
+                        Featured
+                      </div>
+                    )}
                     {profile?.headline || profile.bio ? (
                       <>
                         <p className="text-lg sm:text-xl text-muted-foreground font-semibold">

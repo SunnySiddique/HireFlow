@@ -11,13 +11,16 @@ import JobPreferences from "./_components/JobPreferences";
 import Skills from "./_components/Skills";
 
 import Loader from "@/components/Loader";
+import ManageSubscription from "@/components/subscription/ManageSubscription";
 import {
   useGetJobSeekerProfileBySlug,
   useSaveJobSeekerProfile,
   useUploadProfileAndResume,
 } from "@/hooks/useJobSeeker";
+import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
 import {
   getReadableError,
+  hasAccess,
   MAX_PROFILE_SIZE,
   MAX_RESUME_SIZE,
 } from "@/lib/utils";
@@ -85,10 +88,16 @@ const profileSchema = z
 
 const ProfilePage = () => {
   const { slug } = useParams();
-  // Job seeker profile from useJobSeeker.ts
+  // hooks
   const { data: jobSeekerProfile, isLoading: isJobSeekerProfileLoading } =
     useGetJobSeekerProfileBySlug(slug as string);
 
+  const { data: subscription } = useGetCurrentUserSubscription();
+  const isSubscribed = hasAccess(
+    subscription?.subscription_status as string,
+    subscription?.plan_expires_at as string,
+  );
+  const isChampion = subscription?.plan?.toLowerCase() === "champion";
   //states
   const [editMode, setEditMode] = useState(false);
   const [activeSection, setActiveSection] = useState("about");
@@ -261,7 +270,7 @@ const ProfilePage = () => {
 
   if (isJobSeekerProfileLoading) return <Loader />;
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+    <>
       {/* Hero Profile Section */}
       <HeroProfile
         handleProfileSave={form.handleSubmit(onValid, onInvalid)}
@@ -271,15 +280,18 @@ const ProfilePage = () => {
         isPending={isSubmitting}
         setProfileFile={setProfileFile}
         jobSeekerProfile={jobSeekerProfile}
+        isSubscribed={isSubscribed}
+        isChampion={isChampion}
       />
       {/* Main Content */}
-      <div className="max-w-370 mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="p-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Navigation */}
           <NavigationSidebar
             activeSection={activeSection}
             setActiveSection={setActiveSection}
             role={"job_seeker"}
+            isSubscribed={isSubscribed}
           />
 
           {/* Content Area */}
@@ -340,10 +352,18 @@ const ProfilePage = () => {
                 setResumeFile={setResumeFile}
               />
             )}
+
+            {isSubscribed && activeSection === "billing" && (
+              <ManageSubscription
+                subscription={subscription}
+                isSubscribed={isSubscribed}
+                userRole="job-seeker"
+              />
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

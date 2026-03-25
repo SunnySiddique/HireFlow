@@ -60,12 +60,39 @@ export async function createCheckoutSession(
     mode: "subscription",
     metadata: {
       userId: user.id,
-      userRole: userRole,
-      planKey: planName,
+      userRole,
+      planName,
     },
     success_url: `${process.env.NEXT_PUBLIC_DOMAIN}/${userRole === "employer" ? "employer" : "job-seeker"}/dashboard?success=true`,
     cancel_url: `${process.env.NEXT_PUBLIC_DOMAIN}/${userRole === "employer" ? "employer" : "job-seeker"}/billing`,
   });
 
   redirect(session.url!);
+}
+
+export async function createPortalSession(userRole: "employer" | "job-seeker") {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+  if (!user || authError) redirect("/auth/signin");
+
+  const { data: sub } = await supabase
+    .from("subscriptions")
+    .select("stripe_customer_id")
+    .eq("user_id", user.id)
+    .single();
+
+  if (!sub?.stripe_customer_id) {
+    throw new Error("No subscription found");
+  }
+
+  const portalSession = await stripe.billingPortal.sessions.create({
+    customer: sub.stripe_customer_id,
+    return_url: `${process.env.NEXT_PUBLIC_DOMAIN}/${userRole}/billing`,
+  });
+
+  redirect(portalSession.url);
 }

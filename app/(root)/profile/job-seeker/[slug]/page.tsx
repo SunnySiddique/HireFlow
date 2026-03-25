@@ -58,6 +58,7 @@ const PublicProfilePage = () => {
             activeSection={activeSection}
             setActiveSection={setActiveSection}
             role={"job_seeker"}
+            isSubscribed={false}
           />
 
           {/* Content Area */}
