@@ -44,9 +44,7 @@ export default function JobSeekerLayout({
           onMenuClick={() => setSidebarOpen((prev) => !prev)}
           isSidebarOpen={sidebarOpen}
         />
-        <main className="flex-1 overflow-y-auto p-8 bg-background">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto bg-background">{children}</main>
       </div>
     </div>
   );

@@ -173,38 +173,52 @@ const DashboardNavbar = ({
                         }}
                         target="_blank"
                       >
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className={`p-4 hover:bg-muted/50 cursor-pointer transition-colors relative group ${notification.is_read ? "bg-primary/[0.02]" : ""}`}
+                        <div
+                          className={`p-4 hover:bg-muted/50 cursor-pointer transition-colors relative group ${
+                            !notification.is_read ? "bg-primary/[0.02]" : ""
+                          }`}
                         >
-                          <div className="flex gap-3 sm:gap-4">
+                          <div className="flex gap-3 sm:gap-4 items-start">
+                            {/* Icon */}
                             <div
-                              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${notification.is_read ? "bg-primary/10" : "bg-muted"}`}
+                              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                notification.is_read
+                                  ? "bg-primary/10"
+                                  : "bg-muted"
+                              }`}
                             >
                               <NotificationIcon type={notification.type} />
                             </div>
-                            <div className="flex-1 space-y-1 min-w-0">
-                              <div className="flex items-center justify-between gap-2">
+
+                            {/* Text Content */}
+                            <div className="flex-1 min-w-0 space-y-1">
+                              <div className="flex items-start justify-between gap-2">
                                 <h4
-                                  className={`text-sm font-semibold truncate ${notification.is_read ? "text-foreground" : "text-muted-foreground"}`}
+                                  className={`text-sm font-semibold break-words ${
+                                    notification.is_read
+                                      ? "text-foreground"
+                                      : "text-muted-foreground"
+                                  }`}
                                 >
                                   {notification.title}
                                 </h4>
-                                <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">
+                                <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap flex-shrink-0">
                                   {timeAgo(notification.created_at)}
                                 </span>
                               </div>
-                              <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+
+                              {/* Message */}
+                              <p className="text-xs text-muted-foreground leading-snug break-words max-h-14 overflow-hidden">
                                 {notification.message}
                               </p>
                             </div>
+
+                            {/* Unread indicator */}
                             {!notification.is_read && (
                               <div className="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 bg-primary rounded-full" />
                             )}
                           </div>
-                        </motion.div>
+                        </div>
                       </a>
                     ))}
                   </div>

@@ -3,7 +3,7 @@ import React, { useRef, useState } from "react";
 import CustomField from "@/components/CustomField";
 import EmptyState from "@/components/EmptyState";
 import { EmployerFormData } from "@/types/employer";
-import { Building2, Upload } from "lucide-react";
+import { Building2, Star, Upload } from "lucide-react";
 import Image from "next/image";
 import { UseFormReturn } from "react-hook-form";
 
@@ -37,6 +37,12 @@ const EmployerHeroSection = ({
   return (
     <>
       <div className="border rounded-sm p-8 shadow-lg">
+        {employer?.is_featured && (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-xs mb-2 font-bold uppercase tracking-widest border border-amber-500/20">
+            <Star className="w-3.5 h-3.5 fill-amber-500" />
+            Featured
+          </div>
+        )}
         <div className="flex items-start gap-6">
           {/* Logo */}
           <div className="relative">

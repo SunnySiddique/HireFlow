@@ -19,7 +19,7 @@ const Header = ({
 }: HeaderProps) => {
   return (
     <>
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+      <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="py-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-foreground">

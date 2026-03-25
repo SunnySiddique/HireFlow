@@ -63,8 +63,8 @@ interface JobCardProps {
   job: Job;
   variant?: "browse" | "similar";
   href?: string;
+  isSubscribed: boolean;
 }
-
 
 const statusStyle: Record<string, string> = {
   open: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800",
@@ -72,7 +72,12 @@ const statusStyle: Record<string, string> = {
   draft: "bg-muted text-muted-foreground border-border",
 };
 
-const JobCard = ({ job, variant = "browse", href }: JobCardProps) => {
+const JobCard = ({
+  job,
+  variant = "browse",
+  href,
+  isSubscribed,
+}: JobCardProps) => {
   const { mutate: saveJob } = useSavedJob();
   const { data: savedJobs } = useGetCurrentUserSaveJobs();
 
@@ -134,17 +139,19 @@ const JobCard = ({ job, variant = "browse", href }: JobCardProps) => {
                 {job.status}
               </Badge>
             )}
-            <Button
-              variant="outline"
-              className={`border-border transition-all duration-200 ${isSaved ? "border-primary/50 text-primary bg-primary/5" : "text-foreground hover:bg-muted"}`}
-              onClick={handleSaveJob}
-            >
-              {isSaved ? (
-                <BookmarkCheck className="w-4 h-4" />
-              ) : (
-                <Bookmark className="w-4 h-4" />
-              )}
-            </Button>
+            {isSubscribed && (
+              <Button
+                variant="outline"
+                className={`border-border transition-all duration-200 ${isSaved ? "border-primary/50 text-primary bg-primary/5" : "text-foreground hover:bg-muted"}`}
+                onClick={handleSaveJob}
+              >
+                {isSaved ? (
+                  <BookmarkCheck className="w-4 h-4" />
+                ) : (
+                  <Bookmark className="w-4 h-4" />
+                )}
+              </Button>
+            )}
           </div>
         </div>
 

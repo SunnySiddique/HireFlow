@@ -2,10 +2,11 @@
 
 import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
 import { useGetSimilarJobs } from "@/hooks/useJobs";
+import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
 import { useTrackJobView } from "@/hooks/useViews";
+import { hasAccess } from "@/lib/utils";
 import { Job } from "@/types/jobs";
 import { useEffect } from "react";
-import { AnimatedSection } from "../../app/(root)/job-seeker/jobs/[slug]/_components/animation";
 import JobDetailContent from "../../app/(root)/job-seeker/jobs/[slug]/_components/JobDetailContent";
 import HeaderCard from "../../app/(root)/job-seeker/jobs/[slug]/_components/JobHeader";
 import JobSidebar from "../../app/(root)/job-seeker/jobs/[slug]/_components/JobSidebar";
@@ -16,6 +17,11 @@ const JobDetailClient = ({ job }: { job: Job }) => {
   const { data: similarJobs = [], isLoading } = useGetSimilarJobs(job.id);
   const { data: currentUser } = useGetCurrentUser();
   const { mutate: trackView } = useTrackJobView();
+  const { data: subscription } = useGetCurrentUserSubscription();
+  const isSubscribed = hasAccess(
+    subscription?.subscription_status as string,
+    subscription?.plan_expires_at as string,
+  );
 
   useEffect(() => {
     if (!job?.id) return;
@@ -29,25 +35,28 @@ const JobDetailClient = ({ job }: { job: Job }) => {
   return (
     <div className="space-y-6">
       {/* ── Header Card ───── */}
-      <HeaderCard job={job} />
+      <HeaderCard job={job} isSubscribed={isSubscribed} />
       {/* ── Main Grid ─────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column */}
-        <JobDetailContent job={job} />
+        <JobDetailContent job={job} isSubscribed={isSubscribed} />
         {/* Right Column */}
-        <JobSidebar job={job} />
+        <JobSidebar job={job} isSubscribed={isSubscribed} />
       </div>
 
-      <AnimatedSection delay={5}>
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold text-foreground">Similar Jobs</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-            {similarJobs.map((similarJob) => (
-              <JobCard key={similarJob.id} job={similarJob} variant="similar" />
-            ))}
-          </div>
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-foreground">Similar Jobs</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          {similarJobs.map((similarJob) => (
+            <JobCard
+              key={similarJob.id}
+              job={similarJob}
+              variant="similar"
+              isSubscribed={isSubscribed}
+            />
+          ))}
         </div>
-      </AnimatedSection>
+      </div>
     </div>
   );
 };

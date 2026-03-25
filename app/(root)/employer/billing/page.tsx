@@ -1,19 +1,13 @@
 "use client";
 
+import Checkout from "@/components/subscription/Checkout";
 import { employerPlans } from "@/constants/BillingData";
 import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
 import { cn } from "@/lib/utils";
 import { Check, Info } from "lucide-react";
-import Checkout from "../../../../components/Checkout";
 
 const EmployerBillingPage = () => {
   const { data: subscription } = useGetCurrentUserSubscription();
-  // console.log("subscription:", subscription);
-  // const formattedDate = format(
-  //   subscription?.plan_expires_at as string,
-  //   "MMMM dd, yyyy hh:mm a",
-  // );
-  // const formattedDate1 = format(new Date(), "MMMM dd, yyyy hh:mm a");
 
   return (
     <>

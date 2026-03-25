@@ -51,6 +51,14 @@ export const employerPlans = [
   },
 ];
 
+export const PLAN_LIMITS = {
+  starter: 3,
+  growth: 10,
+  elite: Infinity,
+};
+
+// employer
+
 // seeker
 export const seekerPlans = [
   {
@@ -104,7 +112,6 @@ export const seekerPlans = [
 ];
 
 // ----
-// ✅ Your Price IDs — replace dummy with real ones
 export const PRICE_IDS = {
   employer: {
     starter: "price_1TDrQZHVtR1pHHiQUOEJE6B4",

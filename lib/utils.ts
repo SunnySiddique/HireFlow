@@ -106,3 +106,12 @@ export const pastWeek = () => {
 
   return pastWeek.toISOString();
 };
+
+// has acess
+export const hasAccess = (status: string, plan_expires_at: string) => {
+  return Boolean(
+    (status === "active" || status === "cancelling") &&
+    plan_expires_at &&
+    new Date(plan_expires_at) > new Date(),
+  );
+};
