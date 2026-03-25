@@ -1,6 +1,6 @@
 "use client";
 
-import Checkout from "@/components/Checkout";
+import Checkout from "@/components/subscription/Checkout";
 import { seekerPlans } from "@/constants/BillingData";
 import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
 import { cn } from "@/lib/utils";
@@ -16,9 +16,9 @@ const JobSeekerBillingPage = () => {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/5 blur-[120px]" />
       </div>
 
-      <main>
+      <main className="p-8">
         {/* Header */}
-        <div className="text-center mb-16 lg:mb-24">
+        <div className="text-center mb-16 lg:mb-24 ">
           <div>
             <h2 className="text-primary font-mono text-sm uppercase tracking-widest mb-4">
               Job Seeker Pricing

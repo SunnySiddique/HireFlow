@@ -65,7 +65,6 @@ export async function sendJobMatchNotifications(
   );
 
   if (notifError) {
-    console.error("[sendJobMatchNotifications]", notifError);
     return 0;
   }
 
@@ -90,4 +89,86 @@ export async function sendProfileCompletionNotifications(
   if (error) {
     console.error("[sendProfileCompletionNotification]", error);
   }
+}
+
+export async function sendNotification(
+  supabase: SupabaseClient,
+  userId: string,
+  type: string,
+  title: string,
+  message: string,
+  reference_id: string,
+) {
+  const { error } = await supabase.from("notifications").insert({
+    user_id: userId,
+    type,
+    title,
+    message,
+    reference_id,
+    is_read: false,
+  });
+
+  if (error) {
+    console.error("[sendNotification]", error);
+  }
+}
+
+// Utility function for sending subscription notifications
+export async function sendSubscriptionNotification(
+  supabase: SupabaseClient,
+  userId: string,
+  plan: string,
+  eventType: string,
+  extraData?: { date?: string; amount?: number },
+) {
+  let title = "";
+  let message = "";
+  let type = "";
+
+  switch (eventType) {
+    case "new":
+      title = "Subscription Activated! 🎉";
+      message = `Your ${plan} plan is now active. Enjoy your benefits!`;
+      type = "new";
+      break;
+    case "update":
+      title = "Plan Updated! 🔄";
+      message = `Your plan has been updated to ${plan} successfully.`;
+      type = "update";
+      break;
+    case "renewed":
+      title = "Subscription Renewed! ✅";
+      message = `Your ${plan} plan has been renewed successfully.`;
+      type = "renewed";
+      break;
+    case "cancelling":
+      title = "Subscription Cancellation Scheduled 🔔";
+      message = `Your ${plan} plan will be cancelled at the end of your billing period.`;
+      type = "cancelling";
+      break;
+    case "canceled":
+      title = "Subscription Cancelled ❌";
+      message = `Your ${plan} plan has been cancelled. You can resubscribe anytime.`;
+      type = "canceled";
+      break;
+    case "payment_failed":
+      title = "Payment Failed ⚠️";
+      message = `Your payment for ${plan} plan failed. Please update your card details.`;
+      type = "payment_failed";
+      break;
+    case "trial_end":
+      title = "Trial Ending Soon ⏳";
+      message = `Your trial for ${plan} ends on ${extraData?.date}. Don’t forget to subscribe!`;
+      type = "trial_end";
+      break;
+    case "payment_upcoming":
+      title = "Upcoming Payment 💳";
+      message = `Your next payment of $${extraData?.amount} for ${plan} is due on ${extraData?.date}.`;
+      type = "payment_upcoming";
+      break;
+  }
+
+  if (!userId) return;
+
+  await sendNotification(supabase, userId, type, title, message, type);
 }

@@ -3,16 +3,15 @@
 import Loader from "@/components/Loader";
 import { Card } from "@/components/ui/card";
 import { useGetJobSeekerApplicationStats } from "@/hooks/useDashboard";
-import {
-  Clock,
-  Eye,
-  FileText,
-  Heart,
-  TrendingDown,
-  TrendingUp,
-} from "lucide-react";
+import { Eye, FileText, Heart, TrendingDown, TrendingUp } from "lucide-react";
 
-const DashboardStats = () => {
+const DashboardStats = ({
+  isSubscribed,
+  isAcceleratorPlan,
+}: {
+  isSubscribed: boolean;
+  isAcceleratorPlan: boolean;
+}) => {
   const { data, isLoading } = useGetJobSeekerApplicationStats();
   const thisWeekApplications = data?.thisWeekApplications ?? 0;
   const totalProfileViews = data?.thisWeekProfileviews ?? 0;
@@ -21,6 +20,7 @@ const DashboardStats = () => {
 
   const statsData = [
     {
+      id: "applications-sent",
       title: "Applications Sent",
       value: thisWeekApplications,
       change:
@@ -34,6 +34,7 @@ const DashboardStats = () => {
       iconColor: "text-primary",
     },
     {
+      id: "saved-jobs",
       title: "Saved Jobs",
       value: thisMonthSavedJobs,
       change:
@@ -46,16 +47,17 @@ const DashboardStats = () => {
       iconBg: "bg-red-50",
       iconColor: "text-red-500",
     },
+    // {
+    //   title: "Interview Scheduled",
+    //   value: "3",
+    //   change: "2 this week",
+    //   changeType: "neutral",
+    //   icon: Clock,
+    //   iconBg: "bg-blue-50",
+    //   iconColor: "text-blue-500",
+    // },
     {
-      title: "Interview Scheduled",
-      value: "3",
-      change: "2 this week",
-      changeType: "neutral",
-      icon: Clock,
-      iconBg: "bg-blue-50",
-      iconColor: "text-blue-500",
-    },
-    {
+      id: "profile-views",
       title: "Profile Views",
       value: totalProfileViews,
       change:
@@ -69,14 +71,24 @@ const DashboardStats = () => {
       iconColor: "text-red-500",
     },
   ];
+  const filteredStats = statsData.filter((stat) => {
+    if (!isSubscribed && stat.id === "profile-views") return false;
+    if (isSubscribed && !isAcceleratorPlan && stat.id === "profile-views")
+      return false;
+    return true;
+  });
 
   if (isLoading) return <Loader />;
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-      {statsData.map((stat, index) => (
+    <div
+      className={`grid grid-cols-1 sm:grid-cols-2 ${
+        filteredStats.length === 2 ? "lg:grid-cols-2" : "lg:grid-cols-4"
+      } gap-4 lg:gap-6`}
+    >
+      {filteredStats.map((stat, index) => (
         <Card
           key={index}
-          className="p-4 lg:p-6 bg-background border border-border hover:shadow-md transition-shadow duration-200"
+          className={`p-4 lg:p-6 bg-background border border-border hover:shadow-md transition-shadow duration-200 ${statsData.length === 2 ? "w-full" : ""}`}
         >
           <div className="flex items-start justify-between mb-4">
             <div>

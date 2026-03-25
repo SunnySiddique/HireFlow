@@ -6,13 +6,15 @@ import {
   useUpdateEmployer,
   useUploadCompanyLogo,
 } from "@/hooks/useEmployer";
-import { getReadableError, MAX_PROFILE_SIZE } from "@/lib/utils";
+import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
+import { getReadableError, hasAccess, MAX_PROFILE_SIZE } from "@/lib/utils";
 import { EmployerFormData, EmployerType } from "@/types/employer";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
+import ManageSubscription from "../../../../../components/subscription/ManageSubscription";
 import EmployerAbout from "./EmployerAbout";
 import EmployerCulture from "./EmployerCulture";
 import EmployerHeroSection from "./EmployerHeroSection";
@@ -54,19 +56,26 @@ interface EmployerProfileProps {
 }
 
 const EmployerProfile = ({ slug }: EmployerProfileProps) => {
+  // hooks
   const {
     mutateAsync: updateEmployerProfile,
     isPending: isEmployerProfleUpdating,
   } = useUpdateEmployer();
+
   const { mutateAsync: uploadCompanyLogo, isPending: isLogoUploading } =
     useUploadCompanyLogo();
 
+  const { data: employerProfile } = useEmployerProfileBySlug(slug);
+  const { data: subscription } = useGetCurrentUserSubscription();
+  const isSubscribed = hasAccess(
+    subscription?.subscription_status as string,
+    subscription?.plan_expires_at as string,
+  );
+  // states
   const [editMode, setEditMode] = useState(false);
   const [activeSection, setActiveSection] = useState("about");
   const [coreValues, setCoreValues] = useState<string[]>([]);
-
   const [logoFile, setLogoFile] = useState<File | null>(null);
-  const { data: employerProfile } = useEmployerProfileBySlug(slug);
 
   const form = useForm<EmployerFormData>({
     resolver: zodResolver(employerSchema),
@@ -189,6 +198,7 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Navigation */}
           <NavigationSidebar
+            isSubscribed={isSubscribed}
             activeSection={activeSection}
             setActiveSection={setActiveSection}
             role="employer"
@@ -244,6 +254,13 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
                 editMode={editMode}
                 form={form}
                 employer={employerProfile}
+              />
+            )}
+            {isSubscribed && activeSection === "billing" && (
+              <ManageSubscription
+                subscription={subscription}
+                isSubscribed={isSubscribed}
+                userRole="employer"
               />
             )}
           </div>

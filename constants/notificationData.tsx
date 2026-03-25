@@ -1,15 +1,54 @@
-import { BarChart3, Bell, Briefcase, Eye, Sparkles } from "lucide-react";
+import {
+  AlertCircle,
+  BarChart3,
+  Bell,
+  Briefcase,
+  CheckCircle,
+  Clock,
+  CreditCard,
+  Eye,
+  ListChecks,
+  RefreshCcw,
+  Sparkles,
+  XCircle,
+} from "lucide-react";
 
 export const NotificationIcon = ({ type }: { type: string }) => {
   switch (type) {
+    // Job-related
     case "job_match":
       return <Briefcase className="w-4 h-4 text-blue-500" />;
     case "profile_view":
       return <Eye className="w-4 h-4 text-purple-500" />;
     case "job_view":
       return <BarChart3 className="w-4 h-4 text-green-500" />;
+    case "job_post_limit":
+      return <ListChecks className="w-4 h-4 text-red-500" />;
+
+    // System
     case "system":
       return <Sparkles className="w-4 h-4 text-amber-500" />;
+
+    // Subscription/payment notifications
+    case "new": // new subscription
+      return <CheckCircle className="w-4 h-4 text-green-500" />;
+    case "update": // plan updated
+      return <RefreshCcw className="w-4 h-4 text-blue-500" />;
+    case "renewed": // subscription renewed
+      return <CheckCircle className="w-4 h-4 text-indigo-500" />;
+    case "cancelling": // scheduled cancellation
+      return <Clock className="w-4 h-4 text-yellow-500" />;
+    case "canceled": // fully canceled
+      return <XCircle className="w-4 h-4 text-red-500" />;
+    case "payment_failed":
+      return <AlertCircle className="w-4 h-4 text-red-600" />;
+
+    // Optional: trial ending or upcoming payment
+    case "trial_end":
+      return <Clock className="w-4 h-4 text-orange-500" />;
+    case "payment_upcoming":
+      return <CreditCard className="w-4 h-4 text-blue-500" />;
+
     default:
       return <Bell className="w-4 h-4 text-muted-foreground" />;
   }
@@ -33,6 +72,9 @@ export function getNotificationLink(
         : `/profile/job-seeker/${referenceId}`;
     case "system":
       return `/job-seeker/${referenceId}`;
+    case "subscription":
+    case "job_post_limit":
+      return `/${role}/billing`;
     default:
       return "";
   }
@@ -60,5 +102,10 @@ export const categories = [
     key: "job_view",
     label: "Job Views",
     icon: <BarChart3 className="w-4 h-4" />,
+  },
+  {
+    key: "payment",
+    label: "Payments & Subscriptions",
+    icon: <CreditCard className="w-4 h-4" />,
   },
 ];

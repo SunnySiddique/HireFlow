@@ -13,7 +13,7 @@ const MyApplicationsPage = () => {
 
   if (isLoading) return <Loader />;
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-8">
       {/* Header */}
       <div>
         <h1 className="text-4xl font-bold text-foreground">My Applications</h1>

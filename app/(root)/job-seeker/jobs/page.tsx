@@ -65,7 +65,7 @@ const BrowseJobs = () => {
   };
 
   return (
-    <div className="space-y-6 lg:space-y-8">
+    <div className="space-y-6 lg:space-y-8 p-8">
       {/* Search & Filter Bar */}
       <SearchAndFilterBar
         filters={filters}
