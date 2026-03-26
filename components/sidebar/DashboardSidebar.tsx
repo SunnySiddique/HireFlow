@@ -18,12 +18,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  EMPLOYER_UNSUBSCRIBE_LINKS,
-  employerLinks,
-  JOBSEEKER_UNSUBSCRIBE_LINKS,
-  jobSeekerLinks,
-} from "@/constants";
+import { employerLinks, FREE_LINKS, jobSeekerLinks } from "@/constants";
 import { useEmployerProfile } from "@/hooks/useEmployer";
 import { useGetJobSeekerProfile } from "@/hooks/useJobSeeker";
 import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
@@ -73,15 +68,46 @@ const DashboardSidebar = ({
     return pathname === href;
   };
 
-  let links;
-  if (role === "employer") {
-    links = isSubscribed ? employerLinks : EMPLOYER_UNSUBSCRIBE_LINKS;
-  } else if (role === "job-seeker") {
-    links = isSubscribed ? jobSeekerLinks : JOBSEEKER_UNSUBSCRIBE_LINKS;
-  } else {
-    links = [];
-  }
+  const links = role === "employer" ? employerLinks : jobSeekerLinks;
 
+  const filteredLinks = links.filter((link) => {
+    if (!isSubscribed) {
+      return FREE_LINKS[role].includes(link.label);
+    }
+    if (!link.plan) return true;
+
+    return subscription?.plan === link.plan;
+  });
+
+  const mainLinks = filteredLinks.filter((l) => l.section === "main");
+  const manageLinks = filteredLinks.filter((l) => l.section === "manage");
+
+  const renderLink = (link: any) => {
+    const href =
+      typeof link.href === "function"
+        ? link.href(
+            role === "job-seeker"
+              ? (jobSeekerProfile?.slug ?? "")
+              : (employerProfile?.slug ?? ""),
+          )
+        : link.href;
+
+    return (
+      <Link
+        key={link.label}
+        href={href}
+        className={`${
+          isActive(href)
+            ? "bg-sidebar border-l-4 border-sidebar-primary text-sidebar-primary"
+            : "hover:bg-muted-foreground/10"
+        } flex items-center gap-3 px-4 py-3 rounded-md cursor-pointer`}
+        onClick={() => setSidebarOpen(false)}
+      >
+        {link.icon && <link.icon className="w-4 h-4" />}
+        <span className="text-sm font-medium">{link.label}</span>
+      </Link>
+    );
+  };
   return (
     <>
       {sidebarOpen && (
@@ -119,68 +145,16 @@ const DashboardSidebar = ({
               Main
             </p>
 
-            <div className="space-y-2">
-              {links.slice(0, 3).map((link) => {
-                const href =
-                  typeof link.href === "function"
-                    ? link.href(
-                        role === "job-seeker"
-                          ? (jobSeekerProfile?.slug ?? "")
-                          : (employerProfile?.slug ?? ""),
-                      )
-                    : link.href;
-                return (
-                  <Link
-                    key={link.label}
-                    href={href}
-                    className={`${isActive(href) ? "bg-sidebar border-l-4 border-sidebar-primary text-sidebar-primary" : "hover:bg-muted-foreground/10"} flex items-center gap-3 px-4 py-3 rounded-md cursor-pointer`}
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    {link.icon && <link.icon className="w-4 h-4" />}
-                    <span className="text-sm font-medium">{link.label}</span>
-                  </Link>
-                );
-              })}
-            </div>
+            <div className="space-y-2">{mainLinks.map(renderLink)}</div>
           </div>
 
           {/* Manage Section */}
           <div>
-            {!isSubscribed && role === "job-seeker" && (
-              <p className="text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-3 px-2">
-                Manage
-              </p>
-            )}
+            <p className="text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-3 px-2">
+              Manage
+            </p>
 
-            {isSubscribed && (
-              <p className="text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-3 px-2">
-                Manage
-              </p>
-            )}
-
-            <div className="space-y-2">
-              {links.slice(3).map((link) => {
-                const href =
-                  typeof link.href === "function"
-                    ? link.href(
-                        role === "job-seeker"
-                          ? (jobSeekerProfile?.slug ?? "")
-                          : (employerProfile?.slug ?? ""),
-                      )
-                    : link.href;
-                return (
-                  <Link
-                    key={link.label}
-                    href={href}
-                    className={`${isActive(href) ? "bg-sidebar border-l-4 border-sidebar-primary text-sidebar-primary" : "hover:bg-muted-foreground/10"} flex items-center gap-3 px-4 py-3 rounded-md cursor-pointer`}
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    {link.icon && <link.icon className="w-4 h-4" />}
-                    <span className="text-sm font-medium">{link.label}</span>
-                  </Link>
-                );
-              })}
-            </div>
+            <div className="space-y-2">{manageLinks.map(renderLink)}</div>
           </div>
         </nav>
         {/* Bottom User Profile */}

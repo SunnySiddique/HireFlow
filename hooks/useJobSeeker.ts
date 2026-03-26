@@ -4,6 +4,7 @@ import { invalidateQuery } from "@/lib/react-query/invalidateQueries";
 import { createClient } from "@/lib/supabase/client";
 import { JobSeekerProfile } from "@/types/job-seeker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { redirect } from "next/navigation";
 import toast from "react-hot-toast";
 
 // save job seeker profile
@@ -91,5 +92,29 @@ export const useUploadProfileAndResume = () => {
       toast.error(
         `Something went wrong. uploading proifleImage or Resume try again`,
       ),
+  });
+};
+
+// profiles
+export const useSeekerProfiles = () => {
+  return useQuery({
+    queryKey: ["seekerProfiles"],
+    queryFn: async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+      if (authError || !user) redirect("/auth/signin");
+
+      const { data, error } = await supabase
+        .from("job_seekers")
+        .select("*")
+        .neq("auth_id", user.id);
+
+      if (error) throw error;
+
+      return data;
+    },
   });
 };

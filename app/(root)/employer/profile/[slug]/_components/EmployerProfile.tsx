@@ -1,6 +1,7 @@
 "use client";
 
 import NavigationSidebar from "@/components/NavigationSidebar";
+import ManageSubscription from "@/components/subscription/ManageSubscription";
 import {
   useEmployerProfileBySlug,
   useUpdateEmployer,
@@ -14,7 +15,6 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
-import ManageSubscription from "../../../../../components/subscription/ManageSubscription";
 import EmployerAbout from "./EmployerAbout";
 import EmployerCulture from "./EmployerCulture";
 import EmployerHeroSection from "./EmployerHeroSection";

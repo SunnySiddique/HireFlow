@@ -36,7 +36,7 @@ const HeroProfile = ({
       setProfileImage(URL.createObjectURL(file));
     }
   };
-
+  console.log(profile);
   const imageSrc = profileImage || profile.profile_url;
   return (
     <FormProvider {...form}>

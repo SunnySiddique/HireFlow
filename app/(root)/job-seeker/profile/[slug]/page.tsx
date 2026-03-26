@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import NavigationSidebar from "../../../../components/NavigationSidebar";
 import About from "./_components/About";
 import Documents from "./_components/Documents";
 import Education from "./_components/Education";
@@ -11,6 +10,7 @@ import JobPreferences from "./_components/JobPreferences";
 import Skills from "./_components/Skills";
 
 import Loader from "@/components/Loader";
+import NavigationSidebar from "@/components/NavigationSidebar";
 import ManageSubscription from "@/components/subscription/ManageSubscription";
 import {
   useGetJobSeekerProfileBySlug,
@@ -267,7 +267,7 @@ const ProfilePage = () => {
       toast.error(firstError.message);
     }
   };
-
+  console.log("pro:", jobSeekerProfile);
   if (isJobSeekerProfileLoading) return <Loader />;
   return (
     <>
@@ -280,8 +280,6 @@ const ProfilePage = () => {
         isPending={isSubmitting}
         setProfileFile={setProfileFile}
         jobSeekerProfile={jobSeekerProfile}
-        isSubscribed={isSubscribed}
-        isChampion={isChampion}
       />
       {/* Main Content */}
       <div className="p-8 py-12">

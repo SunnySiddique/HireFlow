@@ -209,7 +209,7 @@ const ApplicantDialog = ({
 
         <DialogFooter className="gap-2 flex-col sm:flex sm:gap-2">
           <a
-            href={`/profile/job-seeker/${applicant.seeker?.slug || ""}`}
+            href={`/profile/seeker/${applicant.seeker?.slug || ""}`}
             target="_blank"
             className="w-full"
           >
