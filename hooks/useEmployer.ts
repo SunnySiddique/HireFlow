@@ -3,6 +3,7 @@ import { uploadEmployerCompanyLogo } from "@/lib/action/media.actions";
 import { createClient } from "@/lib/supabase/client";
 import { EmployerType } from "@/types/employer";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { redirect } from "next/navigation";
 import toast from "react-hot-toast";
 
 // get employer table from db
@@ -76,5 +77,29 @@ export const useUploadCompanyLogo = () => {
       toast.error(
         `Something went wrong. uploading proifleImage or Resume try again`,
       ),
+  });
+};
+
+// profiles
+export const useEmployerProfiles = () => {
+  return useQuery({
+    queryKey: ["employerProfiles"],
+    queryFn: async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+      if (authError || !user) redirect("/auth/signin");
+
+      const { data, error } = await supabase
+        .from("employers")
+        .select("*")
+        .neq("auth_id", user.id);
+
+      if (error) throw error;
+
+      return data;
+    },
   });
 };

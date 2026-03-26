@@ -69,7 +69,7 @@ export function getNotificationLink(
     case "profile_view":
       return role === "job-seeker"
         ? `/profile/company/${referenceId}`
-        : `/profile/job-seeker/${referenceId}`;
+        : `/profile/seeker/${referenceId}`;
     case "system":
       return `/job-seeker/${referenceId}`;
     case "subscription":

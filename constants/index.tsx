@@ -132,30 +132,48 @@ export const AUTH_TABS = [
 // <--- JOB SEEKER PROFILE ---> //
 
 export const jobSeekerLinks = [
-  { label: "Dashboard", href: "/job-seeker/dashboard", icon: LayoutDashboard },
-  { label: "Browse Jobs", href: "/job-seeker/jobs", icon: Briefcase },
+  {
+    label: "Dashboard",
+    href: "/job-seeker/dashboard",
+    icon: LayoutDashboard,
+    section: "main",
+  },
+  {
+    label: "Browse Jobs",
+    href: "/job-seeker/jobs",
+    icon: Briefcase,
+    section: "main",
+  },
   {
     label: "My Applications",
     href: "/job-seeker/applications",
     icon: Users,
+    section: "main",
   },
-  { label: "Saved Jobs", href: "/job-seeker/saved-jobs", icon: Heart },
-  { label: "Billing", href: "/job-seeker/billing", icon: CreditCard },
+  {
+    label: "Find Companies",
+    href: "/job-seeker/companies",
+    icon: Users,
+    section: "main",
+    plan: "champion",
+  },
+  {
+    label: "Saved Jobs",
+    href: "/job-seeker/saved-jobs",
+    icon: Heart,
+    section: "manage",
+  },
+  {
+    label: "Billing",
+    href: "/job-seeker/billing",
+    icon: CreditCard,
+    section: "manage",
+  },
   {
     label: "Profile",
-    href: (slug: string) => `/job-seeker/${slug}`,
+    href: (slug: string) => `/job-seeker/profile/${slug}`,
     icon: User,
-  },
-];
-
-export const JOBSEEKER_UNSUBSCRIBE_LINKS = [
-  { label: "Dashboard", href: "/job-seeker/dashboard", icon: LayoutDashboard },
-  { label: "Billing", href: "/job-seeker/billing", icon: CreditCard },
-  { label: "Browse Jobs", href: "/job-seeker/jobs", icon: Briefcase },
-  {
-    label: "Profile",
-    href: (slug: string) => `/job-seeker/${slug}`,
-    icon: User,
+    section: "manage",
   },
 ];
 
@@ -171,31 +189,58 @@ export const jobSeekerSections = [
   { id: "billing", label: "Billing", icon: CreditCard },
 ];
 
+//free links
+export const FREE_LINKS = {
+  employer: ["Dashboard", "Billing", "Profile"],
+  "job-seeker": ["Dashboard", "Billing", "Profile", "Browse Jobs"],
+};
 // <---  JOB SEEKER PROFILE  ---> //
 
 // <---  EMPLOYER PROFILE  ---> //
 
 export const employerLinks = [
-  { label: "Dashboard", href: "/employer/dashboard", icon: LayoutDashboard },
-  { label: "Manage Jobs", href: "/employer/jobs", icon: Briefcase },
-  { label: "Applicants", href: "/employer/applicants", icon: Users },
-  { label: "Post a Job", href: "/employer/jobs/create", icon: PlusCircle },
-  { label: "Billing", href: "/employer/billing", icon: CreditCard },
   {
-    label: "Profile",
-    href: (slug: string) => `/employer/${slug}`,
-    icon: Building2,
+    label: "Dashboard",
+    href: "/employer/dashboard",
+    icon: LayoutDashboard,
+    section: "main",
   },
-];
-
-// ep unsubscribe links
-export const EMPLOYER_UNSUBSCRIBE_LINKS = [
-  { label: "Dashboard", href: "/employer/dashboard", icon: LayoutDashboard },
-  { label: "Billing", href: "/employer/billing", icon: CreditCard },
+  {
+    label: "Manage Jobs",
+    href: "/employer/jobs",
+    icon: Briefcase,
+    section: "main",
+  },
+  {
+    label: "Applicants",
+    href: "/employer/applicants",
+    icon: Users,
+    section: "main",
+  },
+  {
+    label: "Find Talents",
+    href: "/employer/talents",
+    icon: Building2,
+    section: "main",
+    plan: "elite",
+  },
+  {
+    label: "Post a Job",
+    href: "/employer/jobs/create",
+    icon: PlusCircle,
+    section: "manage",
+  },
+  {
+    label: "Billing",
+    href: "/employer/billing",
+    icon: CreditCard,
+    section: "manage",
+  },
   {
     label: "Profile",
-    href: (slug: string) => `/employer/${slug}`,
+    href: (slug: string) => `/employer/profile/${slug}`,
     icon: Building2,
+    section: "manage",
   },
 ];
 
@@ -209,9 +254,9 @@ export const employerSections = [
 ];
 
 export const employerHiringStatus = [
-  "actively hiring",
+  "actively_hiring",
   "selective",
-  "not hiring",
+  "not_hiring",
 ];
 // <--- EMPLOYER PROFILE ---> //
 

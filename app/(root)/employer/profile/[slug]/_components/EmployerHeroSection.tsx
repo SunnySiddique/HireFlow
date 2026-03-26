@@ -122,7 +122,7 @@ const EmployerHeroSection = ({
           {!editMode && employer?.industry && (
             <div
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border font-semibold text-sm whitespace-nowrap ${
-                employer?.hiring_status.toLowerCase() === "actively hiring"
+                employer?.hiring_status.toLowerCase() === "actively_hiring"
                   ? "bg-green-500/15 text-green-700 border-green-500/30"
                   : employer?.hiring_status.toLowerCase() === "selective"
                     ? "bg-amber-500/15 text-amber-700 border-amber-500/30"
@@ -133,7 +133,7 @@ const EmployerHeroSection = ({
                 className="w-2 h-2 rounded-full animate-pulse"
                 style={{
                   backgroundColor:
-                    employer.hiring_status.toLowerCase() === "actively hiring"
+                    employer.hiring_status.toLowerCase() === "actively_hiring"
                       ? "#22c55e"
                       : employer.hiring_status.toLowerCase() === "selective"
                         ? "#f59e0b"
