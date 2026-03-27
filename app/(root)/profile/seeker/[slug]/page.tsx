@@ -32,7 +32,7 @@ const PublicProfilePage = () => {
     if (!jobSeekerProfile?.id) return;
     if (!currentUser) return;
 
-    trackView(jobSeekerProfile.id);
+    trackView(jobSeekerProfile.auth_id);
   }, [jobSeekerProfile?.id]);
 
   if (isJobSeekerProfileLoading) return <Loader />;

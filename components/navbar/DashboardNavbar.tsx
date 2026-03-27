@@ -250,8 +250,8 @@ const DashboardNavbar = ({
             <Link
               href={
                 role === "job-seeker"
-                  ? `/job-seeker/${jobSeekerProfile?.slug ?? "profile"}`
-                  : `/employer/${employerProfile?.slug ?? "company"}`
+                  ? `/job-seeker/profile/${jobSeekerProfile?.slug ?? "profile"}`
+                  : `/employer/profile/${employerProfile?.slug ?? "company"}`
               }
             >
               {role === "job-seeker" ? (

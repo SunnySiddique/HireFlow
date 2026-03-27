@@ -26,7 +26,8 @@ export const useCompanyProfile = (slug: string) => {
       linkedin_url,
       twitter_url,
       operating_locations,
-      logo_path
+      logo_path,
+      auth_id
       `,
         )
         .eq("slug", slug)

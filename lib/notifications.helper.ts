@@ -172,3 +172,50 @@ export async function sendSubscriptionNotification(
 
   await sendNotification(supabase, userId, type, title, message, type);
 }
+
+export async function sendApplicantsNotification(
+  supabase: SupabaseClient,
+  userId: string,
+  eventType: string,
+) {
+  let title = "";
+  let message = "";
+  let type = "";
+
+  switch (eventType) {
+    case "pending":
+      title = "Application Received";
+      message =
+        "Your application has been received and is pending review. We'll get back to you soon.";
+      type = "pending";
+      break;
+    case "reviewing":
+      title = "Application Under Review";
+      message =
+        "Good news! Your application is currently being reviewed by our hiring team.";
+      type = "reviewing";
+      break;
+    case "shortlisted":
+      title = "You've Been Shortlisted! 🎉";
+      message =
+        "Congratulations! You have been shortlisted for the position. We will contact you shortly regarding the next steps.";
+      type = "shortlisted";
+      break;
+    case "rejected":
+      title = "Application Update";
+      message =
+        "Thank you for your interest. After careful consideration, we have decided to move forward with other candidates. We encourage you to apply for future openings.";
+      type = "rejected";
+      break;
+    case "accepted":
+      title = "Application Accepted! 🎊";
+      message =
+        "Congratulations! Your application has been accepted. Please check your email for further instructions on the onboarding process.";
+      type = "accepted";
+      break;
+  }
+
+  if (!userId) return;
+
+  await sendNotification(supabase, userId, type, title, message, type);
+}

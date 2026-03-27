@@ -17,6 +17,7 @@ import {
   JobWithEmployer,
 } from "@/types/jobs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { redirect } from "next/navigation";
 import toast from "react-hot-toast";
 
 // ---- EMPLOHYER ----
@@ -124,7 +125,7 @@ export const useGetAllApplicants = () => {
 
       const { data: employer, error: empError } = await supabase
         .from("employers")
-        .select("id")
+        .select("auth_id")
         .eq("auth_id", user.id)
         .single();
 
@@ -144,7 +145,7 @@ export const useGetAllApplicants = () => {
           seeker:user_id(id, full_name, email, profile_url, resume_url, slug)
         `,
         )
-        .eq("employer_id", employer.id)
+        .eq("employer_id", user.id)
         .order("applied_at", { ascending: false });
 
       if (error) throw error;
@@ -531,15 +532,7 @@ export const useGetCurrentUserAppliedJobs = () => {
         data: { user },
         error: userError,
       } = await supabase.auth.getUser();
-      if (userError || !user) throw new Error("User not found");
-
-      const { data: jobSeeker, error: jobSeekerError } = await supabase
-        .from("job_seekers")
-        .select("id")
-        .eq("auth_id", user.id)
-        .single();
-
-      if (jobSeekerError || !jobSeeker) throw new Error("Job seeker not found");
+      if (userError || !user) redirect("/auth/signin");
 
       const { data, error } = await supabase
         .from("applicants")
@@ -571,7 +564,7 @@ export const useGetCurrentUserAppliedJobs = () => {
     )
   `,
         )
-        .eq("user_id", jobSeeker.id);
+        .eq("user_id", user.id);
 
       if (error) throw error;
 
