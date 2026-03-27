@@ -108,7 +108,6 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
 
     if (fromType === "create") {
       const payload: JobFormValues = {
-        employer_id: currentEmployerProfile.id,
         job_slug: createSlug(data.jobTitle),
         job_title: data.jobTitle,
         category: data.category,

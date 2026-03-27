@@ -42,7 +42,7 @@ const CompanyView = ({ slug }: CompanyViewProps) => {
     if (!data?.company?.id) return;
     if (!currentUser) return;
 
-    trackView(data.company.id);
+    trackView(data.company.auth_id);
   }, [data?.company?.id]);
 
   if (isLoading) {

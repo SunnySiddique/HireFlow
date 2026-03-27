@@ -15,7 +15,8 @@ const JobSeekerDashboardPage = () => {
     subscription?.plan_expires_at as string,
   );
   const isAcceleratorPlan =
-    subscription?.plan?.toLowerCase() === "acccelerator";
+    subscription?.plan?.toLowerCase() === "acccelerator" ||
+    subscription?.plan?.toLowerCase() === "champion";
   return (
     <main className="p-8">
       {/* Stats Cards */}

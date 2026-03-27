@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { toError } from "../errors";
 import {
+  sendApplicantsNotification,
   sendJobMatchNotifications,
   sendNotification,
 } from "../notifications.helper";
@@ -51,6 +52,7 @@ export async function createJobPost(jobData: jobFormData) {
       error: authError,
     } = await supabase.auth.getUser();
     if (!user || authError) redirect("/auth/signin");
+    const payload = { ...jobData, employer_id: user.id };
 
     const { data: sub } = await supabase
       .from("subscriptions")
@@ -76,7 +78,7 @@ export async function createJobPost(jobData: jobFormData) {
 
     const { data: job, error } = await supabase
       .from("jobs")
-      .insert([jobData])
+      .insert([payload])
       .select()
       .single();
 
@@ -133,6 +135,12 @@ export async function updateJobPost(jobSlug: string, jobData: JobFormValues) {
   try {
     const supabase = await createClient();
 
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (!user || authError) redirect("/auth/sigin");
     const updatedSlug = createSlug(jobData.jobTitle);
 
     const payload: jobUpdateFormData = {
@@ -161,6 +169,7 @@ export async function updateJobPost(jobSlug: string, jobData: JobFormValues) {
       .from("jobs")
       .update(payload)
       .eq("job_slug", jobSlug)
+      .eq("employer_id", user.id)
       .select()
       .single();
 
@@ -237,12 +246,23 @@ export async function updateApplicantStatus(
   try {
     const supabase = await createClient();
 
-    const { error } = await supabase
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+    if (!user || authError) redirect("/auth/signin");
+
+    const { data: applicant, error } = await supabase
       .from("applicants")
       .update({ status, employer_notes })
       .eq("id", applicantId)
       .select()
-      .single();
+      .maybeSingle();
+    await sendApplicantsNotification(
+      supabase,
+      applicant?.user_id as string,
+      status,
+    );
 
     if (error) throw error;
     return { success: true };
@@ -258,20 +278,13 @@ export async function applyJob(jobId: string, coverLetter: string) {
     const supabase = await createClient();
     const {
       data: { user },
+      error: authError,
     } = await supabase.auth.getUser();
 
-    if (!user) throw new Error("Unauthorized");
-
-    const { data: jobSeeker } = await supabase
-      .from("job_seekers")
-      .select("id")
-      .eq("auth_id", user.id)
-      .single();
-
-    if (!jobSeeker) throw new Error("Job seeker profile not found");
+    if (!user || authError) redirect("/auth/signin");
 
     const { data, error } = await supabase.rpc("apply_to_job", {
-      p_user_id: jobSeeker.id,
+      p_user_id: user.id,
       p_job_id: jobId,
       p_cover_letter: coverLetter,
     });

@@ -1,5 +1,7 @@
+import { redirect } from "next/navigation";
 import { toError } from "../errors";
 import { createClient } from "../supabase/client";
+import { hasAccess } from "../utils";
 
 // job-seeker view
 export async function trackSeekerProfileView(seekerId: string) {
@@ -10,37 +12,41 @@ export async function trackSeekerProfileView(seekerId: string) {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser();
-    if (authError || !user) return;
+    if (authError || !user) redirect("/auth/signin");
 
     const { data: employer } = await supabase
       .from("employers")
-      .select("id, slug, company_name")
+      .select("id, slug, company_name,auth_id")
       .eq("auth_id", user.id)
       .single();
 
     if (!employer) return;
 
+    const { data: seekerSub } = await supabase
+      .from("subscriptions")
+      .select("subscription_status, plan_expires_at, plan")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    const isSeekerChampion =
+      hasAccess(
+        seekerSub?.subscription_status as string,
+        seekerSub?.plan_expires_at as string,
+      ) && seekerSub?.plan === "champion";
+
     // record view
     const { error: viewError } = await supabase.from("profile_views").insert({
       target_id: seekerId,
       target_type: "seeker",
-      viewer_id: employer.id,
+      viewer_id: employer.auth_id,
     });
 
     if (viewError?.code === "23505") return;
     if (viewError) throw new Error(viewError.message);
-
-    // notify seeker
-    const { data: seeker } = await supabase
-      .from("job_seekers")
-      .select("auth_id")
-      .eq("id", seekerId)
-      .single();
-
-    if (!seeker) return;
+    if (!isSeekerChampion) return;
 
     const { error: notifError } = await supabase.from("notifications").insert({
-      user_id: seeker.auth_id,
+      user_id: seekerId,
       type: "profile_view",
       title: "New Profile View!",
       message: `${employer.company_name} viewed your profile`,
@@ -64,7 +70,7 @@ export async function trackEmployerProfileView(employerId: string) {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser();
-    if (authError || !user) return;
+    if (authError || !user) redirect("/auth/signin");
 
     // current user must be a seeker
     const { data: seeker } = await supabase
@@ -75,7 +81,20 @@ export async function trackEmployerProfileView(employerId: string) {
 
     if (!seeker) return;
 
-    // check already viewed
+    const { data: employerSub } = await supabase
+      .from("subscriptions")
+      .select("subscription_status, plan_expires_at, plan")
+      .eq("user_id", employerId)
+      .maybeSingle();
+
+    const isEmployerElite =
+      hasAccess(
+        employerSub?.subscription_status as string,
+        employerSub?.plan_expires_at as string,
+      ) && employerSub?.plan === "elite";
+    console.log("employerAuthId:", employerId);
+    console.log("employerSub:", employerSub);
+    console.log("isEmployerElite:", isEmployerElite);
 
     // record view
     const { error: viewError } = await supabase.from("profile_views").insert({
@@ -86,18 +105,10 @@ export async function trackEmployerProfileView(employerId: string) {
 
     if (viewError?.code === "23505") return;
     if (viewError) throw new Error(viewError.message);
-
-    // notify employer
-    const { data: employer } = await supabase
-      .from("employers")
-      .select("auth_id")
-      .eq("id", employerId)
-      .single();
-
-    if (!employer) return;
+    if (!isEmployerElite) return;
 
     const { error: notifError } = await supabase.from("notifications").insert({
-      user_id: employer.auth_id,
+      user_id: employerId,
       type: "profile_view",
       title: "New Profile View!",
       message: `${seeker.full_name} viewed your profile`,
@@ -121,7 +132,7 @@ export async function trackJobView(jobId: string) {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser();
-    if (authError || !user) return;
+    if (authError || !user) redirect("/auth/signin");
 
     // current user must be a seeker
     const { data: seeker } = await supabase
@@ -132,14 +143,6 @@ export async function trackJobView(jobId: string) {
 
     if (!seeker) return;
 
-    const { error: viewError } = await supabase.from("job_views").insert({
-      job_id: jobId,
-      viewer_id: seeker.id,
-    });
-
-    if (viewError?.code === "23505") return;
-    if (viewError) throw new Error(viewError.message);
-
     const { data: job } = await supabase
       .from("jobs")
       .select("employer_id, job_title, job_slug")
@@ -148,16 +151,29 @@ export async function trackJobView(jobId: string) {
 
     if (!job) return;
 
-    const { data: employer } = await supabase
-      .from("employers")
-      .select("auth_id")
-      .eq("id", job.employer_id)
+    const { data: emproyerSub } = await supabase
+      .from("subscriptions")
+      .select("subscription_status, plan_expires_at, plan")
+      .eq("user_id", job.employer_id)
       .maybeSingle();
 
-    if (!employer) return;
+    const isEmployerChampion =
+      hasAccess(
+        emproyerSub?.subscription_status as string,
+        emproyerSub?.plan_expires_at as string,
+      ) && emproyerSub?.plan === "elite";
+
+    const { error: viewError } = await supabase.from("job_views").insert({
+      job_id: jobId,
+      viewer_id: seeker.id,
+    });
+
+    if (viewError?.code === "23505") return;
+    if (viewError) throw new Error(viewError.message);
+    if (!isEmployerChampion) return;
 
     await supabase.from("notifications").insert({
-      user_id: employer.auth_id,
+      user_id: job.employer_id,
       type: "job_view",
       title: "New Job View!",
       message: `A job seeker viewed your "${job.job_title}" posting`,

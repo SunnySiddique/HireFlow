@@ -41,7 +41,6 @@ const ApplicantDialog = ({
     status: applicant?.status || "pending",
     employer_notes: applicant?.employer_notes || "",
   });
-
   const handleUpdateApplicant = async () => {
     await updateApplicantStatus(
       {

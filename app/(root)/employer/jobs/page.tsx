@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEmployerProfile } from "@/hooks/useEmployer";
+import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
 import {
   useDeleteJob,
   useGetEmployerJobs,
@@ -49,12 +50,13 @@ const getStatusColor = (status: string) => {
 };
 
 const ManageJobsPage = () => {
+  const { data: user } = useGetCurrentUser();
   const { data: employerProfile, isLoading: isEmployerProfileLoading } =
     useEmployerProfile();
   const { mutate: updateStatus, isPending: isUpdatingStatus } =
     useUpdateJobStatus();
   const { data: empJobs, isLoading: empJobLoading } = useGetEmployerJobs(
-    employerProfile?.id as string,
+    user?.id as string,
   );
   const { mutateAsync: deleteJobPost, isPending: isDeletingJob } =
     useDeleteJob();

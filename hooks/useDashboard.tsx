@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { startOfMonth, startOfWeek } from "date-fns";
+import { redirect } from "next/navigation";
 
 export const useGetJobSeekerApplicationStats = () =>
   useQuery({
@@ -14,17 +15,7 @@ export const useGetJobSeekerApplicationStats = () =>
       } = await supabase.auth.getUser();
 
       if (userError || !user) {
-        throw new Error("User not found");
-      }
-
-      const { data: jobSeeker, error: jobSeekerError } = await supabase
-        .from("job_seekers")
-        .select("id")
-        .eq("auth_id", user?.id)
-        .maybeSingle();
-
-      if (jobSeekerError || !jobSeeker) {
-        throw new Error("Job seeker not found");
+        redirect("/auth/signin");
       }
 
       const pastWeekDate = startOfWeek(new Date(), { weekStartsOn: 1 });
@@ -38,17 +29,17 @@ export const useGetJobSeekerApplicationStats = () =>
         supabase
           .from("applicants")
           .select("*", { count: "exact", head: true })
-          .eq("user_id", jobSeeker?.id)
+          .eq("user_id", user?.id)
           .gte("applied_at", pastWeekDate.toISOString()),
         supabase
           .from("save_jobs")
           .select("*", { count: "exact", head: true })
-          .eq("user_id", jobSeeker?.id)
+          .eq("user_id", user?.id)
           .gte("saved_at", pastMonth.toISOString()),
         supabase
           .from("profile_views")
           .select("*", { count: "exact", head: true })
-          .eq("target_id", jobSeeker.id)
+          .eq("target_id", user.id)
           .eq("target_type", "seeker")
           .gte("viewed_at", pastWeekDate.toISOString()),
       ]);
@@ -71,17 +62,7 @@ export const useGetEmployerApplicationStats = () => {
         error: userError,
       } = await supabase.auth.getUser();
       if (userError || !user) {
-        throw new Error("User not found");
-      }
-
-      const { data: empProfile, error: empError } = await supabase
-        .from("employers")
-        .select("id")
-        .eq("auth_id", user?.id)
-        .maybeSingle();
-
-      if (empError || !empProfile) {
-        throw new Error("Employer profile not found");
+        redirect("/auth/signin");
       }
 
       const pastWeekDate = startOfWeek(new Date(), { weekStartsOn: 1 });
@@ -89,8 +70,7 @@ export const useGetEmployerApplicationStats = () => {
       const { data: jobs } = await supabase
         .from("jobs")
         .select("id")
-        .eq("employer_id", empProfile.id);
-
+        .eq("employer_id", user.id);
       const jobIds = jobs?.map((j) => j.id) ?? [];
 
       const [
@@ -102,18 +82,18 @@ export const useGetEmployerApplicationStats = () => {
         supabase
           .from("jobs")
           .select("*", { count: "exact", head: true })
-          .eq("employer_id", empProfile.id)
+          .eq("employer_id", user.id)
           .eq("status", "open")
           .gte("created_at", pastWeekDate.toISOString()),
         supabase
           .from("applicants")
           .select("*", { count: "exact", head: true })
-          .eq("employer_id", empProfile.id)
+          .eq("employer_id", user.id)
           .gte("applied_at", pastWeekDate.toISOString()),
         supabase
           .from("profile_views")
           .select("*", { count: "exact", head: true })
-          .eq("target_id", empProfile.id)
+          .eq("target_id", user.id)
           .eq("target_type", "employer")
           .gte("viewed_at", pastWeekDate.toISOString()),
         jobIds.length > 0
