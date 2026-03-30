@@ -1,12 +1,12 @@
 "use client";
 
-import InterviewModal from "@/components/employer/interviews/InterviewModal";
+import EmployerInterviewModal from "@/components/employer/interviews/EmployerInterviewModal";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Calendar } from "lucide-react";
 import { useState } from "react";
-import { InterviewsTable } from "./_components/InterviewsTable";
-import { StatsCards } from "./_components/StatsCard";
+import EmployerInterviewHeader from "./_components/EmployerInterviewHeader";
+import EmployerInterviewsTable from "./_components/EmployerInterviewsTable";
+import EmployerStatsCard from "./_components/EmployerStatsCard";
 
 interface Interview {
   id: string;
@@ -140,60 +140,20 @@ const EmployerInterviewsPage = () => {
   };
 
   return (
-    <main className="min-h-screen bg-background p-8">
+    <main>
+      <EmployerInterviewHeader totalInterviews={interviews.length} />
       {/* Stats Cards */}
       <div className="pb-8">
-        <StatsCards stats={stats} />
+        <EmployerStatsCard stats={stats} />
       </div>
 
       {/* Main Content */}
-      <div className="">
+      <div>
         <Card className="border-border shadow-lg">
           <CardContent className="pt-6">
-            {/* Search and Filters */}
-            <div className="mb-6 space-y-4">
-              <div className="flex flex-col gap-4 md:flex-row md:items-end">
-                <div className="flex-1">
-                  <label className="text-sm font-medium text-foreground mb-2 block">
-                    Search
-                  </label>
-                  <Input
-                    placeholder="Search by candidate name or interviewer..."
-                    className="h-10"
-                  />
-                </div>
-                {/* <SearchFilter onStatusChange={}  /> */}
-              </div>
-
-              {/* Results Info */}
-              <div className="flex items-center justify-between text-sm">
-                <p className="text-muted-foreground">
-                  Showing{" "}
-                  <span className="font-semibold text-foreground">
-                    {/* {filteredInterviews.length} */} 20
-                  </span>{" "}
-                  of {interviews.length} interviews
-                </p>
-                {/* {(searchQuery ||
-                  statusFilter !== "All" ||
-                  typeFilter !== "All") && ( */}
-                <button
-                  // onClick={() => {
-                  //   setSearchQuery("");
-                  //   setStatusFilter("All");
-                  //   setTypeFilter("All");
-                  // }}
-                  className="text-primary hover:underline font-medium"
-                >
-                  Clear filters
-                </button>
-                {/* )} */}
-              </div>
-            </div>
-
             {/* Table */}
             {interviews.length > 0 ? (
-              <InterviewsTable
+              <EmployerInterviewsTable
                 interviews={interviews}
                 onView={handleView}
                 // onDelete={handleDelete}
@@ -215,7 +175,7 @@ const EmployerInterviewsPage = () => {
 
       {/* Modal */}
       {selectedInterview && (
-        <InterviewModal
+        <EmployerInterviewModal
           isView={true}
           interview={selectedInterview}
           isOpen={isModalOpen}
