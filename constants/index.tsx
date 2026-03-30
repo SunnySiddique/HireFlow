@@ -151,6 +151,12 @@ export const jobSeekerLinks = [
     section: "main",
   },
   {
+    label: "My Interviews",
+    href: "/job-seeker/interviews",
+    icon: MessageSquare,
+    section: "main",
+  },
+  {
     label: "Find Companies",
     href: "/job-seeker/companies",
     icon: Users,
@@ -217,6 +223,13 @@ export const employerLinks = [
     icon: Users,
     section: "main",
   },
+  {
+    label: "Interviews",
+    href: "/employer/interviews",
+    icon: MessageSquare,
+    section: "main",
+  },
+
   {
     label: "Find Talents",
     href: "/employer/talents",

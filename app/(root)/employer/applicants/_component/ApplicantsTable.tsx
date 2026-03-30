@@ -1,3 +1,4 @@
+import InterviewModal from "@/components/employer/interviews/InterviewModal";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,11 +18,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useArchiveApplicant } from "@/hooks/useJobs";
 import { formatDate, getInitials } from "@/lib/utils";
 import { ApplicantType } from "@/types/jobs";
 import {
   Archive,
+  Calendar,
   CheckCircle,
   Clock,
   Eye,
@@ -66,6 +74,11 @@ const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
         applicant={selectedApplicant}
         open={isOpen}
         setIsOpen={setIsOpen}
+      />
+      <InterviewModal
+        isView={false}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
       />
       <Card className="bg-background border border-border overflow-hidden">
         <div className="overflow-x-auto">
@@ -141,17 +154,49 @@ const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => {
-                            setSelectedApplicant(applicant);
-                            setIsOpen(true);
-                          }}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
+                        {/* View Applicant */}
+                        <TooltipProvider>
+                          <div className="flex items-center justify-end gap-1">
+                            {/* View Applicant */}
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => {
+                                    setSelectedApplicant(applicant);
+                                    setIsOpen(true);
+                                  }}
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="text-xs">
+                                View Applicant
+                              </TooltipContent>
+                            </Tooltip>
+
+                            {/* Send Interview */}
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => setIsOpen(true)}
+                                >
+                                  <Calendar className="w-4 h-4 text-primary" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="text-xs">
+                                Send Interview
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                        </TooltipProvider>
+
+                        {/* More Options Dropdown */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
