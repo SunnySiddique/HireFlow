@@ -10,7 +10,7 @@ interface StatsCardsProps {
   };
 }
 
-export function StatsCards({ stats }: StatsCardsProps) {
+const EmployerStatsCard = ({ stats }: StatsCardsProps) => {
   const cardData = [
     {
       label: "Total Interviews",
@@ -74,4 +74,6 @@ export function StatsCards({ stats }: StatsCardsProps) {
       })}
     </div>
   );
-}
+};
+
+export default EmployerStatsCard;

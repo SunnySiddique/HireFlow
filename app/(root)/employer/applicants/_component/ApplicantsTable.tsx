@@ -1,4 +1,4 @@
-import InterviewModal from "@/components/employer/interviews/InterviewModal";
+import EmployerInterviewModal from "@/components/employer/interviews/EmployerInterviewModal";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -75,7 +75,7 @@ const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
         open={isOpen}
         setIsOpen={setIsOpen}
       />
-      <InterviewModal
+      <EmployerInterviewModal
         isView={false}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}

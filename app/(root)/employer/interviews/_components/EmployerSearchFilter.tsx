@@ -13,19 +13,21 @@ interface SearchFilterProps {
   onTypeChange: (value: string) => void;
 }
 
-export function SearchFilter({
-  statusFilter,
-  typeFilter,
-  onStatusChange,
-  onTypeChange,
-}: SearchFilterProps) {
+const EmployerSearchFilter = (
+  {
+    // statusFilter,
+    // typeFilter,
+    // onStatusChange,
+    // onTypeChange,
+  },
+) => {
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-end">
       <div>
         <label className="text-sm font-medium text-foreground mb-2 block">
           Status
         </label>
-        <Select value={statusFilter || "All"} onValueChange={onStatusChange}>
+        <Select>
           <SelectTrigger className="w-full md:w-40">
             <SelectValue />
           </SelectTrigger>
@@ -43,7 +45,7 @@ export function SearchFilter({
         <label className="text-sm font-medium text-foreground mb-2 block">
           Type
         </label>
-        <Select value={typeFilter || "All"} onValueChange={onTypeChange}>
+        <Select>
           <SelectTrigger className="w-full md:w-40">
             <SelectValue />
           </SelectTrigger>
@@ -59,4 +61,6 @@ export function SearchFilter({
       </div>
     </div>
   );
-}
+};
+
+export default EmployerSearchFilter;

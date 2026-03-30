@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { DURATION_OPTIONS } from "@/constants/InterviewsData";
 import { MapPin, Phone, Video } from "lucide-react";
 
 // candidtae object
@@ -52,19 +53,19 @@ interface Candidate {
   feedback: string;
 }
 
-interface InterviewModalProps {
+interface EmployerInterviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   isView: boolean;
   interview?: Candidate;
 }
 
-const InterviewModal = ({
+const EmployerInterviewModal = ({
   isOpen,
   onClose,
   isView,
   interview,
-}: InterviewModalProps) => {
+}: EmployerInterviewModalProps) => {
   console.log(interview);
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -151,10 +152,11 @@ const InterviewModal = ({
                   <SelectValue placeholder="Select Duration" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="30 min">30 min</SelectItem>
-                  <SelectItem value="45 min">45 min</SelectItem>
-                  <SelectItem value="60 min">60 min</SelectItem>
-                  <SelectItem value="90 min">90 min</SelectItem>
+                  {DURATION_OPTIONS.map((duration) => (
+                    <SelectItem key={duration} value={`${duration} min`}>
+                      {duration} min
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -206,4 +208,4 @@ const InterviewModal = ({
   );
 };
 
-export default InterviewModal;
+export default EmployerInterviewModal;
