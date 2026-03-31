@@ -62,7 +62,7 @@ const statusIcons: Record<string, React.ReactNode> = {
 const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
   // hooks
   const { mutate: archiveApplicant } = useArchiveApplicant();
-  const { data: interviews = [] } = useEmployerInterviews();
+  const { data: interviews = [] } = useEmployerInterviews({});
   // states
   const [isApplicantModalOpen, setIsApplicantModalOpen] = useState(false);
   const [isInterviewModalOpen, setIsInterviewModalOpen] = useState(false);

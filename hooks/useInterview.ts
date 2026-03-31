@@ -1,6 +1,9 @@
-import { sendInterviewInvite } from "@/lib/action/interview.actions";
+import {
+  deleteInterview,
+  sendInterviewInvite,
+} from "@/lib/action/interview.actions";
 import { createClient } from "@/lib/supabase/client";
-import { sendInterviewInviteType } from "@/types/interview";
+import { InterviewFilters, sendInterviewInviteType } from "@/types/interview";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
 import toast from "react-hot-toast";
@@ -23,11 +26,7 @@ export const useSendInterviewInvite = () => {
   });
 };
 
-export const useEmployerInterviews = (filters: {
-  search: string;
-  status: string;
-  type: string;
-}) => {
+export const useEmployerInterviews = (filters?: InterviewFilters) => {
   return useQuery({
     queryKey: ["interviews", filters],
     queryFn: async () => {
@@ -64,6 +63,23 @@ export const useEmployerInterviews = (filters: {
 
       if (error) throw error;
       return data;
+    },
+  });
+};
+
+export const useDeleteInterview = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (interviewId: string) => deleteInterview(interviewId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["interviews"] });
+      toast.success("Interview deleted successfully.");
+    },
+    onError: (error) => {
+      toast.error(
+        error.message ? error.message : "Failed to delete interview.",
+      );
+      console.log("[useDeleteInterview]", error);
     },
   });
 };

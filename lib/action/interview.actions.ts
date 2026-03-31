@@ -45,3 +45,19 @@ export async function sendInterviewInvite(interview: sendInterviewInviteType) {
     throw toError(error);
   }
 }
+
+// delete interview
+export async function deleteInterview(interviewId: string) {
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("interviews")
+      .delete()
+      .eq("id", interviewId);
+
+    if (error) throw error;
+  } catch (error) {
+    console.log("[deleteInterview]", error);
+    throw toError(error);
+  }
+}
