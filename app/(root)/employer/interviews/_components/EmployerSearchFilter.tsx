@@ -6,37 +6,34 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface SearchFilterProps {
-  statusFilter: string;
-  typeFilter: string;
-  onStatusChange: (value: string) => void;
-  onTypeChange: (value: string) => void;
-}
-
-const EmployerSearchFilter = (
-  {
-    // statusFilter,
-    // typeFilter,
-    // onStatusChange,
-    // onTypeChange,
-  },
-) => {
+const EmployerSearchFilter = ({
+  filters,
+  onFilterChange,
+}: {
+  onFilterChange: (type: string, value: string) => void;
+  filters: { search: string; status: string; type: string };
+}) => {
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-end">
       <div>
         <label className="text-sm font-medium text-foreground mb-2 block">
           Status
         </label>
-        <Select>
+        <Select
+          value={filters.status}
+          onValueChange={(value) => onFilterChange("status", value)}
+        >
           <SelectTrigger className="w-full md:w-40">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="All">All Status</SelectItem>
-            <SelectItem value="Scheduled">Scheduled</SelectItem>
-            <SelectItem value="In Progress">In Progress</SelectItem>
-            <SelectItem value="Completed">Completed</SelectItem>
-            <SelectItem value="Cancelled">Cancelled</SelectItem>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="pending_confirm">
+              Pending Confirmation
+            </SelectItem>
+            <SelectItem value="upcoming">Upcoming</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -45,12 +42,15 @@ const EmployerSearchFilter = (
         <label className="text-sm font-medium text-foreground mb-2 block">
           Type
         </label>
-        <Select>
+        <Select
+          value={filters.type}
+          onValueChange={(value) => onFilterChange("type", value)}
+        >
           <SelectTrigger className="w-full md:w-40">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="All">All Types</SelectItem>
+            <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="zoom">Zoom</SelectItem>
             <SelectItem value="google_meet">Google Meet</SelectItem>
             <SelectItem value="ms_teams">MS Teams</SelectItem>

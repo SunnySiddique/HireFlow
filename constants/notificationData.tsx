@@ -75,6 +75,11 @@ export function getNotificationLink(
     case "subscription":
     case "job_post_limit":
       return `/${role}/billing`;
+
+    // interview notificaitons
+    case "new_interview_invite":
+      return role === "job-seeker" && `/seekers/interviews/${referenceId}`;
+
     default:
       return "";
   }

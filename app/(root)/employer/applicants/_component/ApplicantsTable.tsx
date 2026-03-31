@@ -24,6 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useEmployerInterviews } from "@/hooks/useInterview";
 import { useArchiveApplicant } from "@/hooks/useJobs";
 import { formatDate, getInitials } from "@/lib/utils";
 import { ApplicantType } from "@/types/jobs";
@@ -59,8 +60,12 @@ const statusIcons: Record<string, React.ReactNode> = {
 };
 
 const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
+  // hooks
   const { mutate: archiveApplicant } = useArchiveApplicant();
-  const [isOpen, setIsOpen] = useState(false);
+  const { data: interviews = [] } = useEmployerInterviews();
+  // states
+  const [isApplicantModalOpen, setIsApplicantModalOpen] = useState(false);
+  const [isInterviewModalOpen, setIsInterviewModalOpen] = useState(false);
   const [selectedApplicant, setSelectedApplicant] =
     useState<ApplicantType | null>(null);
 
@@ -72,14 +77,18 @@ const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
     <>
       <ApplicantDialog
         applicant={selectedApplicant}
-        open={isOpen}
-        setIsOpen={setIsOpen}
+        open={isApplicantModalOpen}
+        setIsOpen={setIsApplicantModalOpen}
       />
       <EmployerInterviewModal
         isView={false}
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        isOpen={isInterviewModalOpen}
+        onClose={() => setIsInterviewModalOpen(false)}
+        applicationId={selectedApplicant?.id || ""}
+        seekerId={selectedApplicant?.seeker?.auth_id}
+        seekerName={selectedApplicant?.seeker?.full_name || ""}
       />
+
       <Card className="bg-background border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
@@ -104,131 +113,162 @@ const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
             </TableHeader>
             <TableBody>
               {applicants.length > 0 ? (
-                applicants.map((applicant) => (
-                  <TableRow
-                    key={applicant.id}
-                    className="border-b border-border hover:bg-accent/50 transition"
-                  >
-                    <TableCell className="py-2 sm:py-3 lg:py-4">
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <Avatar className="h-12 w-12 rounded-lg">
-                          {applicant?.seeker?.profile_url ? (
-                            <Image
-                              src={applicant?.seeker?.profile_url}
-                              alt={applicant?.seeker?.full_name}
-                              fill
-                              sizes="56px"
-                              className="object-contain "
-                            />
-                          ) : (
-                            <AvatarFallback className="rounded-lg text-white font-bold">
-                              {getInitials(applicant?.seeker?.full_name)}
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs sm:text-sm font-medium text-foreground truncate">
-                            {applicant?.seeker?.full_name}
-                          </p>
-                          <p className="text-[10px] sm:text-xs text-muted-foreground truncate hidden xs:block">
-                            {applicant.seeker.email}
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-xs sm:text-sm text-foreground hidden sm:table-cell truncate max-w-[120px] sm:max-w-[150px] md:max-w-[200px]">
-                      {applicant.job.job_title}
-                    </TableCell>
-                    <TableCell className="text-xs sm:text-sm text-muted-foreground hidden md:table-cell whitespace-nowrap">
-                      {formatDate(applicant.applied_at)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        className={`${statusColors[applicant.status.toLowerCase()]} text-[10px] sm:text-xs whitespace-nowrap`}
-                      >
-                        <span className="mr-1">
-                          {statusIcons[applicant.status.toLowerCase()]}
-                        </span>
-                        {applicant.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        {/* View Applicant */}
-                        <TooltipProvider>
-                          <div className="flex items-center justify-end gap-1">
-                            {/* View Applicant */}
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() => {
-                                    setSelectedApplicant(applicant);
-                                    setIsOpen(true);
-                                  }}
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent side="top" className="text-xs">
-                                View Applicant
-                              </TooltipContent>
-                            </Tooltip>
-
-                            {/* Send Interview */}
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() => setIsOpen(true)}
-                                >
-                                  <Calendar className="w-4 h-4 text-primary" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent side="top" className="text-xs">
-                                Send Interview
-                              </TooltipContent>
-                            </Tooltip>
+                applicants.map((applicant) => {
+                  const isInterviewScheduled = interviews?.some(
+                    (interview) =>
+                      interview.application_id === applicant.id &&
+                      interview.status === "pending_confirm",
+                  );
+                  return (
+                    <TableRow
+                      key={applicant.id}
+                      className="border-b border-border hover:bg-accent/50 transition"
+                    >
+                      <TableCell className="py-2 sm:py-3 lg:py-4">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <Avatar className="h-12 w-12 rounded-lg">
+                            {applicant?.seeker?.profile_url ? (
+                              <Image
+                                src={applicant?.seeker?.profile_url}
+                                alt={applicant?.seeker?.full_name}
+                                fill
+                                sizes="56px"
+                                className="object-contain "
+                              />
+                            ) : (
+                              <AvatarFallback className="rounded-lg text-white font-bold">
+                                {getInitials(applicant?.seeker?.full_name)}
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs sm:text-sm font-medium text-foreground truncate">
+                              {applicant?.seeker?.full_name}
+                            </p>
+                            <p className="text-[10px] sm:text-xs text-muted-foreground truncate hidden xs:block">
+                              {applicant.seeker.email}
+                            </p>
                           </div>
-                        </TooltipProvider>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm text-foreground hidden sm:table-cell truncate max-w-[120px] sm:max-w-[150px] md:max-w-[200px]">
+                        {applicant.job.job_title}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm text-muted-foreground hidden md:table-cell whitespace-nowrap">
+                        {formatDate(applicant.applied_at)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          className={`${statusColors[applicant.status.toLowerCase()]} text-[10px] sm:text-xs whitespace-nowrap`}
+                        >
+                          <span className="mr-1">
+                            {statusIcons[applicant.status.toLowerCase()]}
+                          </span>
+                          {applicant.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          {/* View Applicant */}
+                          <TooltipProvider>
+                            <div className="flex items-center justify-end gap-1">
+                              {/* View Applicant */}
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => {
+                                      setSelectedApplicant(applicant);
+                                      setIsApplicantModalOpen(true);
+                                    }}
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="text-xs">
+                                  View Applicant
+                                </TooltipContent>
+                              </Tooltip>
 
-                        {/* More Options Dropdown */}
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 hover:bg-destructive/10"
-                            >
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleArchive(applicant.id, !applicant.archived)
-                              }
-                              className="flex items-center gap-2 cursor-pointer"
-                            >
-                              <Archive className="w-4 h-4" />
-                              <span>
-                                {applicant.archived ? "Unarchive" : "Archive"}
-                              </span>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-xs text-muted-foreground cursor-default">
-                              More options coming soon
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                              {/* Send Interview */}
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  {isInterviewScheduled ? (
+                                    <a
+                                      href="/employer/interviews"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8"
+                                      >
+                                        <Clock className="w-4 h-4 text-muted-foreground" />
+                                      </Button>
+                                    </a>
+                                  ) : (
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8"
+                                      onClick={() => {
+                                        setIsInterviewModalOpen(true);
+                                        setSelectedApplicant(applicant);
+                                      }}
+                                    >
+                                      <Calendar className="w-4 h-4 text-primary" />
+                                    </Button>
+                                  )}
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="text-xs">
+                                  {isInterviewScheduled
+                                    ? "Interview Scheduled"
+                                    : "Schedule Interview"}
+                                </TooltipContent>
+                              </Tooltip>
+                            </div>
+                          </TooltipProvider>
+
+                          {/* More Options Dropdown */}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 hover:bg-destructive/10"
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleArchive(
+                                    applicant.id,
+                                    !applicant.archived,
+                                  )
+                                }
+                                className="flex items-center gap-2 cursor-pointer"
+                              >
+                                <Archive className="w-4 h-4" />
+                                <span>
+                                  {applicant.archived ? "Unarchive" : "Archive"}
+                                </span>
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem className="text-xs text-muted-foreground cursor-default">
+                                More options coming soon
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="h-64">

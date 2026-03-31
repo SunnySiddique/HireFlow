@@ -107,6 +107,7 @@ export interface JobWithEmployer {
 // employer applicant type
 export type Seeker = {
   id: string;
+  auth_id: string;
   email: string;
   full_name: string;
   profile_url: string;
