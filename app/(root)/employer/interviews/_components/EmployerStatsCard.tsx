@@ -1,12 +1,19 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, CheckCircle, Clock, Zap } from "lucide-react";
+import {
+  Calendar,
+  CheckCircle,
+  Clock,
+  HelpCircle,
+  XCircle,
+} from "lucide-react";
 
 interface StatsCardsProps {
   stats: {
     total: number;
-    scheduled: number;
+    upcoming: number;
+    pending_confirm: number;
+    cancelled: number;
     completed: number;
-    inProgress: number;
   };
 }
 
@@ -20,30 +27,37 @@ const EmployerStatsCard = ({ stats }: StatsCardsProps) => {
       trend: "+12%",
     },
     {
-      label: "Scheduled",
-      value: stats.scheduled,
+      label: "Upcoming",
+      value: stats.upcoming,
       icon: Clock,
       color: "bg-secondary/10 text-secondary",
       trend: "+3",
     },
     {
+      label: "Pending Confirm",
+      value: stats.pending_confirm,
+      icon: HelpCircle,
+      color: "bg-chart-3/30 text-chart-2",
+      trend: "Awaiting",
+    },
+    {
       label: "Completed",
       value: stats.completed,
       icon: CheckCircle,
-      color: "bg-accent/20 text-foreground",
+      color: "bg-chart-1/20 text-chart-1",
       trend: "+1",
     },
     {
-      label: "In Progress",
-      value: stats.inProgress,
-      icon: Zap,
-      color: "bg-orange-100/50 text-orange-600",
-      trend: "Live",
+      label: "Cancelled",
+      value: stats.cancelled,
+      icon: XCircle,
+      color: "bg-destructive/10 text-destructive",
+      trend: "—",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       {cardData.map((stat) => {
         const IconComponent = stat.icon;
         return (

@@ -21,7 +21,6 @@ const ApplicantsPage = () => {
   const debouncedSearch = useDebounce(filters.search, 500);
 
   const { data: applicants, isLoading } = useGetAllApplicants();
-  console.log("applicants:", applicants);
   const filteredApplicants = (applicants ?? []).filter((applicant) => {
     const search = debouncedSearch.toLowerCase();
 

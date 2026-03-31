@@ -3,8 +3,18 @@ import EmployerSearchFilter from "./EmployerSearchFilter";
 
 const EmployerInterviewHeader = ({
   totalInterviews,
+  filters,
+  updateFilter,
+  resetFilters,
 }: {
   totalInterviews: number;
+  filters: {
+    search: string;
+    status: string;
+    type: string;
+  };
+  updateFilter: (key: string, value: string) => void;
+  resetFilters: () => void;
 }) => {
   return (
     <>
@@ -23,13 +33,13 @@ const EmployerInterviewHeader = ({
             <Input
               placeholder="Search by candidate name or interviewer..."
               className="h-10"
+              value={filters.search}
+              onChange={(e) => updateFilter("search", e.target.value)}
             />
           </div>
           <EmployerSearchFilter
-          // onStatusChange={"all"}
-          // onTypeChange={""}
-          // statusFilter=""
-          // typeFilter=""
+            filters={filters}
+            onFilterChange={updateFilter}
           />
         </div>
 
@@ -38,24 +48,16 @@ const EmployerInterviewHeader = ({
           <p className="text-muted-foreground">
             Showing{" "}
             <span className="font-semibold text-foreground">
-              {/* {filteredInterviews.length} */} 20
+              {totalInterviews}
             </span>{" "}
             of {totalInterviews} interviews
           </p>
-          {/* {(searchQuery ||
-                  statusFilter !== "All" ||
-                  typeFilter !== "All") && ( */}
           <button
-            // onClick={() => {
-            //   setSearchQuery("");
-            //   setStatusFilter("All");
-            //   setTypeFilter("All");
-            // }}
+            onClick={resetFilters}
             className="text-primary hover:underline font-medium"
           >
             Clear filters
           </button>
-          {/* )} */}
         </div>
       </div>
     </>

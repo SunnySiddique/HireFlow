@@ -120,16 +120,9 @@ export const useGetAllApplicants = () => {
 
       const {
         data: { user },
+        error: authError,
       } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-
-      const { data: employer, error: empError } = await supabase
-        .from("employers")
-        .select("auth_id")
-        .eq("auth_id", user.id)
-        .single();
-
-      if (empError) throw empError;
+      if (!user || authError) redirect("/auth/signin");
 
       const { data, error } = await supabase
         .from("applicants")
@@ -142,7 +135,7 @@ export const useGetAllApplicants = () => {
           employer_notes,
           archived,
           job:job_id(id, job_title),
-          seeker:user_id(id, full_name, email, profile_url, resume_url, slug)
+          seeker:user_id(id, auth_id, full_name, email, profile_url, resume_url, slug)
         `,
         )
         .eq("employer_id", user.id)
