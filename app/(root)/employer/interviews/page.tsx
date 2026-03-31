@@ -2,7 +2,10 @@
 
 import EmployerInterviewModal from "@/components/employer/interviews/EmployerInterviewModal";
 import { Card, CardContent } from "@/components/ui/card";
-import { useEmployerInterviews } from "@/hooks/useInterview";
+import {
+  useDeleteInterview,
+  useEmployerInterviews,
+} from "@/hooks/useInterview";
 import { useInterviewFilters } from "@/hooks/useInterviewFilters";
 import { Interview } from "@/types/interview";
 import { Calendar } from "lucide-react";
@@ -12,12 +15,6 @@ import EmployerInterviewsTable from "./_components/EmployerInterviewsTable";
 import EmployerStatsCard from "./_components/EmployerStatsCard";
 
 const EmployerInterviewsPage = () => {
-  // states
-  const [interviewFilter, setInterviewFilter] = useState({
-    search: "",
-    status: "all",
-    type: "all",
-  });
   const [selectedInterview, setSelectedInterview] = useState<Interview | null>(
     null,
   );
@@ -28,6 +25,8 @@ const EmployerInterviewsPage = () => {
   // hooks
   const { data: interviews = [], isLoading } =
     useEmployerInterviews(queryFilters);
+  const { mutateAsync: deleteInterview, isPending: isDeleting } =
+    useDeleteInterview();
 
   const handleView = (interview: Interview) => {
     setSelectedInterview(interview);
@@ -36,6 +35,10 @@ const EmployerInterviewsPage = () => {
 
   const handleUpdateFilter = (key: string, value: string) => {
     updateFilter(key as keyof typeof filters, value);
+  };
+
+  const handleDelete = async (interviewId: string) => {
+    await deleteInterview(interviewId);
   };
 
   const stats = {
@@ -70,7 +73,8 @@ const EmployerInterviewsPage = () => {
               <EmployerInterviewsTable
                 interviews={interviews}
                 onView={handleView}
-                // onDelete={handleDelete}
+                onDelete={handleDelete}
+                isDeleting={isDeleting}
               />
             ) : (
               <div className="py-12 text-center">

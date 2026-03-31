@@ -1,11 +1,6 @@
 import { useDebounce } from "@/hooks/useDebounce";
+import { InterviewFilters } from "@/types/interview";
 import { useState } from "react";
-
-type InterviewFilters = {
-  search: string;
-  status: string;
-  type: string;
-};
 
 export const useInterviewFilters = () => {
   const [filters, setFilters] = useState<InterviewFilters>({

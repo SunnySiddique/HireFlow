@@ -49,6 +49,7 @@ const EmployerInterviewModal = ({
   } = useSendInterviewInvite();
 
   const [interviewData, setInterviewData] = useState({
+    interviewer_name: interview?.interviewer_name ?? "",
     interviewer_title: interview?.interviewer_title ?? "",
     interview_type: interview?.interview_type ?? "",
     interview_date: interview?.scheduled_at
@@ -131,7 +132,7 @@ const EmployerInterviewModal = ({
               <Input
                 placeholder="e.g. James Cho"
                 name="interviewer_name"
-                value={seekerName ?? ""}
+                value={interviewData.interviewer_name || seekerName}
                 disabled={true}
                 className="disabled:opacity-60 disabled:cursor-not-allowed"
               />

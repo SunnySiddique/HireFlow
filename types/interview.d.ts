@@ -40,3 +40,9 @@ export interface Interview {
     profile_url?: string;
   };
 }
+
+export type InterviewFilters = {
+  search?: string;
+  status?: string;
+  type?: string;
+};

@@ -37,6 +37,7 @@ interface InterviewsTableProps {
   interviews: Interview[];
   onView?: (interview: Interview) => void;
   onDelete?: (id: string) => void;
+  isDeleting: boolean;
 }
 
 const statusConfig: Record<string, { label: string; className: string }> = {
@@ -143,6 +144,7 @@ const EmployerInterviewsTable = ({
   interviews,
   onView,
   onDelete,
+  isDeleting,
 }: InterviewsTableProps) => {
   return (
     <div className="w-full space-y-4">
@@ -303,8 +305,9 @@ const EmployerInterviewsTable = ({
                               <AlertDialogAction
                                 onClick={() => onDelete?.(interview.id)}
                                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                disabled={isDeleting}
                               >
-                                Delete
+                                {isDeleting ? "Deleting..." : "Delete"}
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
@@ -421,8 +424,9 @@ const EmployerInterviewsTable = ({
                           <AlertDialogAction
                             onClick={() => onDelete?.(interview.id)}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            disabled={isDeleting}
                           >
-                            Delete
+                            {isDeleting ? "Deleting..." : "Delete"}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
