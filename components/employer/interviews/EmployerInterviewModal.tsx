@@ -49,6 +49,7 @@ const EmployerInterviewModal = ({
   } = useSendInterviewInvite();
 
   const [interviewData, setInterviewData] = useState({
+    candidate_name: interview?.candidate_name ?? "",
     interviewer_name: interview?.interviewer_name ?? "",
     interviewer_title: interview?.interviewer_title ?? "",
     interview_type: interview?.interview_type ?? "",
@@ -84,7 +85,7 @@ const EmployerInterviewModal = ({
       {
         ...rest,
         ...(isView && interview?.id ? { id: interview.id } : {}),
-        interviewer_name: seekerName!,
+        candidate_name: seekerName!,
         duration_minutes: Number(interviewData.duration_minutes),
         seeker_id: seekerId!,
         application_id: applicationId as string,
@@ -124,17 +125,25 @@ const EmployerInterviewModal = ({
 
         <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
           {/* Interviewer Name & Title */}
+          <label className="block text-sm font-medium text-muted-foreground mb-1.5">
+            Candidate Name
+          </label>
+          <Input
+            placeholder="e.g. Senior Engineer"
+            name="candidate_name"
+            value={interviewData.candidate_name || seekerName || ""}
+            disabled={true}
+          />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                 Interviewer Name
               </label>
               <Input
-                placeholder="e.g. James Cho"
-                name="interviewer_name"
-                value={interviewData.interviewer_name || seekerName}
-                disabled={true}
-                className="disabled:opacity-60 disabled:cursor-not-allowed"
+                placeholder="e.g. Senior Engineer"
+                name="interviewer_title"
+                value={interviewData.interviewer_title}
+                onChange={handleChange}
               />
             </div>
             <div>

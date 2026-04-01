@@ -1,4 +1,5 @@
 import EmployerInterviewModal from "@/components/employer/interviews/EmployerInterviewModal";
+import Pagination from "@/components/pagination/Pagination";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useEmployerInterviews } from "@/hooks/useInterview";
+import { useInterviewFilters } from "@/hooks/useInterviewFilters";
 import { useArchiveApplicant } from "@/hooks/useJobs";
 import { formatDate, getInitials } from "@/lib/utils";
 import { ApplicantType } from "@/types/jobs";
@@ -62,7 +64,11 @@ const statusIcons: Record<string, React.ReactNode> = {
 const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
   // hooks
   const { mutate: archiveApplicant } = useArchiveApplicant();
-  const { data: interviews = [] } = useEmployerInterviews({});
+  const { data } = useEmployerInterviews({});
+  const { filters, updateFilter } = useInterviewFilters();
+
+  const interviews = data?.data ?? [];
+  const totalPages = data?.totalPages ?? 0;
   // states
   const [isApplicantModalOpen, setIsApplicantModalOpen] = useState(false);
   const [isInterviewModalOpen, setIsInterviewModalOpen] = useState(false);
@@ -292,6 +298,12 @@ const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
             </TableBody>
           </Table>
         </div>
+        <Pagination
+          currentPage={filters.page}
+          totalPages={totalPages}
+          onNext={() => updateFilter("page", (filters?.page ?? 1) + 1)}
+          onPrev={() => updateFilter("page", (filters?.page ?? 1) - 1)}
+        />
       </Card>
     </>
   );
