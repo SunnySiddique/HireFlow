@@ -6,7 +6,7 @@ export const useInterviewFilters = () => {
   const [filters, setFilters] = useState<InterviewFilters>({
     search: "",
     status: "all",
-    type: "all",
+    page: 1,
   });
 
   const debouncedSearch = useDebounce(filters.search, 500);
@@ -16,10 +16,14 @@ export const useInterviewFilters = () => {
     search: debouncedSearch,
   };
 
-  const updateFilter = (key: keyof InterviewFilters, value: string) => {
+  const updateFilter = (
+    key: keyof InterviewFilters,
+    value: string | number,
+  ) => {
     setFilters((prev) => ({
       ...prev,
       [key]: value,
+      page: key === "search" || key === "status" ? 1 : prev.page,
     }));
   };
 

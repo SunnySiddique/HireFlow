@@ -5,6 +5,7 @@ export interface sendInterviewInviteType {
   application_id: string;
   interview_type: string;
   scheduled_at: string;
+  candidate_name: string;
 
   duration_minutes: number;
 
@@ -24,6 +25,7 @@ export interface Interview {
   interviewer_id: string;
   seeker_id: string;
   application_id: string;
+  candidate_name: string;
   status: "upcoming" | "pending_confirm" | "completed" | "cancelled";
   interview_type: string;
   scheduled_at: string;
@@ -39,10 +41,15 @@ export interface Interview {
   seeker?: {
     profile_url?: string;
   };
+  employer?: {
+    company_name?: string;
+    company_logo_url?: string;
+  };
 }
 
 export type InterviewFilters = {
   search?: string;
   status?: string;
   type?: string;
+  page?: number;
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import EmployerInterviewModal from "@/components/employer/interviews/EmployerInterviewModal";
+import Pagination from "@/components/pagination/Pagination";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   useDeleteInterview,
@@ -10,7 +11,7 @@ import { useInterviewFilters } from "@/hooks/useInterviewFilters";
 import { Interview } from "@/types/interview";
 import { Calendar } from "lucide-react";
 import { useState } from "react";
-import EmployerInterviewHeader from "./_components/EmployerInterviewHeader";
+import InterviewHeader from "../../../../components/interview/InterviewHeader";
 import EmployerInterviewsTable from "./_components/EmployerInterviewsTable";
 import EmployerStatsCard from "./_components/EmployerStatsCard";
 
@@ -23,10 +24,13 @@ const EmployerInterviewsPage = () => {
     useInterviewFilters();
 
   // hooks
-  const { data: interviews = [], isLoading } =
-    useEmployerInterviews(queryFilters);
+  const { data, isLoading } = useEmployerInterviews(queryFilters);
+
   const { mutateAsync: deleteInterview, isPending: isDeleting } =
     useDeleteInterview();
+
+  const interviews = data?.data ?? [];
+  const totalPages = data?.totalPages ?? 0;
 
   const handleView = (interview: Interview) => {
     setSelectedInterview(interview);
@@ -50,10 +54,9 @@ const EmployerInterviewsPage = () => {
     cancelled: interviews.filter((i) => i.status === "cancelled").length,
   };
 
-  if (isLoading) return <h1 className="text-center ">Loading...</h1>;
   return (
     <main>
-      <EmployerInterviewHeader
+      <InterviewHeader
         totalInterviews={interviews.length}
         filters={filters}
         updateFilter={handleUpdateFilter}
@@ -69,7 +72,14 @@ const EmployerInterviewsPage = () => {
         <Card className="border-border shadow-lg">
           <CardContent className="pt-6">
             {/* Table */}
-            {interviews.length > 0 ? (
+            {isLoading ? (
+              <div className="py-12 text-center">
+                <Calendar className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4 animate-pulse" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  Loading interviews...
+                </h3>
+              </div>
+            ) : interviews.length > 0 ? (
               <EmployerInterviewsTable
                 interviews={interviews}
                 onView={handleView}
@@ -88,6 +98,12 @@ const EmployerInterviewsPage = () => {
               </div>
             )}
           </CardContent>
+          <Pagination
+            currentPage={filters.page}
+            totalPages={totalPages}
+            onNext={() => updateFilter("page", (filters?.page ?? 1) + 1)}
+            onPrev={() => updateFilter("page", (filters?.page ?? 1) - 1)}
+          />
         </Card>
       </div>
 

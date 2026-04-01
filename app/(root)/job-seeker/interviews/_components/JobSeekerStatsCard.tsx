@@ -1,35 +1,39 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Briefcase, Calendar, CheckCircle, Clock } from "lucide-react";
 
-const JobSeekerStatsCard = ({ mockInterviews }: { mockInterviews: any[] }) => {
-  const stats = [
+interface StatsCardsProps {
+  stats: {
+    total: number;
+    upcoming: number;
+    pending_confirm: number;
+    cancelled: number;
+    completed: number;
+  };
+}
+
+const JobSeekerStatsCard = ({ stats }: StatsCardsProps) => {
+  const cardData = [
     {
       title: "Total Interviews",
-      value: mockInterviews.length.toString(),
+      value: stats.total,
       icon: Briefcase,
       description: "All time",
     },
     {
       title: "Upcoming",
-      value: mockInterviews
-        .filter((i) => i.status === "upcoming")
-        .length.toString(),
+      value: stats.upcoming,
       icon: Calendar,
       description: "Scheduled",
     },
     {
       title: "Pending Confirm",
-      value: mockInterviews
-        .filter((i) => i.status === "pending_confirm")
-        .length.toString(),
+      value: stats.pending_confirm,
       icon: Clock,
       description: "Requires action",
     },
     {
       title: "Completed",
-      value: mockInterviews
-        .filter((i) => i.status === "completed")
-        .length.toString(),
+      value: stats.completed,
       icon: CheckCircle,
       description: "Past interviews",
     },
@@ -37,7 +41,7 @@ const JobSeekerStatsCard = ({ mockInterviews }: { mockInterviews: any[] }) => {
   return (
     <div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4  pb-8 pt-5">
-        {stats.map((stat, index) => (
+        {cardData.map((stat, index) => (
           <Card key={index} className="border-border shadow-sm">
             <CardContent className="p-4 sm:p-6 flex flex-col justify-between h-full">
               <div className="flex items-center justify-between mb-2">
