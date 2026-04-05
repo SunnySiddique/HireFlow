@@ -141,8 +141,8 @@ const EmployerInterviewModal = ({
               </label>
               <Input
                 placeholder="e.g. Senior Engineer"
-                name="interviewer_title"
-                value={interviewData.interviewer_title}
+                name="interviewer_name"
+                value={interviewData.interviewer_name}
                 onChange={handleChange}
               />
             </div>

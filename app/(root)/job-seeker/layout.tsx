@@ -16,7 +16,11 @@ export default function JobSeekerLayout({
   const pathname = usePathname();
 
   const isJobs = pathname === "/job-seeker/jobs";
+  const isInterviewDetail = /^\/job-seeker\/interviews\/[^/]+$/.test(pathname);
 
+  if (isInterviewDetail) {
+    return <>{children}</>;
+  }
   return (
     <div className="flex h-screen bg-background">
       {!isJobs && (

@@ -43,11 +43,13 @@ export const NotificationIcon = ({ type }: { type: string }) => {
     case "payment_failed":
       return <AlertCircle className="w-4 h-4 text-red-600" />;
 
-    // Optional: trial ending or upcoming payment
-    case "trial_end":
-      return <Clock className="w-4 h-4 text-orange-500" />;
-    case "payment_upcoming":
-      return <CreditCard className="w-4 h-4 text-blue-500" />;
+    // interview notifications
+    case "new_interview_invite":
+      return <Bell className="w-4 h-4 text-blue-500" />;
+    case "interview_accepted":
+      return <CheckCircle className="w-4 h-4 text-green-500" />;
+    case "interview_declined":
+      return <XCircle className="w-4 h-4 text-red-500" />;
 
     default:
       return <Bell className="w-4 h-4 text-muted-foreground" />;
@@ -78,7 +80,9 @@ export function getNotificationLink(
 
     // interview notificaitons
     case "new_interview_invite":
-      return role === "job-seeker" && `/seekers/interviews/${referenceId}`;
+    case "interview_accepted":
+    case "interview_declined":
+      return role === "job-seeker" && `/job-seeker/interviews/${referenceId}`;
 
     default:
       return "";

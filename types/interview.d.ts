@@ -19,7 +19,6 @@ export interface sendInterviewInviteType {
 }
 
 // interview type for interview table
-// types/interview.ts — add these fields
 export interface Interview {
   id: string;
   interviewer_id: string;
@@ -39,6 +38,7 @@ export interface Interview {
   created_at: string;
   updated_at: string;
   seeker?: {
+    auth_id?: string;
     profile_url?: string;
   };
   employer?: {
@@ -53,3 +53,30 @@ export type InterviewFilters = {
   type?: string;
   page?: number;
 };
+
+export interface notifyInterview {
+  id: string;
+  application_id: string;
+  interviewer_id: string;
+  seeker_id: string;
+  status: string;
+  interview_type: string;
+  scheduled_at: string;
+  duration_minutes: number;
+  meeting_link: string;
+  interviewer_name: string;
+  interviewer_title: string;
+  message: string;
+  notes: string;
+  feedback: string;
+  employer: {
+    company_logo_url: string;
+    company_name: string;
+  };
+  applicant: {
+    job: {
+      title: string;
+      company_name: string;
+    };
+  };
+}

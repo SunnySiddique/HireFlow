@@ -25,7 +25,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useEmployerInterviews } from "@/hooks/useInterview";
+import { useInterviews } from "@/hooks/useInterview";
 import { useInterviewFilters } from "@/hooks/useInterviewFilters";
 import { useArchiveApplicant } from "@/hooks/useJobs";
 import { formatDate, getInitials } from "@/lib/utils";
@@ -61,10 +61,12 @@ const statusIcons: Record<string, React.ReactNode> = {
   accepted: <CheckCircle className="w-3 h-3" />,
 };
 
+//TODO FIX THE when employer modify the interview modal the notification not gone
+
 const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
   // hooks
   const { mutate: archiveApplicant } = useArchiveApplicant();
-  const { data } = useEmployerInterviews({});
+  const { data } = useInterviews({}, "employer");
   const { filters, updateFilter } = useInterviewFilters();
 
   const interviews = data?.data ?? [];
@@ -121,9 +123,7 @@ const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
               {applicants.length > 0 ? (
                 applicants.map((applicant) => {
                   const isInterviewScheduled = interviews?.some(
-                    (interview) =>
-                      interview.application_id === applicant.id &&
-                      interview.status === "pending_confirm",
+                    (interview) => interview.application_id === applicant.id,
                   );
                   return (
                     <TableRow
