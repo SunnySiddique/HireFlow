@@ -115,3 +115,11 @@ export const hasAccess = (status: string, plan_expires_at: string) => {
     new Date(plan_expires_at) > new Date(),
   );
 };
+
+// interview
+export const interviewTime = (scheduledAt: string) => {
+  const interviewTime = new Date(scheduledAt);
+  const joinAvailableAt = new Date(interviewTime.getTime() - 5 * 60 * 1000);
+
+  return new Date() >= joinAvailableAt;
+};

@@ -3,10 +3,7 @@
 import EmployerInterviewModal from "@/components/employer/interviews/EmployerInterviewModal";
 import Pagination from "@/components/pagination/Pagination";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  useDeleteInterview,
-  useEmployerInterviews,
-} from "@/hooks/useInterview";
+import { useDeleteInterview, useInterviews } from "@/hooks/useInterview";
 import { useInterviewFilters } from "@/hooks/useInterviewFilters";
 import { Interview } from "@/types/interview";
 import { Calendar } from "lucide-react";
@@ -19,12 +16,13 @@ const EmployerInterviewsPage = () => {
   const [selectedInterview, setSelectedInterview] = useState<Interview | null>(
     null,
   );
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { filters, queryFilters, updateFilter, resetFilters } =
     useInterviewFilters();
 
   // hooks
-  const { data, isLoading } = useEmployerInterviews(queryFilters);
+  const { data, isLoading } = useInterviews(queryFilters, "employer");
 
   const { mutateAsync: deleteInterview, isPending: isDeleting } =
     useDeleteInterview();
@@ -41,8 +39,11 @@ const EmployerInterviewsPage = () => {
     updateFilter(key as keyof typeof filters, value);
   };
 
-  const handleDelete = async (interviewId: string) => {
-    await deleteInterview(interviewId);
+  const handleDelete = async (interviewId: string, seekerId: string) => {
+    await deleteInterview({
+      interviewId,
+      seekerId,
+    });
   };
 
   const stats = {
@@ -114,6 +115,8 @@ const EmployerInterviewsPage = () => {
           interview={selectedInterview}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+          seekerId={selectedInterview?.seeker_id ?? ""}
+          applicationId={selectedInterview?.application_id ?? ""}
         />
       )}
     </main>

@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { MapPin, MonitorSmartphone, Phone, Users, Video } from "lucide-react";
 // employer
 export const DURATION_OPTIONS = ["30", "45", "60", "90"];
 
@@ -20,4 +21,30 @@ export const getStatusBadge = (status: string) => {
     default:
       return <Badge variant="outline">{status}</Badge>;
   }
+};
+
+// employer
+export const typeIcon = (type: string) => {
+  switch (type.toLowerCase()) {
+    case "zoom":
+      return <Video className="h-3.5 w-3.5" />;
+    case "google_meet":
+      return <MonitorSmartphone className="h-3.5 w-3.5" />;
+    case "ms_teams":
+      return <Users className="h-3.5 w-3.5" />;
+    case "phone":
+      return <Phone className="h-3.5 w-3.5" />;
+    case "in_person":
+      return <MapPin className="h-3.5 w-3.5" />;
+    default:
+      return <MonitorSmartphone className="h-3.5 w-3.5" />;
+  }
+};
+
+export const typeLabel: Record<string, string> = {
+  zoom: "Zoom",
+  google_meet: "Google Meet",
+  ms_teams: "MS Teams",
+  phone: "Phone",
+  in_person: "In Person",
 };
