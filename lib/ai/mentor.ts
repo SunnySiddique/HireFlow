@@ -11,15 +11,24 @@ async function getFilteredJobsForAI() {
       `
       id,
       job_title,
-      location,
-      skills_required,
+      job_slug,
+      job_description,
+      category,
+      employment_type,
       experience_level,
       salary_min,
       salary_max,
       currency,
+      location,
       remote_option,
+      skills_required,
+      benefits,
+      requirements,
+      responsibilities,
+      open_positions,
+      application_deadline,
       created_at,
-      employers:employer_id (company_name)
+      employers:employer_id(company_name)
     `,
     )
     .eq("status", "open")
@@ -30,7 +39,10 @@ async function getFilteredJobsForAI() {
     .order("created_at", { ascending: false })
     .limit(30);
 
-  if (error) throw new Error(`Failed to fetch jobs: ${error.message}`);
+  if (error) {
+    throw new Error(`Failed to fetch jobs: ${error.message}`);
+  }
+
   if (!jobs || jobs.length === 0) return "";
 
   return jobs
@@ -38,31 +50,78 @@ async function getFilteredJobsForAI() {
       const company =
         job.employers?.company_name ||
         `Employer ${job.employer_id?.slice(0, 8)}`;
-      const skills = job.skills_required?.join(", ") || "Not specified";
+
+      const skills = job.skills_required?.length
+        ? job.skills_required.join(", ")
+        : "Not specified";
+
+      const benefits = job.benefits?.length
+        ? job.benefits.join(", ")
+        : "Not mentioned";
+
       const salary =
         job.salary_min && job.salary_max
           ? `${job.salary_min}-${job.salary_max} ${job.currency || "BDT"}`
           : "Not mentioned";
 
-      return `JOB-${job.id} | ${job.job_title} | ${company} | ${job.location || "N/A"} |
-Requires: ${skills} |
-Experience: ${job.experience_level || "Not specified"} |
-Salary: ${salary} |
-Remote: ${job.remote_option || "No"}`;
+      const formatJsonField = (field: any) => {
+        if (!field) return "Not specified";
+        if (Array.isArray(field)) return field.join(", ");
+        if (typeof field === "object") return JSON.stringify(field);
+        return String(field);
+      };
+
+      const requirements = formatJsonField(job.requirements);
+      const responsibilities = formatJsonField(job.responsibilities);
+
+      const deadline = job.application_deadline
+        ? new Date(job.application_deadline).toLocaleDateString()
+        : "Not specified";
+
+      return `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+JOB_ID: ${job.id}
+TITLE: ${job.job_title}
+SLUG: ${job.job_slug}
+COMPANY: ${company}
+
+LOCATION: ${job.location || "N/A"}
+CATEGORY: ${job.category || "Not specified"}
+EMPLOYMENT_TYPE: ${job.employment_type || "Not specified"}
+EXPERIENCE_LEVEL: ${job.experience_level || "Not specified"}
+OPEN_POSITIONS: ${job.open_positions || 1}
+
+DESCRIPTION:
+${job.job_description || "Not provided"}
+
+REQUIREMENTS:
+${requirements}
+
+RESPONSIBILITIES:
+${responsibilities}
+
+SKILLS_REQUIRED:
+${skills}
+
+BENEFITS:
+${benefits}
+
+SALARY:
+${salary}
+
+REMOTE_OPTION:
+${job.remote_option || "No"}
+
+APPLICATION_DEADLINE:
+${deadline}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
     })
-    .join("\n\n");
+    .join("\n");
 }
 
 export async function analyzeResumeAndJobMatch(resume: any) {
   const jobsText = await getFilteredJobsForAI();
-
-  if (!jobsText) {
-    return {
-      resume_summary: "No active jobs found at the moment.",
-      extracted_skills: {},
-      job_matches: [],
-    };
-  }
 
   const userMessage = `
 Here is the candidate's resume:
@@ -70,6 +129,7 @@ ${resume}
 
 Here are the most relevant job postings to analyze (only these ones):
 ${jobsText}`;
+
   const completion = await openrouter.chat.completions.create({
     model: "meta-llama/llama-3-8b-instruct",
     temperature: 0.2,
