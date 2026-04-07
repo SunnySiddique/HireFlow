@@ -11,6 +11,7 @@ import {
   MapPin,
   MessageSquare,
   PlusCircle,
+  Sparkles,
   Target,
   TrendingUp,
   User,
@@ -162,6 +163,13 @@ export const jobSeekerLinks = [
     icon: Users,
     section: "main",
     plan: "champion",
+  },
+  {
+    label: "AI Career Hub",
+    href: "/job-seeker/ai",
+    icon: Sparkles,
+    section: "main",
+    // plan: "champion",
   },
   {
     label: "Saved Jobs",
