@@ -45,6 +45,13 @@ export interface Interview {
     company_name?: string;
     company_logo_url?: string;
   };
+  applicant?: {
+    job: {
+      job_title: string;
+      job_description: string;
+      experience_level: string;
+    };
+  };
 }
 
 export type InterviewFilters = {

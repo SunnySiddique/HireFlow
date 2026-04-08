@@ -1,4 +1,4 @@
-import { ArrowRight, Bot, Sparkles, Wand2 } from "lucide-react";
+import { ArrowRight, Bot, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 const AICareerHubPage = () => {
@@ -20,7 +20,7 @@ const AICareerHubPage = () => {
       </div>
 
       {/* Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Card 1: Job Recommendations */}
         <Link
           href="/job-seeker/ai/resume-matching"
@@ -51,39 +51,9 @@ const AICareerHubPage = () => {
           </div>
         </Link>
 
-        {/* Card 2: Resume Optimizer */}
-        <Link
-          href="#"
-          className="group relative flex flex-col bg-card rounded-2xl border border-border/50 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden"
-        >
-          {/* Top Accent Line */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-secondary/80 to-secondary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-          <div className="p-8 flex-1 flex flex-col">
-            <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-6 text-secondary group-hover:scale-110 transition-transform duration-300">
-              <Wand2 className="w-6 h-6" />
-            </div>
-
-            <h3 className="text-xl font-semibold mb-3 group-hover:text-secondary transition-colors">
-              Resume Optimizer
-            </h3>
-            <p className="text-sm text-muted-foreground mb-8 flex-1 leading-relaxed">
-              Enhance your resume and cover letter with AI-powered improvements
-              to get past ATS and stand out to recruiters.
-            </p>
-
-            <div className="mt-auto">
-              <div className="w-full flex items-center justify-center px-4 py-3 rounded-xl bg-secondary text-secondary-foreground font-semibold group-hover:bg-secondary/90 transition-all">
-                Optimize Now
-                <ArrowRight className="w-4 h-4 ml-2 opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-              </div>
-            </div>
-          </div>
-        </Link>
-
         {/* Card 3: Mock Interview */}
         <Link
-          href="#"
+          href="/job-seeker/ai/mock-interview"
           className="group relative flex flex-col bg-card rounded-2xl border border-border/50 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden"
         >
           {/* Top Accent Line */}
