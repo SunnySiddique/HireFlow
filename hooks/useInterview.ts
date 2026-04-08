@@ -8,7 +8,7 @@ import { invalidateQuery } from "@/lib/react-query/invalidateQueries";
 import { createClient } from "@/lib/supabase/client";
 import { InterviewFilters, sendInterviewInviteType } from "@/types/interview";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 // employer
@@ -33,8 +33,17 @@ export const useInterviews = (
   filters?: InterviewFilters,
   role: "employer" | "seeker" = "employer",
 ) => {
+  const router = useRouter();
+
   return useQuery({
-    queryKey: ["interviews", filters?.search, filters?.status, filters?.page],
+    queryKey: [
+      "interviews",
+      role,
+      filters?.search,
+      filters?.status,
+      filters?.type,
+      filters?.page,
+    ],
     queryFn: async () => {
       const supabase = await createClient();
       const {
@@ -42,13 +51,18 @@ export const useInterviews = (
         error: authError,
       } = await supabase.auth.getUser();
 
-      if (!user || authError) redirect("/auth/signin");
+      if (!user || authError) {
+        router.push("/auth/signin");
+        throw new Error("Unauthorized");
+      }
 
       const queryId = role === "employer" ? "interviewer_id" : "seeker_id";
       const selectedField =
         role === "employer"
           ? `seeker:seeker_id(auth_id, profile_url)`
-          : `employer:interviewer_id(company_logo_url, company_name)`;
+          : `
+      employer:interviewer_id(company_logo_url, company_name)
+    `;
 
       let query = supabase
         .from("interviews")
@@ -87,18 +101,18 @@ export const useInterviews = (
       }
 
       // pagnination
+      const page = filters?.page ?? 1;
       const limit = 5;
-      if (filters?.page) {
-        const from = ((filters?.page ?? 1) - 1) * limit;
-        const to = from + limit - 1;
-        query = query.range(from, to);
-      }
+
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+
+      query = query.range(from, to);
 
       const { data, error, count } = await query;
 
-      const totalPages = Math.ceil((count || 0) / limit);
-
       if (error) throw error;
+      const totalPages = Math.ceil((count || 0) / limit);
       return { data, totalPages };
     },
   });

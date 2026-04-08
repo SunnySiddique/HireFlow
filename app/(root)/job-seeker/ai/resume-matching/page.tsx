@@ -1,6 +1,6 @@
 "use client";
 
-import AICoachUploadPage from "../_components/UploadResume";
+import AICoachUploadPage from "../_components/AICoachUploadPage";
 
 const ResumeJobRecommendationsPage = () => {
   return (
