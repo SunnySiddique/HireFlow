@@ -169,7 +169,7 @@ export const jobSeekerLinks = [
     href: "/job-seeker/ai",
     icon: Sparkles,
     section: "main",
-    // plan: "champion",
+    plan: "champion",
   },
   {
     label: "Saved Jobs",

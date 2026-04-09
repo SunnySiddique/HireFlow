@@ -1,47 +1,57 @@
 import { getVapi } from "@/lib/vapi";
-import Vapi from "@vapi-ai/web";
 import { useEffect, useRef, useState } from "react";
 
 type Message = { role: "user" | "assistant"; text: string };
 
-export type InterviewConfig = {
-  jobTitle?: string;
-  companyName?: string;
-  jobDescription?: string;
-  candidateName?: string;
-  Experience?: string;
-};
-
 export const useVapi = () => {
-  const vapiRef = useRef<Vapi | null>(null);
+  const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [transcript, setTranscript] = useState<Message[]>([]);
   const transcriptEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const vapi = getVapi();
-    vapiRef.current = vapi;
+  const vapiRef = useRef(getVapi());
 
-    vapi.on("call-start", () => setIsConnected(true));
-    vapi.on("call-end", () => {
+  useEffect(() => {
+    const vapi = vapiRef.current;
+
+    const onCallStart = () => setIsConnected(true);
+    const onCallEnd = () => {
       setIsConnected(false);
       setIsSpeaking(false);
-    });
+    };
+    const onSpeechStart = () => {
+      setIsSpeaking(true);
+      setIsConnecting(false);
+    };
+    const onSpeechEnd = () => {
+      setIsSpeaking(false);
+      setIsConnecting(false);
+    };
 
-    const handleMessage = (message: any) => {
+    const onMessage = (message: any) => {
       if (message.type === "transcript" && message.transcriptType === "final") {
-        const newMessage = { content: message.transcript, role: message.role };
-        setTranscript((prev) => [...prev, newMessage]);
+        setTranscript((prev) => [
+          ...prev,
+          { role: message.role, text: message.transcript },
+        ]);
       }
     };
-    vapi.on("speech-start", () => setIsSpeaking(true));
-    vapi.on("speech-end", () => setIsSpeaking(false));
-    vapi.on("message", handleMessage);
+
+    vapi.on("call-start", onCallStart);
+    vapi.on("call-end", onCallEnd);
+    vapi.on("speech-start", onSpeechStart);
+    vapi.on("speech-end", onSpeechEnd);
+    vapi.on("message", onMessage);
     vapi.on("error", console.error);
 
     return () => {
-      vapi?.stop();
+      vapi.off("call-start", onCallStart);
+      vapi.off("call-end", onCallEnd);
+      vapi.off("speech-start", onSpeechStart);
+      vapi.off("speech-end", onSpeechEnd);
+      vapi.off("message", onMessage);
+      vapi.off("error", console.error);
     };
   }, []);
 
@@ -50,25 +60,23 @@ export const useVapi = () => {
   }, [transcript]);
 
   const startCall = () => {
+    setIsConnecting(true);
     setTranscript([]);
-    if (vapiRef.current) {
-      console.log("id:", process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!);
-      vapiRef.current?.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!);
-    }
+    vapiRef.current.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!);
   };
 
   const endCall = () => {
-    vapiRef.current?.stop();
-    setTranscript([]);
+    setIsConnecting(false);
+    vapiRef.current.stop();
   };
 
   return {
     startCall,
+    endCall,
     isSpeaking,
     transcript,
-    endCall,
     isConnected,
-    setIsConnected,
     transcriptEndRef,
+    isConnecting,
   };
 };
