@@ -117,6 +117,7 @@ const EmployerInterviewRow = ({
   useEffect(() => {
     if (!interview.scheduled_at) return;
 
+    let interval: NodeJS.Timeout;
     const check = () => {
       const available = interviewTime(interview.scheduled_at);
       setIsJoinAvailable(available);
@@ -124,10 +125,12 @@ const EmployerInterviewRow = ({
       if (available && !notificationSentRef.current) {
         notificationSentRef.current = true;
         notifyBeforeInterview(interview.id);
+
+        if (interval) clearInterval(interval);
       }
     };
     check();
-    const interval = setInterval(check, 60 * 1000);
+    interval = setInterval(check, 60 * 1000);
     return () => clearInterval(interval);
   }, [interview.scheduled_at]);
 
