@@ -20,7 +20,7 @@ function CheckList({ items }: { items: string[] }) {
   );
 }
 
-const JobDetailContent = ({ job }: { job: Job; isSubscribed: boolean }) => {
+const JobDetailContent = ({ job }: { job: Job }) => {
   return (
     <>
       <div className="lg:col-span-2 space-y-6">

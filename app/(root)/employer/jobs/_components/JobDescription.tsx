@@ -1,11 +1,12 @@
 import CustomField from "@/components/CustomField";
+import { Switch } from "@/components/ui/switch";
 import { JobFormValues } from "@/types/jobs";
 import {
   Briefcase,
   Calendar,
   Check,
   FileText,
-  Shield,
+  Star,
   Target,
   X,
   Zap,
@@ -16,6 +17,9 @@ import { UseFormReturn } from "react-hook-form";
 interface JobDescriptionProps {
   form: UseFormReturn<JobFormValues>;
 }
+
+//TODO: fix the profile featured button. and add the the featured button when employer create job
+// TODO: then filter the featured job in the browse job page
 
 const JobDescription = ({ form }: JobDescriptionProps) => {
   const [skillInput, setSkillInput] = useState<string>("");
@@ -96,6 +100,44 @@ const JobDescription = ({ form }: JobDescriptionProps) => {
             placeholder="Describe the role, responsibilities, and what success looks like..."
             isJob={true}
           />
+        </div>
+
+        {/* Featured Job Toggle */}
+        <div className="border-dashed bg-primary/5 border border-primary/20 rounded-lg p-6 space-y-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3 flex-1">
+              <div className="p-2.5 rounded-lg bg-primary/10 dark:bg-primary/10 border border-primary/20 mt-0.5">
+                <Star className="w-5 h-5 text-primary fill-current" />
+              </div>
+              <div className="flex-1">
+                <label className="text-sm font-bold text-foreground block">
+                  Featured Job
+                </label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Make this job stand out on the job board and get more
+                  visibility from candidates
+                </p>
+              </div>
+            </div>
+            <div className="flex-shrink-0">
+              <Switch
+                checked={form.watch("isFeatured") || false}
+                onCheckedChange={(checked) =>
+                  form.setValue("isFeatured", checked)
+                }
+                className="data-[state=checked]:bg-primary"
+              />
+            </div>
+          </div>
+          {form.watch("isFeatured") && (
+            <div className="text-xs text-muted-foreground bg-primary/20 dark:bg-primary/10 border border-primary/20 rounded px-3 py-2 flex items-start gap-2">
+              <span className="text-muted-foreground font-bold mt-0.5">✓</span>
+              <span>
+                This job will be highlighted with a special badge and featured
+                prominently to attract top candidates
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Requirements and Responsibilties Field */}
@@ -343,25 +385,6 @@ const JobDescription = ({ form }: JobDescriptionProps) => {
           label=""
           type="date"
           placeholder=""
-        />
-      </div>
-
-      {/* Status */}
-      <div className="space-y-2 pt-4">
-        <div className="flex items-center gap-2">
-          <Shield className="w-4 h-4 text-primary" />
-          <label className="text-sm font-bold text-foreground">Status</label>
-        </div>
-        <CustomField
-          control={form.control}
-          name="status"
-          label=""
-          type="select"
-          options={[
-            { label: "Open", value: "open" },
-            { label: "Closed", value: "closed" },
-          ]}
-          placeholder="Select status"
         />
       </div>
     </>

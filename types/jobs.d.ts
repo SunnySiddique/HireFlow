@@ -57,6 +57,7 @@ export interface Job {
   created_at?: string | null; // ISO string
   updated_at?: string | null; // ISO string
   responsibilities?: Record<string, any> | null; // JSONB
+  isFeatured?: boolean | null;
 }
 
 // jobs sidebar filters type

@@ -3,7 +3,7 @@ import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { getResumeFileName } from "@/lib/utils";
 import { ProfileFormData } from "@/types/job-seeker";
-import { Download, FileText, Upload, X } from "lucide-react";
+import { FileText, Upload, X } from "lucide-react";
 import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from "react";
 import { FormProvider, UseFormReturn } from "react-hook-form";
 
@@ -30,27 +30,6 @@ const Documents = ({
     if (file) {
       setShowResumeName(file.name);
       setResumeFile(file);
-    }
-  };
-
-  const handleDownloadResume = async () => {
-    if (!resumeUrl) return;
-
-    try {
-      const response = await fetch(resumeUrl);
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = getResumeFileName(resumeUrl);
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Failed to download file:", error);
     }
   };
 
@@ -126,20 +105,6 @@ const Documents = ({
                         ? getResumeFileName(resumeUrl)
                         : "No resume uploaded"}
                     </a>
-                  </div>
-                  <div>
-                    {resumeUrl && (
-                      <Button
-                        variant={"ghost"}
-                        className="ml-auto"
-                        onClick={() => {
-                          handleDownloadResume();
-                          setShowResumeName("");
-                        }}
-                      >
-                        <Download className="w-5 h-5 " />
-                      </Button>
-                    )}
                   </div>
                 </div>
               )}

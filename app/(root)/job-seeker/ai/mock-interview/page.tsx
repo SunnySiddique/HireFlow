@@ -23,8 +23,8 @@ const AIMockInterviewPage = () => {
   } = useVapi();
 
   const { data: seeker, isLoading } = useGetJobSeekerProfile();
-  console.log("user:", seeker);
-  if (isLoading) return <Loader />;
+
+  if (isLoading) return <Loader mode="inline" />;
   return (
     <div className="flex flex-col">
       {/* Main Content */}

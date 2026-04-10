@@ -1,4 +1,3 @@
-import Loader from "@/components/Loader";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import {
@@ -15,10 +14,8 @@ import { Edit, Eye, Loader2, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 const JobListings = () => {
-  const { data: jobListings, isLoading } = useActiveJobs();
+  const { data: jobListings } = useActiveJobs();
   const { mutateAsync: deleteJob, isPending } = useDeleteJob();
-
-  if (isLoading) return <Loader />;
 
   return (
     <div className="lg:col-span-2">

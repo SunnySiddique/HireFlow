@@ -14,6 +14,7 @@ const EmployerDashboardPage = () => {
     subscription?.subscription_status as string,
     subscription?.plan_expires_at as string,
   );
+
   return (
     <>
       <StatsCard />
@@ -28,7 +29,7 @@ const EmployerDashboardPage = () => {
           </div>
         </>
       ) : (
-<UnSubscribeEmptyState />
+        <UnSubscribeEmptyState />
       )}
     </>
   );

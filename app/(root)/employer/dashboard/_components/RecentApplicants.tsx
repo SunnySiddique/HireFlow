@@ -1,52 +1,12 @@
-import Loader from "@/components/Loader";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { useRecentApplicants } from "@/hooks/useJobs";
 import { getInitials, timeAgo } from "@/lib/utils";
 import Image from "next/image";
 
-// const recentApplicants = [
-//   {
-//     name: "Sarah Johnson",
-//     role: "Senior React Developer",
-//     time: "2h ago",
-//     initials: "SJ",
-//     gradient: "from-blue-400 to-blue-600",
-//   },
-//   {
-//     name: "Mike Chen",
-//     role: "UX/UI Designer",
-//     time: "4h ago",
-//     initials: "MC",
-//     gradient: "from-purple-400 to-purple-600",
-//   },
-//   {
-//     name: "Emma Davis",
-//     role: "Product Manager",
-//     time: "6h ago",
-//     initials: "ED",
-//     gradient: "from-pink-400 to-pink-600",
-//   },
-//   {
-//     name: "Alex Rodriguez",
-//     role: "DevOps Engineer",
-//     time: "8h ago",
-//     initials: "AR",
-//     gradient: "from-green-400 to-green-600",
-//   },
-//   {
-//     name: "Lisa Wong",
-//     role: "Backend Developer",
-//     time: "1d ago",
-//     initials: "LW",
-//     gradient: "from-orange-400 to-orange-600",
-//   },
-// ];
-
 const RecentApplicants = () => {
-  const { data: recentApplicants, isLoading } = useRecentApplicants();
+  const { data: recentApplicants } = useRecentApplicants();
 
-  if (isLoading) return <Loader />;
   return (
     <>
       <div>

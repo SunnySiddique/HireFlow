@@ -48,6 +48,7 @@ const jobFormSchema = z
       .array(z.string().min(1))
       .min(1, "At least one responsibility is needed"),
     applicationDeadline: z.string().optional(),
+    isFeatured: z.boolean().default(false),
     status: z.string().default("draft"),
   })
   .refine((data) => data.maximumSalary >= data.minimumSalary, {
@@ -88,7 +89,7 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
       responsibilities: initialData?.responsibilities || [],
       skills: initialData?.skills_required || [],
       applicationDeadline: initialData?.application_deadline || "",
-      status: initialData?.status.toLowerCase() || "draft",
+      isFeatured: initialData?.is_featured || false,
     },
   });
 
@@ -124,6 +125,7 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
         requirements: data.requirements || [],
         responsibilities: data.responsibilities || [],
         application_deadline: data.applicationDeadline || null,
+        is_featured: data.isFeatured,
         status: data.status,
         skills_required: data.skills.map((s: string) => s.toLowerCase()),
       };

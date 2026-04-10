@@ -8,14 +8,12 @@ import {
   formatSalary,
   getInitials,
 } from "@/lib/utils";
-import { Bookmark, Building2, Clock, Loader, MapPin, Wifi } from "lucide-react";
+import { Bookmark, Building2, Clock, MapPin, Wifi } from "lucide-react";
 import Link from "next/link";
 import EmptyState from "./EmptyState";
 
 const RecommendedJobs = () => {
-  const { data: recommendedJobs = [], isLoading } = useRecommandedJobs();
-
-  if (isLoading) return <Loader />;
+  const { data: recommendedJobs = [] } = useRecommandedJobs();
 
   return (
     <>

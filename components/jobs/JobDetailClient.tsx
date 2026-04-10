@@ -18,43 +18,47 @@ const JobDetailClient = ({ job }: { job: Job }) => {
   const { data: currentUser } = useGetCurrentUser();
   const { mutate: trackView } = useTrackJobView();
   const { data: subscription } = useGetCurrentUserSubscription();
+
   const isSubscribed = hasAccess(
     subscription?.subscription_status as string,
     subscription?.plan_expires_at as string,
   );
 
+  console.log("isSub:", isSubscribed);
   useEffect(() => {
     if (!job?.id) return;
     if (!currentUser) return;
 
     trackView(job.id);
-    console.log("logded");
   }, [job?.id]);
-
-  if (isLoading) return <Loader />;
+  if (isLoading) return <Loader mode="inline" />;
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 md:px-14 py-5">
       {/* ── Header Card ───── */}
       <HeaderCard job={job} isSubscribed={isSubscribed} />
       {/* ── Main Grid ─────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ">
         {/* Left Column */}
-        <JobDetailContent job={job} isSubscribed={isSubscribed} />
+        <JobDetailContent job={job} />
         {/* Right Column */}
         <JobSidebar job={job} isSubscribed={isSubscribed} />
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-foreground">Similar Jobs</h2>
+        {similarJobs.length > 0 && (
+          <h2 className="text-xl font-bold text-foreground">Similar Jobs</h2>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-          {similarJobs.map((similarJob) => (
-            <JobCard
-              key={similarJob.id}
-              job={similarJob}
-              variant="similar"
-              isSubscribed={isSubscribed}
-            />
-          ))}
+          {similarJobs.length > 0 &&
+            similarJobs.map((similarJob) => (
+              <JobCard
+                key={similarJob.id}
+                job={similarJob}
+                variant="similar"
+                isSubscribed={isSubscribed}
+              />
+            ))}
         </div>
       </div>
     </div>

@@ -70,6 +70,8 @@ export const formatLabel = (value: string): string => {
       return "Full-time";
     case "part_time":
       return "Part-time";
+    case "on_site":
+      return "On-Site";
     default:
       return value.charAt(0).toUpperCase() + value.slice(1);
   }

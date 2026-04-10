@@ -1,13 +1,14 @@
 "use client";
 
 import SavedJobCard from "@/components/jobs/SavedJobCard";
+import Loader from "@/components/Loader";
 import { useGetCurrentUserSaveJobs } from "@/hooks/useJobs";
 import { Bookmark } from "lucide-react";
 
 const SavedJobsPage = () => {
   const { data: savedJobs, isLoading } = useGetCurrentUserSaveJobs();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loader mode="inline" />;
 
   return (
     <div className="flex flex-col gap-4 p-8">

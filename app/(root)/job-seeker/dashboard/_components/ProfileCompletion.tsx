@@ -1,4 +1,3 @@
-import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -19,7 +18,7 @@ const profileTabs = [
   {
     id: "about",
     label: "About",
-    fields: ["headline", "about"],
+    fields: ["headline", "about", "profile_url"],
     icon: User,
   },
   {
@@ -55,7 +54,7 @@ const profileTabs = [
 ];
 
 const ProfileCompletion = () => {
-  const { data: jobSeekerProfile, isLoading } = useGetJobSeekerProfile();
+  const { data: jobSeekerProfile } = useGetJobSeekerProfile();
 
   const isSectionCompleted = (fields: string[]) => {
     return fields.some((field) => {
@@ -68,8 +67,6 @@ const ProfileCompletion = () => {
   };
 
   const progress = jobSeekerProfile?.profile_completion ?? 0;
-
-  if (isLoading) return <Loader />;
 
   return (
     <Card className="p-4 lg:p-6 bg-background border border-border">
@@ -135,7 +132,10 @@ const ProfileCompletion = () => {
       </div>
 
       {/* Action Link */}
-      <Link href={`/job-seeker/${jobSeekerProfile?.slug}`} className="block">
+      <Link
+        href={`/job-seeker/profile/${jobSeekerProfile?.slug}`}
+        className="block"
+      >
         <Button
           variant="outline"
           className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
