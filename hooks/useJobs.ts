@@ -363,7 +363,7 @@ export const useGetAllJobsForJobSeeker = (filters: JobFiltersType) => {
         `,
           { count: "exact" },
         )
-        .neq("status", "closed");
+        .eq("status", "open");
 
       if (filters.category) {
         query = query.eq("category", filters.category);
@@ -377,7 +377,7 @@ export const useGetAllJobsForJobSeeker = (filters: JobFiltersType) => {
         query = query.eq("experience_level", filters.experienceLevel);
       }
       if (filters.salaryMin !== undefined) {
-        query = query.gte("salary_max", filters.salaryMin);
+        query = query.gte("salary_min", filters.salaryMin);
       }
       if (filters.salaryMax !== undefined) {
         query = query.lte("salary_max", filters.salaryMax);
@@ -392,7 +392,6 @@ export const useGetAllJobsForJobSeeker = (filters: JobFiltersType) => {
       }
 
       /* ---------------- SORTING ---------------- */
-      query = query.order("created_at", { ascending: false });
 
       if (filters.sort !== "all") {
         if (filters.sort === "recent") {

@@ -1,5 +1,6 @@
 "use client";
 
+import Loader from "@/components/Loader";
 import UnSubscribeEmptyState from "@/components/UnSubscribeEmptyState";
 import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
 import { hasAccess } from "@/lib/utils";
@@ -9,7 +10,7 @@ import RecentApplications from "./_components/RecentApplications";
 import RecommendedJobs from "./_components/RecommendedJobs";
 
 const JobSeekerDashboardPage = () => {
-  const { data: subscription } = useGetCurrentUserSubscription();
+  const { data: subscription, isLoading } = useGetCurrentUserSubscription();
   const isSubscribed = hasAccess(
     subscription?.subscription_status as string,
     subscription?.plan_expires_at as string,
@@ -17,6 +18,8 @@ const JobSeekerDashboardPage = () => {
   const isAcceleratorPlan =
     subscription?.plan?.toLowerCase() === "acccelerator" ||
     subscription?.plan?.toLowerCase() === "champion";
+
+  if (isLoading) return <Loader mode="full" />;
   return (
     <main className="p-8">
       {/* Stats Cards */}

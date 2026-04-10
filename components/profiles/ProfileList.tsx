@@ -11,7 +11,6 @@ import { FeaturedEmployerCard } from "./FeaturedEmployerCard";
 import { FeaturedTalentCard } from "./FeaturedTalentCard";
 import { TalentCard } from "./TalentCard";
 
-// TODO protect user form sub
 const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
   const { data: seekerProfiles, isLoading: isSeekerProfileLoading } =
     useSeekerProfiles();
@@ -43,7 +42,8 @@ const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
     matchesSearch(profile),
   );
 
-  if (isSeekerProfileLoading || isEmployerProfileLoading) return <Loader />;
+  if (isSeekerProfileLoading || isEmployerProfileLoading)
+    return <Loader mode="inline" />;
   return (
     <main className="p-8">
       <div className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-30 pb-4 mb-8">

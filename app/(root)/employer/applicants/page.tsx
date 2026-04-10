@@ -40,7 +40,7 @@ const ApplicantsPage = () => {
     return searchFilter && statusFilter && archivedFilter;
   });
 
-  if (isLoading) return <Loader />;
+  if (isLoading) return <Loader mode="inline" />;
 
   return (
     <div className="flex-1 flex flex-col w-full min-w-0">

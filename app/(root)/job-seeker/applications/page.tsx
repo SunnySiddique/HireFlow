@@ -11,7 +11,7 @@ const MyApplicationsPage = () => {
   const { data, isLoading } = useGetCurrentUserAppliedJobs();
   const applications = data ?? [];
 
-  if (isLoading) return <Loader />;
+  if (isLoading) return <Loader mode="inline" />;
   return (
     <div className="space-y-8 p-8">
       {/* Header */}

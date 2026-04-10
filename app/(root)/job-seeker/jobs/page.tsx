@@ -5,16 +5,18 @@ import JobCardSkeleton from "@/components/jobs/JobCardSkeleton";
 import Loader from "@/components/Loader";
 import { SALARY_RANGES } from "@/constants/jobsData";
 import { useGetAllJobsForJobSeeker } from "@/hooks/useJobs";
+import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
+import { hasAccess } from "@/lib/utils";
 import { JobFiltersType } from "@/types/jobs";
 import { useState } from "react";
-import JobFilters from "./_components/JobFilters";
+
 import JobTopBar from "./_components/JobTopBar";
 import NoJobsFound from "./_components/NoJobsFound";
-import { default as Pagination } from "./_components/Pagination";
+import Pagination from "./_components/Pagination";
 import SearchAndFilterBar from "./_components/SearchAndFilterBar";
 
 const BrowseJobs = () => {
-  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+  const { data: subscription } = useGetCurrentUserSubscription();
 
   const [filters, setFilters] = useState<JobFiltersType>({
     search: "",
@@ -28,6 +30,7 @@ const BrowseJobs = () => {
     limit: 10,
     sort: "all",
   });
+
   const [salaryLabel, setSalaryLabel] = useState("");
 
   const {
@@ -35,7 +38,10 @@ const BrowseJobs = () => {
     isLoading,
     isFetching,
   } = useGetAllJobsForJobSeeker(filters);
+
   const { jobs, totalCount, totalPages } = data;
+
+  const featuredJobs = jobs.filter((job: any) => job.is_featured);
 
   const updateFilters = (updated: Partial<typeof filters>) => {
     setFilters((prev) => ({ ...prev, ...updated, page: 1 }));
@@ -44,10 +50,7 @@ const BrowseJobs = () => {
   const updateSalary = (label: string) => {
     setSalaryLabel(label);
     const selected = SALARY_RANGES.find((s) => s.label === label);
-    updateFilters({
-      salaryMin: selected?.min,
-      salaryMax: selected?.max,
-    });
+    updateFilters({ salaryMin: selected?.min, salaryMax: selected?.max });
   };
 
   const clearFilters = () => {
@@ -61,12 +64,26 @@ const BrowseJobs = () => {
       salaryMin: undefined,
       salaryMax: undefined,
       page: 1,
+      limit: 10,
+      sort: "all",
     });
   };
 
+  const isSubscribed = hasAccess(
+    subscription?.subscription_status as string,
+    subscription?.plan_expires_at as string,
+  );
   return (
-    <div className="space-y-6 lg:space-y-8 p-8">
-      {/* Search & Filter Bar */}
+    <div className="px-4 md:px-14 py-4 space-y-4">
+      <div className="space-y-2">
+        <h1 className="text-xl md:text-2xl font-bold">Find Your Dream Job</h1>
+
+        <p className="text-sm text-muted-foreground">
+          Browse {totalCount} jobs • {featuredJobs.length} featured
+          opportunities
+        </p>
+      </div>
+
       <SearchAndFilterBar
         filters={filters}
         salaryLabel={salaryLabel}
@@ -75,71 +92,75 @@ const BrowseJobs = () => {
         onClear={clearFilters}
       />
 
-      {/* Main Grid */}
+      <JobTopBar
+        totalCount={totalCount ?? 0}
+        sort={filters.sort}
+        onSortChange={(val) => updateFilters({ sort: val })}
+        featuredCount={featuredJobs.length}
+      />
 
-      <div className="flex-1 flex flex-col">
-        {/* Sidebar Filters */}
-        <div className="flex-1 px-4 lg:px-8 py-6 lg:py-8">
-          <div className="flex flex-col lg:flex-row gap-6">
-            <aside className="hidden lg:block">
-              <JobFilters
-                filters={filters}
-                salaryLabel={salaryLabel}
-                onFilterChange={updateFilters}
-                onSalaryChange={updateSalary}
-                onClear={clearFilters}
-              />
-            </aside>
+      {/* 🚀 Loading States */}
+      {isLoading ? (
+        <Loader mode="full" />
+      ) : isFetching ? (
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <JobCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : jobs.length === 0 ? (
+        <NoJobsFound />
+      ) : (
+        <div className="space-y-6">
+          {featuredJobs.length > 0 && (
+            <div className="space-y-3">
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <span className="inline-block w-0.5 h-3 bg-primary rounded-full" />
+                Featured Opportunities
+              </p>
 
-            {/* Jobs Grid */}
-            <div className="flex-1">
-              <JobTopBar
-                totalCount={totalCount ?? 0}
-                sort={filters.sort}
-                onSortChange={(val) => updateFilters({ sort: val })}
-                setViewMode={setViewMode}
-              />
-              {isLoading ? (
-                <Loader />
-              ) : isFetching ? (
-                <div
-                  className={
-                    viewMode === "grid"
-                      ? "grid grid-cols-1 lg:grid-cols-3 gap-5"
-                      : "flex flex-col"
-                  }
-                >
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <JobCardSkeleton key={i} />
-                  ))}
-                </div>
-              ) : jobs.length > 0 ? (
-                <div
-                  className={
-                    viewMode === "grid"
-                      ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 "
-                      : "flex flex-col gap-5"
-                  }
-                >
-                  {jobs.map((job) => (
-                    <JobCard key={job.id} job={job} variant="browse" />
-                  ))}
-                </div>
-              ) : (
-                <NoJobsFound />
-              )}
-              <Pagination
-                page={filters.page ?? 1}
-                totalItems={totalCount}
-                totalPages={totalPages}
-                onPageChange={(newPage) =>
-                  setFilters((prev) => ({ ...prev, page: newPage }))
-                }
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {featuredJobs.map((job: any) => (
+                  <JobCard
+                    key={job.id}
+                    job={job}
+                    variant="browse"
+                    isSubscribed={isSubscribed}
+                    featured
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-3">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+              All Jobs
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+              {jobs.map((job: any) => (
+                <JobCard
+                  key={job.id}
+                  job={job}
+                  variant="browse"
+                  isSubscribed={isSubscribed}
+                  featured={job.is_featured}
+                />
+              ))}
             </div>
           </div>
         </div>
-      </div>
+      )}
+
+      <Pagination
+        page={filters.page ?? 1}
+        totalItems={totalCount}
+        totalPages={totalPages}
+        onPageChange={(newPage) =>
+          setFilters((prev) => ({ ...prev, page: newPage }))
+        }
+      />
     </div>
   );
 };

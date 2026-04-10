@@ -5,38 +5,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { JobFiltersType } from "@/types/jobs";
-import { Grid3x3, List } from "lucide-react";
 
 interface JobTopBarProps {
   totalCount: number;
   sort?: JobFiltersType["sort"];
   onSortChange: (val: JobFiltersType["sort"]) => void;
-  setViewMode: (mode: "grid" | "list") => void;
+  featuredCount: number;
 }
 
 const JobTopBar = ({
   totalCount,
   sort,
   onSortChange,
-  setViewMode,
+  featuredCount,
 }: JobTopBarProps) => {
   return (
-    <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-      <p className="text-sm text-muted-foreground">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
         Showing{" "}
         <span className="font-medium text-foreground">{totalCount}</span> jobs
+        {featuredCount > 0 && (
+          <span className="ml-1 text-primary font-medium">
+            ({featuredCount} featured)
+          </span>
+        )}
       </p>
 
-      <div className="flex items-center justify-between gap-3">
+      <div className="w-full sm:w-auto">
         <Select
           value={sort ?? "all"}
           onValueChange={(val) => onSortChange(val as JobFiltersType["sort"])}
         >
-          <SelectTrigger className="w-48 bg-background border border-border text-foreground">
-            <SelectValue placeholder="Sort" />
+          <SelectTrigger className="w-full sm:w-[180px] md:w-[200px] bg-background border border-border text-xs sm:text-sm">
+            <SelectValue placeholder="Sort jobs" />
           </SelectTrigger>
+
           <SelectContent>
             <SelectItem value="all">All</SelectItem>
             <SelectItem value="recent">Most Recent</SelectItem>
@@ -44,29 +48,6 @@ const JobTopBar = ({
             <SelectItem value="salary-low">Lowest Salary</SelectItem>
           </SelectContent>
         </Select>
-
-        <ToggleGroup
-          type="single"
-          defaultValue="list"
-          className="justify-start"
-        >
-          <ToggleGroupItem
-            value="grid"
-            aria-label="Grid view"
-            title="Grid view"
-            onClick={() => setViewMode("grid")}
-          >
-            <Grid3x3 size={18} />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="list"
-            aria-label="List view"
-            title="List view"
-            onClick={() => setViewMode("list")}
-          >
-            <List size={18} />
-          </ToggleGroupItem>
-        </ToggleGroup>
       </div>
     </div>
   );

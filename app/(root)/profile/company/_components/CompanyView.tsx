@@ -48,7 +48,7 @@ const CompanyView = ({ slug }: CompanyViewProps) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader />
+        <Loader mode="full" />
       </div>
     );
   }

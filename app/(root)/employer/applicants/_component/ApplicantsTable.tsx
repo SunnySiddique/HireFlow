@@ -61,8 +61,6 @@ const statusIcons: Record<string, React.ReactNode> = {
   accepted: <CheckCircle className="w-3 h-3" />,
 };
 
-//TODO FIX THE when employer modify the interview modal the notification not gone
-
 const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
   // hooks
   const { mutate: archiveApplicant } = useArchiveApplicant();

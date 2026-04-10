@@ -83,7 +83,7 @@ const ManageJobsPage = () => {
   }, [empJobs]);
 
   if (!empJobs || isEmployerProfileLoading || empJobLoading || isUpdatingStatus)
-    return <Loader />;
+    return <Loader mode="inline" />;
 
   return (
     <main>

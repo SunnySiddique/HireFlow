@@ -47,105 +47,110 @@ const SearchAndFilterBar = ({
   }, [debouncedSearch, debouncedLocation]);
 
   return (
-    <Card className="p-4 lg:p-6 bg-background border border-border">
+    <Card className="p-4 md:p-5 lg:p-6 bg-background border border-border">
       <div className="space-y-4">
-        {/* Top Inputs: Search & Location */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* 🔍 Search Inputs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {/* Search */}
           <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Job title, keyword or company..."
-              className="pl-10 pr-4 py-2 bg-background border border-border text-foreground w-full"
+              className="pl-10 w-full text-sm placeholder:text-sm"
               value={filters.search}
               onChange={(e) => onFilterChange({ search: e.target.value })}
             />
           </div>
 
+          {/* Location */}
           <div className="relative w-full">
-            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="City, state or remote..."
-              className="pl-10 pr-4 py-2 bg-background border border-border text-foreground w-full"
+              className="pl-10 w-full text-sm placeholder:text-sm"
               value={filters.location}
               onChange={(e) => onFilterChange({ location: e.target.value })}
             />
           </div>
         </div>
 
-        {/* Mobile Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:hidden">
+        {/* 🎯 Filters (2 columns on mobile) */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          {/* Category */}
           <Select
             value={filters.category}
             onValueChange={(val) => onFilterChange({ category: val })}
           >
-            <SelectTrigger className="w-full bg-background border border-border text-foreground">
+            <SelectTrigger className="w-full text-sm">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {JOB_CATEGORY.map((item) => (
-                <SelectItem value={item.value} key={item.value}>
+                <SelectItem key={item.value} value={item.value}>
                   {item.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
+          {/* Employment Type */}
           <Select
             value={filters.employmentType}
             onValueChange={(val) => onFilterChange({ employmentType: val })}
           >
-            <SelectTrigger className="w-full bg-background border border-border text-foreground">
-              <SelectValue placeholder="Employment Type" />
+            <SelectTrigger className="w-full text-sm">
+              <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
               {EMPLOYMENT_TYPES.map((item) => (
-                <SelectItem value={item.value} key={item.value}>
+                <SelectItem key={item.value} value={item.value}>
                   {item.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
+          {/* Experience */}
           <Select
             value={filters.experienceLevel}
             onValueChange={(val) => onFilterChange({ experienceLevel: val })}
           >
-            <SelectTrigger className="w-full bg-background border border-border text-foreground">
-              <SelectValue placeholder="Experience Level" />
+            <SelectTrigger className="w-full text-sm">
+              <SelectValue placeholder="Experience" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Levels</SelectItem>
               {EXPERIENCE_LEVELS.map((level) => (
-                <SelectItem value={level.value} key={level.value}>
+                <SelectItem key={level.value} value={level.value}>
                   {level.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
+          {/* Salary */}
           <Select
             value={salaryLabel}
             onValueChange={(val) => onSalaryChange(val)}
           >
-            <SelectTrigger className="w-full bg-background border border-border text-foreground">
-              <SelectValue placeholder="Salary Range" />
+            <SelectTrigger className="w-full text-sm">
+              <SelectValue placeholder="Salary" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="any">Any</SelectItem>
               {SALARY_RANGES.map((item) => (
-                <SelectItem value={item.label} key={item.label}>
+                <SelectItem key={item.label} value={item.label}>
                   {item.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-
           <Button
             variant="ghost"
-            className="w-full sm:col-span-2 text-foreground border border-border hover:bg-muted"
             onClick={onClear}
+            className="text-sm border border-border"
           >
             Clear Filters
           </Button>

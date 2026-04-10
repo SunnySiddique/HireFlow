@@ -1,7 +1,10 @@
 "use client";
 
+import Loader from "@/components/Loader";
 import DashboardNavbar from "@/components/navbar/DashboardNavbar";
 import DashboardSidebar from "@/components/sidebar/DashboardSidebar";
+import { useEmployerProfile } from "@/hooks/useEmployer";
+import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
 import { useState } from "react";
 
 export default function EmployerLayout({
@@ -9,8 +12,12 @@ export default function EmployerLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { isLoading } = useEmployerProfile();
+  const { isLoading: isGetSub } = useGetCurrentUserSubscription();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  if (isLoading || isGetSub) return <Loader mode="full" />;
   return (
     <div className="flex h-screen bg-background">
       <DashboardSidebar

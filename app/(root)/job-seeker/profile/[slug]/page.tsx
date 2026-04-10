@@ -267,8 +267,7 @@ const ProfilePage = () => {
       toast.error(firstError.message);
     }
   };
-  console.log("pro:", jobSeekerProfile);
-  if (isJobSeekerProfileLoading) return <Loader />;
+  if (isJobSeekerProfileLoading) return <Loader mode="inline" />;
   return (
     <>
       {/* Hero Profile Section */}

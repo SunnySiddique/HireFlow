@@ -1,6 +1,5 @@
 "use client";
 
-import Loader from "@/components/Loader";
 import { Card } from "@/components/ui/card";
 import { useGetJobSeekerApplicationStats } from "@/hooks/useDashboard";
 import { Eye, FileText, Heart, TrendingDown, TrendingUp } from "lucide-react";
@@ -12,7 +11,7 @@ const DashboardStats = ({
   isSubscribed: boolean;
   isAcceleratorPlan: boolean;
 }) => {
-  const { data, isLoading } = useGetJobSeekerApplicationStats();
+  const { data } = useGetJobSeekerApplicationStats();
   const thisWeekApplications = data?.thisWeekApplications ?? 0;
   const totalProfileViews = data?.thisWeekProfileviews ?? 0;
 
@@ -71,6 +70,7 @@ const DashboardStats = ({
       iconColor: "text-red-500",
     },
   ];
+
   const filteredStats = statsData.filter((stat) => {
     if (!isSubscribed && stat.id === "profile-views") return false;
     if (isSubscribed && !isAcceleratorPlan && stat.id === "profile-views")
@@ -78,7 +78,6 @@ const DashboardStats = ({
     return true;
   });
 
-  if (isLoading) return <Loader />;
   return (
     <div
       className={`grid grid-cols-1 sm:grid-cols-2 ${

@@ -1,4 +1,3 @@
-import Loader from "@/components/Loader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -81,9 +80,8 @@ const jobStatusConfig: Record<string, string> = {
 };
 
 const RecentApplications = () => {
-  const { data: jobs = [], isLoading } = useGetRecentJobs();
+  const { data: jobs = [] } = useGetRecentJobs();
 
-  if (isLoading) return <Loader />;
   return (
     <>
       {jobs.length > 0 ? (
