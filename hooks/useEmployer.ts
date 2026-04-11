@@ -61,6 +61,9 @@ export const useUpdateEmployer = () => {
       queryClient.invalidateQueries({ queryKey: ["employerProfileBySlug"] });
       queryClient.invalidateQueries({ queryKey: ["employerProfile"] });
     },
+    onError: (error) => {
+      toast.error(error.message || "Something went wrong");
+    },
   });
 };
 

@@ -41,6 +41,7 @@ const InterviewRowController = ({
   return (
     <>
       {/* Desktop */}
+
       <EmployerInterviewRow
         interview={interview}
         onView={onView}
@@ -49,13 +50,15 @@ const InterviewRowController = ({
         isJoinAvailable={isJoinAvailable}
       />
       {/* Mobile */}
-      <EmployerInterviewMobileCard
-        interview={interview}
-        onView={onView}
-        onDeleteClick={onDeleteClick}
-        isDeleting={isDeleting}
-        isJoinAvailable={isJoinAvailable}
-      />
+      <div className="md:hidden">
+        <EmployerInterviewMobileCard
+          interview={interview}
+          onView={onView}
+          onDeleteClick={onDeleteClick}
+          isDeleting={isDeleting}
+          isJoinAvailable={isJoinAvailable}
+        />
+      </div>
     </>
   );
 };

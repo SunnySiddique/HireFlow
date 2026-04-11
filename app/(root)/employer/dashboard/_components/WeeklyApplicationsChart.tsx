@@ -29,7 +29,7 @@ const WeeklyApplicationsChart = () => {
           <YAxis
             stroke="#6b7280"
             domain={[0, "dataMax + 1"]}
-            tickFormatter={(value) => Math.round(value)}
+            tickFormatter={(value) => Math.round(value).toString()}
           />
           <Tooltip />
           <Bar dataKey="applicants" fill="#d87943" radius={[8, 8, 0, 0]} />

@@ -9,7 +9,7 @@ const EditJobPage = async ({ params }: PageProps) => {
   const { slug } = await params;
   const result = await getJobPostBySlug(slug);
 
-  if (!result) return <NoJobsFound />;
+  if (!result) return <NoJobsFound isEmployer={true} />;
   return (
     <>
       <CreateJobForm fromType={"edit"} initialData={result} />

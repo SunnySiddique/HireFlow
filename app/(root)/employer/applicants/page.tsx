@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetAllApplicants } from "@/hooks/useJobs";
 import { exportToExcel } from "@/lib/utils/excel";
+import { ApplicantType } from "@/types/jobs";
 import { Download } from "lucide-react";
 import { useState } from "react";
 import ApplicantsSearchBar from "./_component/ApplicantsSearchBar";
@@ -21,27 +22,32 @@ const ApplicantsPage = () => {
   const debouncedSearch = useDebounce(filters.search, 500);
 
   const { data: applicants, isLoading } = useGetAllApplicants();
-  const filteredApplicants = (applicants ?? []).filter((applicant) => {
-    const search = debouncedSearch.toLowerCase();
 
-    const searchFilter =
-      applicant.seeker?.full_name?.toLowerCase().includes(search) ||
-      applicant.job?.job_title?.toLowerCase().includes(search);
+  const filteredApplicants = (applicants ?? [])
+    .filter((applicant) => {
+      const search = debouncedSearch.toLowerCase();
+      const applicantStatus = applicant.status ?? "pending";
 
-    const statusFilter =
-      filters.status === "all" ||
-      applicant.status?.toLowerCase() === filters.status.toLowerCase();
+      const searchFilter =
+        applicant.seeker?.full_name?.toLowerCase().includes(search) ||
+        applicant.job?.job_title?.toLowerCase().includes(search);
 
-    const archivedFilter =
-      activeTab === "active"
-        ? !(applicant as any).archived
-        : (applicant as any).archived;
+      const statusFilter =
+        filters.status === "all" ||
+        applicantStatus.toLowerCase() === filters.status.toLowerCase();
 
-    return searchFilter && statusFilter && archivedFilter;
-  });
+      const archivedFilter =
+        activeTab === "active" ? !applicant.archived : applicant.archived;
+
+      return searchFilter && statusFilter && archivedFilter;
+    })
+    .map((applicant) => ({
+      ...applicant,
+      status: applicant.status ?? "pending",
+    })) as ApplicantType[];
 
   if (isLoading) return <Loader mode="inline" />;
-
+  console.log(applicants);
   return (
     <div className="flex-1 flex flex-col w-full min-w-0">
       {/* Page Header */}

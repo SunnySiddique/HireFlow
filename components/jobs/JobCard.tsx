@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useGetCurrentUserSaveJobs, useSavedJob } from "@/hooks/useJobs";
 import { formatLabel, formatSalary, getInitials } from "@/lib/utils";
+import { Job } from "@/types/jobs";
 import {
   Bookmark,
   BookmarkCheck,
@@ -14,38 +15,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-
-interface Employer {
-  id: string;
-  website: string;
-  company_name: string;
-  company_logo_url: string;
-}
-
-export interface Job {
-  id: string;
-  job_title: string;
-  job_slug: string;
-  employer_id: string;
-  job_description: string;
-  category: string;
-  employment_type: string;
-  experience_level: string;
-  salary_min: number;
-  salary_max: number;
-  currency: string;
-  location: string;
-  remote_option: string;
-  skills_required: string[];
-  benefits: string[];
-  application_deadline: string;
-  open_positions: number;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  is_featured: boolean;
-  employer: Employer;
-}
 
 interface JobCardProps {
   job: Job;
@@ -98,14 +67,14 @@ const JobCard = ({
               className={`h-10 w-10 flex-shrink-0 rounded-lg border ${featured ? "border-primary/30" : "border-border"}`}
             >
               <AvatarImage
-                src={job.employer.company_logo_url}
-                alt={job.employer.company_name}
+                src={job?.employer?.company_logo_url ?? "N/A"}
+                alt={job?.employer?.company_name ?? "N/A"}
                 className="object-cover"
               />
               <AvatarFallback
                 className={`rounded-lg text-xs font-bold ${featured ? "bg-primary/10 text-primary" : "bg-muted text-foreground"}`}
               >
-                {getInitials(job.employer.company_name)}
+                {getInitials(job?.employer?.company_name ?? "N/A")}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
@@ -113,13 +82,13 @@ const JobCard = ({
                 {job.job_title}
               </h4>
               <a
-                href={job.employer.website}
+                href={job?.employer?.website ?? "N/A"}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
                 className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-primary transition-colors w-fit mt-0.5"
               >
-                {job.employer.company_name}
+                {job?.employer?.company_name ?? "N/A"}
                 <ExternalLink className="h-2.5 w-2.5 ml-0.5 opacity-60" />
               </a>
             </div>
@@ -167,9 +136,9 @@ const JobCard = ({
         {/* Type badges */}
         <div className="flex flex-wrap gap-1.5">
           {[
-            formatLabel(job.remote_option),
-            formatLabel(job.employment_type),
-            formatLabel(job.experience_level),
+            formatLabel(job.remote_option ?? "N/A"),
+            formatLabel(job.employment_type ?? "N/A"),
+            formatLabel(job.experience_level ?? "N/A"),
           ].map((label) => (
             <Badge
               key={label}
@@ -186,7 +155,7 @@ const JobCard = ({
 
         {/* Skills */}
         <div className="flex flex-wrap gap-1">
-          {job.skills_required.slice(0, 4).map((skill) => (
+          {(job?.skills_required ?? []).slice(0, 4).map((skill) => (
             <span
               key={skill}
               className={`text-[10px] font-mono px-1.5 py-0.5 rounded-sm border ${
@@ -198,11 +167,11 @@ const JobCard = ({
               {skill.toUpperCase()}
             </span>
           ))}
-          {job.skills_required.length > 4 && (
+          {(job.skills_required ?? []).length > 4 && (
             <span
               className={`text-[10px] px-1.5 py-0.5 rounded-sm border ${featured ? "bg-primary/5 text-primary border-primary/20" : "bg-muted text-muted-foreground border-border"}`}
             >
-              +{job.skills_required.length - 4}
+              +{(job.skills_required ?? []).length - 4}
             </span>
           )}
         </div>
@@ -216,7 +185,11 @@ const JobCard = ({
             <span
               className={`text-sm font-semibold ${featured ? "text-primary" : "text-foreground"}`}
             >
-              {formatSalary(job.salary_min, job.salary_max, job.currency)}
+              {formatSalary(
+                job.salary_min ?? 0,
+                job.salary_max ?? 0,
+                job.currency ?? "usd",
+              )}
             </span>
           </div>
           <Link href={detailHref} onClick={(e) => e.stopPropagation()}>

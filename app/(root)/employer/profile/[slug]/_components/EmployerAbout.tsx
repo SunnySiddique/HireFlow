@@ -1,5 +1,5 @@
 import CustomField from "@/components/CustomField";
-import { EmployerFormData } from "@/types/employer";
+import { Employer, EmployerFormData } from "@/types/employer";
 import { Calendar, Globe, MapPin, Users } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
@@ -7,8 +7,7 @@ interface EmployerAboutProps {
   editMode: boolean;
   setEditMode: (mode: boolean) => void;
   form: UseFormReturn<EmployerFormData>;
-  // handleProfileSave: () => void;
-  employer: any;
+  employer?: Employer;
 }
 
 const EmployerAbout = ({ editMode, form, employer }: EmployerAboutProps) => {

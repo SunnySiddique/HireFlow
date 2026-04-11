@@ -155,18 +155,26 @@ const ApplicantsTable = ({ applicants }: { applicants: ApplicantType[] }) => {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-xs sm:text-sm text-foreground hidden sm:table-cell truncate max-w-[120px] sm:max-w-[150px] md:max-w-[200px]">
+                      <TableCell className="text-xs sm:text-sm text-foreground hidden sm:table-cell truncate max-w-30 sm:max-w-37.5 md:max-w-50">
                         {applicant.job.job_title}
                       </TableCell>
                       <TableCell className="text-xs sm:text-sm text-muted-foreground hidden md:table-cell whitespace-nowrap">
-                        {formatDate(applicant.applied_at)}
+                        {formatDate(
+                          applicant.applied_at ? applicant.applied_at : "N/A",
+                        )}
                       </TableCell>
                       <TableCell>
                         <Badge
-                          className={`${statusColors[applicant.status.toLowerCase()]} text-[10px] sm:text-xs whitespace-nowrap`}
+                          className={`${statusColors[applicant.status ? applicant.status.toLowerCase() : "N/A"]} text-[10px] sm:text-xs whitespace-nowrap`}
                         >
                           <span className="mr-1">
-                            {statusIcons[applicant.status.toLowerCase()]}
+                            {
+                              statusIcons[
+                                applicant.status
+                                  ? applicant.status.toLowerCase()
+                                  : "N/A"
+                              ]
+                            }
                           </span>
                           {applicant.status}
                         </Badge>

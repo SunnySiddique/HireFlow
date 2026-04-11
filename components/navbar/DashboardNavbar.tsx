@@ -89,7 +89,7 @@ const DashboardNavbar = ({
 
   return (
     <div className="px-4 lg:px-8 py-4 bg-background border-b border-border/40 sticky top-0 z-30 backdrop-blur-md">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-row items-center justify-between gap-4">
         {/* Welcome Text */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -255,41 +255,48 @@ const DashboardNavbar = ({
               }
             >
               {role === "job-seeker" ? (
-                <Avatar className="h-10 w-10 lg:h-12 lg:w-12 border-2 border-primary cursor-pointer hover:scale-105 transition-transform shadow-sm">
-                  {jobSeekerProfile?.profile_url ? (
-                    <AvatarImage
-                      src={jobSeekerProfile?.profile_url || "/placeholder.svg"}
-                      alt={jobSeekerProfile?.full_name || "Job-seeker logo"}
-                    />
-                  ) : (
-                    <AvatarFallback className="bg-primary text-primary-foreground font-bold">
-                      {getInitials(jobSeekerProfile?.full_name ?? "Jone")}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
+                <Link href={`/job-seeker/profile/${jobSeekerProfile?.slug}`}>
+                  <Avatar className="h-10 w-10 lg:h-12 lg:w-12 border-2 border-primary cursor-pointer hover:scale-105 transition-transform shadow-sm">
+                    {jobSeekerProfile?.profile_url ? (
+                      <AvatarImage
+                        src={
+                          jobSeekerProfile?.profile_url || "/placeholder.svg"
+                        }
+                        alt={jobSeekerProfile?.full_name || "Job-seeker logo"}
+                      />
+                    ) : (
+                      <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+                        {getInitials(jobSeekerProfile?.full_name ?? "Jone")}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                </Link>
               ) : (
-                <Avatar className="h-10 w-10 lg:h-12 lg:w-12 cursor-pointer hover:scale-105 transition-transform shadow-sm">
-                  {employerProfile?.company_logo_url ? (
-                    <AvatarImage
-                      src={
-                        employerProfile?.company_logo_url || "/placeholder.svg"
-                      }
-                      alt={employerProfile?.company_name || "Employer logo"}
-                    />
-                  ) : (
-                    <AvatarFallback className="bg-primary text-primary-foreground font-bold">
-                      {getInitials(
-                        (employerProfile?.company_name as string) ?? "MT",
-                      )}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
+                <Link href={`/job-seeker/profile/${employerProfile?.slug}`}>
+                  <Avatar className="h-10 w-10 lg:h-12 lg:w-12 cursor-pointer hover:scale-105 transition-transform shadow-sm">
+                    {employerProfile?.company_logo_url ? (
+                      <AvatarImage
+                        src={
+                          employerProfile?.company_logo_url ||
+                          "/placeholder.svg"
+                        }
+                        alt={employerProfile?.company_name || "Employer logo"}
+                      />
+                    ) : (
+                      <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+                        {getInitials(
+                          (employerProfile?.company_name as string) ?? "MT",
+                        )}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                </Link>
               )}
             </Link>
           </div>
 
           {/* Menu icon — mobile only */}
-          <div className="block sm:hidden">
+          <div className="block lg:hidden">
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={onMenuClick}

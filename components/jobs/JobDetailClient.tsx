@@ -31,9 +31,10 @@ const JobDetailClient = ({ job }: { job: Job }) => {
 
     trackView(job.id);
   }, [job?.id]);
+
   if (isLoading) return <Loader mode="inline" />;
   return (
-    <div className="space-y-6 px-4 md:px-14 py-5">
+    <div className="space-y-6 py-5">
       {/* ── Header Card ───── */}
       <HeaderCard job={job} isSubscribed={isSubscribed} />
       {/* ── Main Grid ─────── */}

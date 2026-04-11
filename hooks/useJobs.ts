@@ -55,7 +55,7 @@ export const useCreateJob = () => {
       invalidateQuery(queryClient, ["getEmployerJobs"]);
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      toast.error(error.message || "Something went wrong creating Job");
     },
   });
 };
@@ -79,7 +79,7 @@ export const useUpdateJob = () => {
       invalidateQuery(queryClient, ["getEmployerJobs"]);
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      toast.error(error.message || "Something went wrong updating Job");
     },
   });
 };
@@ -91,6 +91,10 @@ export const useUpdateJobStatus = () => {
     mutationFn: ({ jobId, status }: { jobId: string; status: string }) =>
       updateJobStatus(jobId, status),
     onSuccess: () => {
+      invalidateQuery(queryClient, ["getEmployerJobs"]);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Something went wrong updating job status");
       invalidateQuery(queryClient, ["getEmployerJobs"]);
     },
   });
@@ -106,7 +110,7 @@ export const useDeleteJob = () => {
       invalidateQuery(queryClient, ["activeJobs"]);
     },
     onError: (error: any) => {
-      toast.error("Failed to delete job:", error);
+      toast.error(error.message || "Something went wrong deleting Job");
     },
   });
 };
@@ -161,6 +165,11 @@ export const useArchiveApplicant = () => {
     onSuccess: () => {
       invalidateQuery(queryClient, ["allApplicants"]);
     },
+    onError: (error) => {
+      toast.error(
+        error.message || "Something went wrong adding archive applicant",
+      );
+    },
   });
 };
 
@@ -182,7 +191,9 @@ export const useUpdateApplicantStatus = () => {
       invalidateQuery(queryClient, ["allApplicants"]);
     },
     onError: (error: any) => {
-      toast.error("Failed to update applicant status:", error);
+      toast.error(
+        error.message || "Something went wrong updating applicant status",
+      );
     },
   });
 };
@@ -665,6 +676,9 @@ export const useSavedJob = () => {
       invalidateQuery(queryClient, ["applicationStats"]);
       toast.success("Job Saved Successfully");
     },
+    onError: (error) => {
+      toast.error(error.message || "Something went wrong Saving Job");
+    },
   });
 };
 
@@ -707,56 +721,68 @@ export const useGetRecentJobs = () => {
 
 // recommanded jobs
 export const useRecommandedJobs = () => {
-  return useQuery<JobWithEmployer[]>({
-    queryKey: ["recomandedJobs"],
-    queryFn: async (): Promise<JobWithEmployer[]> => {
+  return useQuery({
+    queryKey: ["recommendedJobs"],
+    queryFn: async () => {
       const supabase = createClient();
 
       const {
         data: { user },
         error: userError,
       } = await supabase.auth.getUser();
+
       if (userError || !user) throw new Error("User not found");
 
       const { data: jobSeeker, error: jobSeekerError } = await supabase
         .from("job_seekers")
-        .select("*")
+        .select("skills")
         .eq("auth_id", user.id)
         .single();
 
-      if (jobSeekerError || !jobSeeker) throw new Error("Job seeker not found");
+      if (jobSeekerError || !jobSeeker) {
+        throw new Error("Job seeker not found");
+      }
 
-      const userSkills: string[] = jobSeeker.skills || [];
-      if (userSkills.length === 0) return [];
+      const userSkills = jobSeeker.skills ?? [];
 
-      const { data: jobs, error: jobsError } = await supabase
+      // 🔥 fallback for empty skills
+      let query = supabase
         .from("jobs")
         .select(
           `
-                id,
-                job_title,
-                location,
-                salary_min,
-                salary_max,
-                currency,
-                employment_type,
-                job_slug,
-                created_at,
-                skills_required,
-           employer:employer_id (
-             id,
-             company_name,
-             company_logo_url,
-             website
-           )`,
+          id,
+          job_title,
+          location,
+          salary_min,
+          salary_max,
+          currency,
+          employment_type,
+          job_slug,
+          created_at,
+          skills_required,
+          employer:employer_id (
+            id,
+            company_name,
+            company_logo_url,
+            website
+          )
+        `,
         )
         .eq("status", "open")
-        .overlaps("skills_required", userSkills);
+        .limit(20)
+        .order("created_at", { ascending: false });
 
-      if (jobsError || !jobs) throw new Error("Jobs not found");
+      if (userSkills.length > 0) {
+        query = query.overlaps("skills_required", userSkills);
+      }
+
+      const { data: jobs, error } = await query;
+
+      if (error || !jobs) throw new Error("Jobs not found");
 
       const jobsWithScore = jobs.map((job) => {
-        const jobSkills: string[] = job.skills_required || [];
+        const jobSkills = job.skills_required ?? [];
+
         const matchScore = jobSkills.filter((skill) =>
           userSkills.includes(skill),
         ).length;
@@ -767,9 +793,7 @@ export const useRecommandedJobs = () => {
         };
       });
 
-      jobsWithScore.sort((a, b) => b.matchScore - a.matchScore);
-
-      return jobsWithScore;
+      return jobsWithScore.sort((a, b) => b.matchScore - a.matchScore);
     },
   });
 };

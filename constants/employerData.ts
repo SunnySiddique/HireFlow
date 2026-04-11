@@ -13,3 +13,9 @@ export const buttonText = [
     btnTxt: "Job Description",
   },
 ];
+
+export const statusLabel: Record<string, string> = {
+  actively_hiring: "Actively Hiring",
+  selective: "Selective",
+  not_hiring: "Not Hiring",
+};

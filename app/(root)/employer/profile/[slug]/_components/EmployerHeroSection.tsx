@@ -2,7 +2,8 @@ import React, { useRef, useState } from "react";
 
 import CustomField from "@/components/CustomField";
 import EmptyState from "@/components/EmptyState";
-import { EmployerFormData } from "@/types/employer";
+import { statusLabel } from "@/constants/employerData";
+import { Employer, EmployerFormData } from "@/types/employer";
 import { Building2, Star, Upload } from "lucide-react";
 import Image from "next/image";
 import { UseFormReturn } from "react-hook-form";
@@ -11,7 +12,7 @@ interface EmployerHeroSectionProps {
   editMode: boolean;
   setEditMode: (mode: boolean) => void;
   form: UseFormReturn<EmployerFormData>;
-  employer: any;
+  employer?: Employer;
   setLogoFile: React.Dispatch<React.SetStateAction<File | null>>;
   isLoading: boolean;
 }
@@ -33,6 +34,7 @@ const EmployerHeroSection = ({
       setViewLogo(URL.createObjectURL(file));
     }
   };
+  const hiringStatus = employer?.hiring_status?.toLowerCase() ?? "";
 
   return (
     <>
@@ -49,7 +51,7 @@ const EmployerHeroSection = ({
             <div className="w-24 h-24 rounded-lg bg-muted border-2 border-border flex items-center justify-center overflow-hidden">
               {viewLogo || employer?.company_logo_url ? (
                 <Image
-                  src={viewLogo || employer?.company_logo_url}
+                  src={viewLogo || employer?.company_logo_url || ""}
                   alt="Profile image"
                   fill
                   className="object-cover"
@@ -122,9 +124,9 @@ const EmployerHeroSection = ({
           {!editMode && employer?.industry && (
             <div
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border font-semibold text-sm whitespace-nowrap ${
-                employer?.hiring_status.toLowerCase() === "actively_hiring"
+                hiringStatus === "actively_hiring"
                   ? "bg-green-500/15 text-green-700 border-green-500/30"
-                  : employer?.hiring_status.toLowerCase() === "selective"
+                  : hiringStatus === "selective"
                     ? "bg-amber-500/15 text-amber-700 border-amber-500/30"
                     : "bg-red-500/15 text-red-700 border-red-500/30"
               }`}
@@ -133,15 +135,15 @@ const EmployerHeroSection = ({
                 className="w-2 h-2 rounded-full animate-pulse"
                 style={{
                   backgroundColor:
-                    employer.hiring_status.toLowerCase() === "actively_hiring"
+                    hiringStatus === "actively_hiring"
                       ? "#22c55e"
-                      : employer.hiring_status.toLowerCase() === "selective"
+                      : hiringStatus === "selective"
                         ? "#f59e0b"
                         : "#ef4444",
                 }}
               />
               <span className="capitalize">
-                {employer.hiring_status.toLowerCase() || "Status not set"}
+                {statusLabel[hiringStatus] || "Status not set"}
               </span>
             </div>
           )}

@@ -19,7 +19,7 @@ export const useGetCurrentUserSubscription = () => {
         .from("subscriptions")
         .select("*")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw new Error(error.message);
 

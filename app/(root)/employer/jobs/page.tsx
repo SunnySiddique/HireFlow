@@ -42,8 +42,6 @@ const getStatusColor = (status: string) => {
       return "bg-green-50 text-green-700 ...";
     case "closed":
       return "bg-red-50 text-red-700 ...";
-    case "draft":
-      return "bg-muted text-muted-foreground border-border";
     default:
       return "bg-muted text-muted-foreground border-border";
   }
@@ -51,10 +49,8 @@ const getStatusColor = (status: string) => {
 
 const ManageJobsPage = () => {
   const { data: user } = useGetCurrentUser();
-  const { data: employerProfile, isLoading: isEmployerProfileLoading } =
-    useEmployerProfile();
-  const { mutate: updateStatus, isPending: isUpdatingStatus } =
-    useUpdateJobStatus();
+  useEmployerProfile();
+  const { mutateAsync: updateStatus } = useUpdateJobStatus();
   const { data: empJobs, isLoading: empJobLoading } = useGetEmployerJobs(
     user?.id as string,
   );
@@ -63,27 +59,36 @@ const ManageJobsPage = () => {
 
   const [jobToDelete, setJobToDelete] = useState<string | null>(null);
   const [jobs, setJobs] = useState<Job[]>(empJobs || []);
+  const [updatingStatusJobId, setUpdatingStatusJobId] = useState<string | null>(
+    null,
+  );
 
   const handleDeleteJob = async (jobId: string) => {
     setJobToDelete(jobId);
     await deleteJobPost(jobId, { onSettled: () => setJobToDelete(null) });
   };
 
-  const handleChangeJobStatus = (jobId: string, newStatus: string) => {
+  const handleChangeJobStatus = async (jobId: string, newStatus: string) => {
+    setUpdatingStatusJobId(jobId);
     setJobs((prev) =>
       prev.map((job) =>
         job.id === jobId ? { ...job, status: newStatus } : job,
       ),
     );
-    updateStatus({ jobId, status: newStatus });
+    try {
+      await updateStatus({ jobId, status: newStatus });
+    } catch {
+      if (empJobs) setJobs(empJobs);
+    } finally {
+      setUpdatingStatusJobId(null);
+    }
   };
 
   useEffect(() => {
     if (empJobs) setJobs(empJobs);
   }, [empJobs]);
 
-  if (!empJobs || isEmployerProfileLoading || empJobLoading || isUpdatingStatus)
-    return <Loader mode="inline" />;
+  if (!empJobs || empJobLoading) return <Loader mode="inline" />;
 
   return (
     <main>
@@ -127,6 +132,7 @@ const ManageJobsPage = () => {
                           onValueChange={(newStatus) =>
                             handleChangeJobStatus(job.id, newStatus)
                           }
+                          disabled={updatingStatusJobId === job.id}
                         >
                           <SelectTrigger className="h-7 w-[90px] text-xs">
                             <SelectValue placeholder="Change" />
@@ -134,7 +140,6 @@ const ManageJobsPage = () => {
                           <SelectContent>
                             <SelectItem value="open">Open</SelectItem>
                             <SelectItem value="closed">Closed</SelectItem>
-                            <SelectItem value="draft">Draft</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -143,10 +148,10 @@ const ManageJobsPage = () => {
                     {/* Type badges */}
                     <div className="flex flex-wrap gap-1.5 mb-4">
                       {[
-                        formatLabel(job.category),
-                        formatLabel(job.employment_type),
-                        formatLabel(job.experience_level),
-                        formatLabel(job.status),
+                        formatLabel(job.category ?? "N/A"),
+                        formatLabel(job.employment_type ?? "N/A"),
+                        formatLabel(job.experience_level ?? "N/A"),
+                        formatLabel(job.status ?? "N/A"),
                       ].map((label) => (
                         <Badge
                           key={label}
@@ -243,7 +248,7 @@ const ManageJobsPage = () => {
                         className="flex-1 border-destructive/40 text-destructive hover:bg-destructive/10 hover:border-destructive text-xs transition-colors"
                         onClick={() => handleDeleteJob(job.id)}
                       >
-                        {isDeletingJob && jobToDelete === job.job_slug ? (
+                        {isDeletingJob && jobToDelete === job.id ? (
                           <LoaderCircle className="w-3.5 h-3.5 animate-spin" />
                         ) : (
                           <>

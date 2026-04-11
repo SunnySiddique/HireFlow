@@ -15,37 +15,20 @@ import {
   useDeleteNotification,
   useMarkNotificationAsRead,
 } from "@/hooks/useNotifications";
+import { Notification } from "@/types/notification";
 import { MoreVertical } from "lucide-react";
 import toast from "react-hot-toast";
-
-export type NotificationType =
-  | "system"
-  | "seeker_profile_views"
-  | "employer_profile_views"
-  | "job_match"
-  | "job_view";
-
-export interface NotificationListsProps {
-  id: string;
-  user_id: string;
-  title: string | null;
-  message: string | null;
-  reference_id: string | null;
-  type: NotificationType;
-  is_read: boolean;
-  created_at: string;
-}
 
 const NotificationLists = ({
   notification,
   role,
 }: {
-  notification: NotificationListsProps;
+  notification: Notification;
   role: "job-seeker" | "employer";
 }) => {
   const { mutateAsync: markNotificationAsRead } = useMarkNotificationAsRead();
   const { mutateAsync: deleteNotification } = useDeleteNotification();
-
+  console.log(notification);
   const handleMarkNotificationAsRead = async (notifyId: string) => {
     await markNotificationAsRead(notifyId, {
       onSuccess: () => {
@@ -70,7 +53,7 @@ const NotificationLists = ({
           <div
             className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${notification.is_read ? "bg-primary/10" : "bg-muted"}`}
           >
-            <NotificationIcon type={notification.type} />
+            <NotificationIcon type={notification.type ?? "N/A"} />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1">
@@ -126,11 +109,13 @@ const NotificationLists = ({
             </p>
             <div className="flex items-center gap-4">
               <a
-                href={getNotificationLink(
-                  notification.type as string,
-                  notification.reference_id,
-                  role,
-                )}
+                href={
+                  getNotificationLink(
+                    notification.type as string,
+                    notification.reference_id,
+                    role,
+                  ) as string
+                }
                 target="_blank"
               >
                 <Button
