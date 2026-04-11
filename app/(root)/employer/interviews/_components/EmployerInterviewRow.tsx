@@ -1,9 +1,17 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TableCell, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { typeIcon, typeLabel } from "@/constants/InterviewsData";
 import { Interview } from "@/types/interview";
 import { Eye, Trash2 } from "lucide-react";
+import CandidateAvatar from "./CandidateAvatar";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   upcoming: {
@@ -31,12 +39,14 @@ const EmployerInterviewRow = ({
   onDeleteClick,
   isDeleting,
   isJoinAvailable,
+  className,
 }: {
   interview: Interview;
   onView?: (interview: Interview) => void;
   onDeleteClick?: (interview: Interview) => void;
   isDeleting: boolean;
   isJoinAvailable: boolean;
+  className?: string;
 }) => {
   const status = statusConfig[interview.status] ?? {
     label: interview.status,
@@ -49,90 +59,126 @@ const EmployerInterviewRow = ({
     isJoinAvailable;
 
   return (
-    <TableRow className="border-border hover:bg-accent/40 transition-colors">
-      <TableCell className="pl-5">
-        <div className="flex items-center gap-3">
-          <CandidateAvatar
-            name={interview.interviewer_name}
-            profileUrl={interview.seeker?.profile_url}
-            size="sm"
-          />
-          <div>
-            <p className="font-medium text-foreground text-sm">
-              {interview.interviewer_name}
-            </p>
-            {interview.interviewer_title && (
-              <p className="text-xs text-muted-foreground">
-                {interview.interviewer_title}
-              </p>
-            )}
-          </div>
-        </div>
-      </TableCell>
-      <TableCell className="text-sm text-muted-foreground">
-        {interview.interviewer_title ?? "—"}
-      </TableCell>
-      <TableCell>
-        <div className="flex items-center gap-1.5 text-muted-foreground capitalize">
-          {typeIcon(interview.interview_type)}
-          <span className="text-sm">
-            {typeLabel[interview.interview_type] ?? interview.interview_type}
-          </span>
-        </div>
-      </TableCell>
-      <TableCell className="text-sm text-foreground">
-        {new Date(interview.scheduled_at).toLocaleString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </TableCell>
-      <TableCell className="text-sm text-muted-foreground">
-        {interview.duration_minutes} mins
-      </TableCell>
-      <TableCell>
-        <Badge
-          variant="secondary"
-          className={`text-xs font-medium rounded-full px-2.5 py-0.5 ${status.className}`}
-        >
-          {status.label}
-        </Badge>
-      </TableCell>
-      <TableCell className="text-right pr-5">
-        <div className="flex justify-end gap-1">
-          {showJoinButton && (
-            <Button
-              size="sm"
-              className="h-8"
-              onClick={() => window.open(interview.meeting_link!, "_blank")}
-            >
-              Join
-            </Button>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onView?.(interview)}
-            className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary rounded-lg"
-            title="View details"
+    <div className="hidden md:block w-full overflow-x-auto rounded-xl border border-border">
+      <Table>
+        <TableHeader>
+          <TableRow className="border-border bg-muted/40 hover:bg-muted/40">
+            <TableHead className="font-semibold text-foreground pl-5">
+              Candidate
+            </TableHead>
+            <TableHead className="font-semibold text-foreground">
+              Interviewer
+            </TableHead>
+            <TableHead className="font-semibold text-foreground">
+              Type
+            </TableHead>
+            <TableHead className="font-semibold text-foreground">
+              Date & Time
+            </TableHead>
+            <TableHead className="font-semibold text-foreground">
+              Duration
+            </TableHead>
+            <TableHead className="font-semibold text-foreground">
+              Status
+            </TableHead>
+            <TableHead className="text-right font-semibold text-foreground pr-5">
+              Actions
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow
+            className={`border-border hover:bg-accent/40 transition-colors ${className ?? ""}`}
           >
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDeleteClick?.(interview)}
-            className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive rounded-lg"
-            title="Delete"
-            disabled={isDeleting}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      </TableCell>
-    </TableRow>
+            <TableCell className="pl-5">
+              <div className="flex items-center gap-3">
+                <CandidateAvatar
+                  name={interview.interviewer_name}
+                  profileUrl={interview.seeker?.profile_url ?? "N/A"}
+                  size="sm"
+                />
+                <div>
+                  <p className="font-medium text-foreground text-sm">
+                    {interview.interviewer_name}
+                  </p>
+                  {interview.interviewer_title && (
+                    <p className="text-xs text-muted-foreground">
+                      {interview.interviewer_title}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </TableCell>
+            <TableCell className="text-sm text-muted-foreground">
+              {interview.interviewer_title ?? "—"}
+            </TableCell>
+            <TableCell>
+              <div className="flex items-center gap-1.5 text-muted-foreground capitalize">
+                {typeIcon(interview.interview_type)}
+                <span className="text-sm">
+                  {typeLabel[interview.interview_type] ??
+                    interview.interview_type}
+                </span>
+              </div>
+            </TableCell>
+            <TableCell className="text-sm text-foreground">
+              {new Date(interview.scheduled_at).toLocaleString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </TableCell>
+            <TableCell className="text-sm text-muted-foreground">
+              {interview.duration_minutes} mins
+            </TableCell>
+            <TableCell>
+              <Badge
+                variant="secondary"
+                className={`text-xs font-medium rounded-full px-2.5 py-0.5 ${status.className}`}
+              >
+                {status.label}
+              </Badge>
+            </TableCell>
+            <TableCell className="text-right pr-5">
+              <div className="flex justify-end gap-1">
+                {showJoinButton && (
+                  <Button
+                    size="sm"
+                    className="h-8"
+                    onClick={() =>
+                      window.open(interview.meeting_link!, "_blank")
+                    }
+                  >
+                    Join
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onView?.(interview)}
+                  className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary rounded-lg"
+                  title="View details"
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onDeleteClick?.(interview)}
+                  className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive rounded-lg"
+                  title="Delete"
+                  disabled={isDeleting}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </div>
   );
 };
 

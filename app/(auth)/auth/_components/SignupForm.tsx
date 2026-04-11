@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AUTH_TABS } from "@/constants";
-import { createUser } from "@/lib/action/auth.actions";
+import { useCreateUser } from "@/hooks/useAuth";
 import { createClient } from "@/lib/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Chrome, Github } from "lucide-react";
@@ -33,10 +33,11 @@ type JobSeekerFormData = z.infer<typeof jobSeekerSchema>;
 type EmployerFormData = z.infer<typeof employerSchema>;
 
 export function SignupForm() {
+  const { mutate: createUser, isPending } = useCreateUser();
+
   const [activeTab, setActiveTab] = useState<"job_seeker" | "employer">(
     "job_seeker",
   );
-  const [isLoading, setIsLoading] = useState(false);
 
   const jobSeekerForm = useForm<JobSeekerFormData>({
     resolver: zodResolver(jobSeekerSchema),
@@ -63,49 +64,28 @@ export function SignupForm() {
       ? "/job-seeker/dashboard"
       : "/employer/dashboard";
 
-  const onJobSeekerSubmit = async (data: JobSeekerFormData) => {
-    try {
-      setIsLoading(true);
-
-      if (data.password !== data.confirmPassword)
-        return toast.error("Password doesn't match");
-
-      const result = await createUser(activeTab, data);
-
-      if (result.success) {
-        window.location.href = path;
-        if (activeTab === "job_seeker") jobSeekerForm.reset();
-        else employerForm.reset();
-      } else {
-        toast.error(result.message);
-      }
-    } catch (error: any) {
-      console.log(error.message || "seomting went wrong");
-    } finally {
-      setIsLoading(false);
+  const onJobSeekerSubmit = (data: JobSeekerFormData) => {
+    if (data.password !== data.confirmPassword) {
+      toast.error("Password doesn't match");
+      return;
     }
+
+    createUser({
+      role: activeTab,
+      data,
+    });
   };
 
-  const onEmployerSubmit = async (data: EmployerFormData) => {
-    try {
-      setIsLoading(true);
-
-      if (data.password !== data.confirmPassword)
-        return toast.error("Password doesn't match");
-
-      const result = await createUser(activeTab, data);
-
-      if (result.success) {
-        window.location.href = `${path}`;
-        jobSeekerForm.reset();
-      } else {
-        toast.error(result.message);
-      }
-    } catch (error: any) {
-      console.log(error.message || "seomting went wrong");
-    } finally {
-      setIsLoading(false);
+  const onEmployerSubmit = (data: EmployerFormData) => {
+    if (data.password !== data.confirmPassword) {
+      toast.error("Password doesn't match");
+      return;
     }
+
+    createUser({
+      role: activeTab,
+      data,
+    });
   };
 
   const handleSignInWithGoogleAndGithub = async (
@@ -137,7 +117,7 @@ export function SignupForm() {
           <Button
             variant="outline"
             className="flex-1 h-12 border border-border hover:bg-muted bg-transparent"
-            disabled={isLoading}
+            disabled={isPending}
             onClick={() => handleSignInWithGoogleAndGithub("github")}
           >
             <Github className="w-5 h-5" />
@@ -145,7 +125,7 @@ export function SignupForm() {
           <Button
             variant="outline"
             className="flex-1 h-12 border border-border hover:bg-muted bg-transparent"
-            disabled={isLoading}
+            disabled={isPending}
             onClick={() => handleSignInWithGoogleAndGithub("google")}
           >
             <Chrome className="w-5 h-5" />
@@ -220,9 +200,9 @@ export function SignupForm() {
               <Button
                 type="submit"
                 className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-base rounded-lg"
-                disabled={isLoading}
+                disabled={isPending}
               >
-                {isLoading ? "Creating Account..." : "Sign Up"}
+                {isPending ? "Creating Account..." : "Sign Up"}
               </Button>
             </form>
           </Form>
@@ -279,9 +259,9 @@ export function SignupForm() {
               <Button
                 type="submit"
                 className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-base rounded-lg"
-                disabled={isLoading}
+                disabled={isPending}
               >
-                {isLoading ? "Creating Account..." : "Sign Up"}
+                {isPending ? "Creating Account..." : "Sign Up"}
               </Button>
             </form>
           </Form>

@@ -48,7 +48,7 @@ export const useMarkNotificationAsRead = () => {
       invalidateQuery(queryClient, ["notifications"]);
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message || "Something went wrong");
     },
   });
 };
@@ -62,7 +62,7 @@ export const useMarkAllNotificationsAsRead = () => {
       invalidateQuery(queryClient, ["notifications"]);
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message || "Something went wrong");
     },
   });
 };
@@ -76,7 +76,7 @@ export const useDeleteNotification = () => {
       invalidateQuery(queryClient, ["notifications"]);
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message || "Something went wrong");
     },
   });
 };
@@ -91,7 +91,7 @@ export const useDeleteAllNotifications = () => {
       toast.success("All notifications cleared! 🎉 You're all caught up!");
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message || "Something went wrong");
     },
   });
 };

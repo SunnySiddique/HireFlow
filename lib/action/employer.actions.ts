@@ -1,30 +1,28 @@
 "use server";
 
 import { EmployerType } from "@/types/employer";
+import { serverAuth } from "../auth/serverAuth";
 import { createClient } from "../supabase/server";
 
 export async function updateEmployerProfile(profileData: EmployerType) {
-  try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+  const supabase = await createClient();
 
-    if (authError || !user) {
-      throw new Error("Not authenticated");
-    }
-    const { error: isEmployerError } = await supabase
-      .from("employers")
-      .update(profileData)
-      .eq("auth_id", user.id);
+  const user = await serverAuth();
 
-    if (isEmployerError) {
-      throw new Error(isEmployerError.message);
-    }
+  const { data, error } = await supabase
+    .from("employers")
+    .update(profileData)
+    .eq("auth_id", user.id)
+    .select()
+    .maybeSingle();
 
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  if (error) {
+    throw new Error(error.message);
   }
+
+  if (!data) {
+    throw new Error("UPDATE_FAILED");
+  }
+
+  return data;
 }

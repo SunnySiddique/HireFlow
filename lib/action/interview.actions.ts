@@ -1,68 +1,64 @@
 "use server";
 
 import { sendInterviewInviteType } from "@/types/interview";
-import { redirect } from "next/navigation";
-import { toError } from "../errors";
+import { serverAuth } from "../auth/serverAuth";
 import { sendNotification } from "../notifications.helper";
 import { createClient } from "../supabase/server";
 
 export async function sendInterviewInvite(interview: sendInterviewInviteType) {
-  try {
-    const supabase = await createClient();
+  const supabase = await createClient();
+  const user = await serverAuth();
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+  const payload = {
+    ...interview,
+    interviewer_id: user.id,
+    notes: interview.notes ?? "",
+    feedback: interview.feedback ?? "",
+  };
 
-    if (!user || authError) redirect("/auth/signin");
+  const isUpdate = Boolean(interview.id);
 
-    const payload = { ...interview, interviewer_id: user.id };
-    if (!payload.notes) payload.notes = "";
-    if (!payload.feedback) payload.feedback = "";
+  const { data, error } = await supabase
+    .from("interviews")
+    .upsert(payload)
+    .select()
+    .maybeSingle();
 
-    const { data, error } = await supabase
-      .from("interviews")
-      .upsert(payload)
-      .select()
-      .single();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Failed to send interview invite");
 
-    const isUpdate = !!interview.id;
+  const scheduledTime = new Date(payload.scheduled_at).toLocaleString();
 
-    if (error) throw error;
-
-    if (!isUpdate) {
-      await sendNotification(
-        supabase,
-        payload.seeker_id,
-        "new_interview_invite",
-        "New Interview Invite",
-        `You have a new interview invite scheduled on ${new Date(payload.scheduled_at).toLocaleString()}.`,
-        `${data.id}`,
-      );
-    } else if (payload.status === "completed") {
-      await sendNotification(
-        supabase,
-        payload.seeker_id,
-        "interview_completed",
-        "Interview Completed ✅",
-        `Your interview scheduled on ${new Date(payload.scheduled_at).toLocaleString()} has been marked as completed.`,
-        `${data.id}`,
-      );
-    } else {
-      await sendNotification(
-        supabase,
-        payload.seeker_id,
-        "interview_updated",
-        "Interview Updated 📅",
-        `Your interview details have been updated. Please check the latest schedule for ${new Date(payload.scheduled_at).toLocaleString()}.`,
-        `${data.id}`,
-      );
-    }
-  } catch (error) {
-    console.log("[sendInterviewInvite]", error);
-    throw toError(error);
+  if (!isUpdate) {
+    await sendNotification(
+      supabase,
+      payload.seeker_id,
+      "new_interview_invite",
+      "New Interview Invite",
+      `You have a new interview invite scheduled on ${scheduledTime}.`,
+      `${data.id}`,
+    );
+  } else if (payload.status === "completed") {
+    await sendNotification(
+      supabase,
+      payload.seeker_id,
+      "interview_completed",
+      "Interview Completed ✅",
+      `Your interview on ${scheduledTime} was completed.`,
+      `${data.id}`,
+    );
+  } else {
+    await sendNotification(
+      supabase,
+      payload.seeker_id,
+      "interview_updated",
+      "Interview Updated 📅",
+      `Interview updated. New schedule: ${scheduledTime}.`,
+      `${data.id}`,
+    );
   }
+
+  return data;
 }
 
 // update interview status
@@ -71,75 +67,48 @@ export async function updateInterviewStatus(
   status: "accept" | "decline",
   interviewerId: string,
 ) {
-  try {
-    const supabase = await createClient();
+  const supabase = await createClient();
+  await serverAuth();
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+  const { error } = await supabase.rpc("update_interview_status", {
+    interview_id: interviewId,
+    response: status,
+  });
 
-    if (!user || authError) redirect("/auth/signin");
+  if (error) throw new Error(error.message);
 
-    const { error } = await supabase.rpc("update_interview_status", {
-      interview_id: interviewId,
-      response: status,
-    });
+  const isAccepted = status === "accept";
 
-    if (status === "accept") {
-      await sendNotification(
-        supabase,
-        interviewerId,
-        "interview_accepted",
-        "Interview Accepted",
-        `Your interview invitation has been accepted.`,
-        `${interviewId}`,
-      );
-    } else {
-      await sendNotification(
-        supabase,
-        interviewerId,
-        "interview_declined",
-        "Interview Declined",
-        `Your interview invitation has been declined.`,
-        `${interviewId}`,
-      );
-    }
-
-    if (error) throw toError(error);
-  } catch (error) {
-    console.log("[updateInterviewStatus]", error);
-    throw toError(error);
-  }
+  await sendNotification(
+    supabase,
+    interviewerId,
+    isAccepted ? "interview_accepted" : "interview_declined",
+    isAccepted ? "Interview Accepted" : "Interview Declined",
+    isAccepted
+      ? "Your interview invitation has been accepted."
+      : "Your interview invitation has been declined.",
+    `${interviewId}`,
+  );
 }
 
 // delete interview
 export async function deleteInterview(interviewId: string, seekerId: string) {
-  try {
-    console.log(
-      "Deleting interview with ID:",
-      interviewId,
-      "for seekerId:",
-      seekerId,
-    );
-    const supabase = await createClient();
-    const { error } = await supabase
-      .from("interviews")
-      .delete()
-      .eq("id", interviewId);
+  const supabase = await createClient();
+  await serverAuth();
 
-    if (error) throw error;
+  const { error } = await supabase
+    .from("interviews")
+    .delete()
+    .eq("id", interviewId);
 
-    await sendNotification(
-      supabase,
-      seekerId,
-      "interview_deleted",
-      "Interview Deleted",
-      `Your interview invitation has been deleted.`,
-      `${interviewId}`,
-    );
-  } catch (error) {
-    console.log("[deleteInterview]", error);
-    throw toError(error);
-  }
+  if (error) throw new Error(error.message);
+
+  await sendNotification(
+    supabase,
+    seekerId,
+    "interview_deleted",
+    "Interview Deleted",
+    "Your interview invitation has been deleted.",
+    `${interviewId}`,
+  );
 }

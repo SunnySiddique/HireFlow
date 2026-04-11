@@ -1,29 +1,31 @@
 "use server";
 
-import { redirect } from "next/navigation";
-import { toError } from "../errors";
+import { serverAuth } from "../auth/serverAuth";
 import { createClient } from "../supabase/server";
 
 // employer
 export async function increaseJobUsedPost(jobUsed: number) {
-  try {
-    const supabase = await createClient();
+  const supabase = await createClient();
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+  const user = await serverAuth();
 
-    if (authError || !user) redirect("/auth/signin");
+  const { error } = await supabase
+    .from("subscriptions")
+    .update({ job_posts_used: jobUsed })
+    .eq("user_id", user.id);
 
-    const { error } = await supabase
-      .from("subscriptions")
-      .update({ job_posts_used: jobUsed })
-      .eq("user_id", user.id);
+  if (error) throw new Error(error.message);
+}
 
-    if (error) throw new Error(error.message);
-  } catch (error) {
-    console.log("[getCurrentUserSubscription]:", error);
-    throw toError(error);
-  }
+//
+export async function getSubscription(userId: string) {
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("subscriptions")
+    .select("subscription_status, plan_expires_at, plan")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  return data;
 }

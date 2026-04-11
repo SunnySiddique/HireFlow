@@ -1,3 +1,5 @@
+import { Json } from "@/lib/types/supabase";
+
 // employer
 export interface jobFormData {
   employer_id: string;
@@ -24,13 +26,13 @@ export interface jobFormData {
 export type jobUpdateFormData = Partial<Omit<jobFormData, "employer_id">>;
 export type JobFormValues = z.infer<typeof jobFormSchema>;
 
-type Employer = {
+export type Employer = {
   id: string;
-  slug: string;
-  company_logo_url: string;
+  slug: string | null;
+  company_logo_url: string | null;
   company_name: string;
-  website: string;
-  description: string;
+  website: string | null;
+  description?: string | null;
 };
 
 export interface Job {
@@ -38,26 +40,26 @@ export interface Job {
   job_title: string;
   job_slug: string;
   employer_id: string;
-  employer?: Employer | null; // if you join employer data
+  employer?: Employer | null;
   job_description: string;
-  category?: string | null;
-  employment_type?: string | null;
-  experience_level?: string | null;
-  salary_min?: number | null;
-  salary_max?: number | null;
-  currency?: string | null;
-  location?: string | null;
-  remote_option?: string | null;
-  skills_required?: string[] | null;
-  benefits?: string[] | null;
-  application_deadline?: string | null; // ISO string
-  open_positions?: number | null;
-  status?: string | null;
-  requirements?: Record<string, any> | null; // JSONB
-  created_at?: string | null; // ISO string
-  updated_at?: string | null; // ISO string
-  responsibilities?: Record<string, any> | null; // JSONB
-  isFeatured?: boolean | null;
+  category: string | null;
+  employment_type: string | null;
+  experience_level: string | null;
+  salary_min: number | null;
+  salary_max: number | null;
+  currency: string | null;
+  location: string | null;
+  remote_option: string | null;
+  skills_required: string[] | null;
+  benefits: string[] | null;
+  application_deadline: string | null;
+  open_positions: number | null;
+  status: string | null;
+  requirements: Json;
+  responsibilities: Json | null;
+  is_featured?: boolean | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 // jobs sidebar filters type
@@ -108,11 +110,12 @@ export interface JobWithEmployer {
 // employer applicant type
 export type Seeker = {
   id: string;
-  auth_id: string;
+  slug: string | null;
   email: string;
+  auth_id: string;
   full_name: string;
-  profile_url: string;
-  resume_url: string;
+  resume_url: string | null;
+  profile_url: string | null;
 };
 
 export type Job = {
@@ -122,10 +125,11 @@ export type Job = {
 
 export type ApplicantType = {
   id: string;
-  status: "pending" | "reviewing" | "shortlisted" | "rejected" | "accepted";
-  applied_at: string;
+  status: string;
+  applied_at: string | null;
   cover_letter: string | null;
   employer_notes: string | null;
+  archived: boolean;
   job: Job;
   seeker: Seeker;
 };

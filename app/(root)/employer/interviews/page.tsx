@@ -27,7 +27,13 @@ const EmployerInterviewsPage = () => {
   const { mutateAsync: deleteInterview, isPending: isDeleting } =
     useDeleteInterview();
 
-  const interviews = data?.data ?? [];
+  const interviews = (data?.data ?? []).map((i) => ({
+    ...i,
+    status: i.status ?? "upcoming",
+    interview_type: i.interview_type ?? "",
+    scheduled_at: i.scheduled_at ?? "",
+  })) as Interview[];
+
   const totalPages = data?.totalPages ?? 0;
 
   const handleView = (interview: Interview) => {
@@ -39,10 +45,10 @@ const EmployerInterviewsPage = () => {
     updateFilter(key as keyof typeof filters, value);
   };
 
-  const handleDelete = async (interviewId: string, seekerId: string) => {
+  const handleDelete = async (interview: Interview) => {
     await deleteInterview({
-      interviewId,
-      seekerId,
+      interviewId: interview.id,
+      seekerId: interview.seeker_id ?? "",
     });
   };
 
@@ -54,7 +60,7 @@ const EmployerInterviewsPage = () => {
     completed: interviews.filter((i) => i.status === "completed").length,
     cancelled: interviews.filter((i) => i.status === "cancelled").length,
   };
-
+  console.log(interviews);
   return (
     <main>
       <InterviewHeader
@@ -62,6 +68,7 @@ const EmployerInterviewsPage = () => {
         filters={filters}
         updateFilter={handleUpdateFilter}
         resetFilters={resetFilters}
+        role="employer"
       />
       {/* Stats Cards */}
       <div className="pb-8">
@@ -84,7 +91,7 @@ const EmployerInterviewsPage = () => {
               <EmployerInterviewsTable
                 interviews={interviews}
                 onView={handleView}
-                onDelete={handleDelete}
+                onDeleteClick={handleDelete}
                 isDeleting={isDeleting}
               />
             ) : (

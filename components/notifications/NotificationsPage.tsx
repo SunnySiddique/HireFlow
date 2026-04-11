@@ -9,6 +9,7 @@ import {
   useMarkAllNotificationsAsRead,
   useNotifications,
 } from "@/hooks/useNotifications";
+import { NotificationType } from "@/types/notification";
 import { useState } from "react";
 import { NotificationActions } from "./NotificationActions";
 import NotificationLists from "./NotificationLists";
@@ -22,7 +23,10 @@ const NotificationsPage = ({ role }: { role: "job-seeker" | "employer" }) => {
 
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const { data } = useNotifications();
-  const notifications = data?.notifications ?? [];
+  const notifications = (data?.notifications ?? []).map((n) => ({
+    ...n,
+    type: n.type as NotificationType | null,
+  }));
 
   const filteredNotifications = notifications.filter((n) => {
     if (activeCategory === "all") return true;
@@ -119,6 +123,7 @@ const NotificationsPage = ({ role }: { role: "job-seeker" | "employer" }) => {
                     <NotificationLists
                       notification={notification}
                       key={notification.id}
+                      role={role}
                     />
                   ))
               ) : (

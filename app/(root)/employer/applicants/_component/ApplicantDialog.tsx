@@ -22,7 +22,7 @@ import { formatDate, getInitials } from "@/lib/utils";
 import { ApplicantType } from "@/types/jobs";
 import { ExternalLink } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface ApplicantDialogProps {
   applicant: ApplicantType | null;
@@ -59,15 +59,6 @@ const ApplicantDialog = ({
       },
     );
   };
-
-  useEffect(() => {
-    if (applicant) {
-      setApplicantUpdates({
-        status: applicant.status || "pending",
-        employer_notes: applicant.employer_notes || "",
-      });
-    }
-  }, [applicant]);
 
   if (!applicant) return null;
   return (
@@ -119,7 +110,9 @@ const ApplicantDialog = ({
               <p>
                 <span className="text-muted-foreground">Applied: </span>
                 <span className="text-foreground">
-                  {formatDate(applicant.applied_at)}
+                  {formatDate(
+                    applicant.applied_at ? applicant.applied_at : "N/A",
+                  )}
                 </span>
               </p>
             </div>

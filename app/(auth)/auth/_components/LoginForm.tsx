@@ -10,11 +10,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AUTH_TABS } from "@/constants";
-import { loginUser } from "@/lib/action/auth.actions";
-import { createClient } from "@/lib/supabase/client";
+import { useLoginUser } from "@/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Chrome, Github } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -22,6 +21,7 @@ import { z } from "zod";
 import { Form } from "../../../../components/ui/form";
 import AuthField from "./AuthField";
 import AuthTabs from "./AuthTabs";
+import { createClient } from "@/lib/supabase/client";
 
 const jobSeekerSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -37,13 +37,13 @@ type JobSeekerFormData = z.infer<typeof jobSeekerSchema>;
 type EmployerFormData = z.infer<typeof employerSchema>;
 
 export function LoginForm() {
+  const { mutate: loginUser, isPending } = useLoginUser();
+
   const [activeTab, setActiveTab] = useState<"job_seeker" | "employer">(
     "job_seeker",
   );
-  const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
 
-  const router = useRouter();
   const jobSeekerForm = useForm<JobSeekerFormData>({
     resolver: zodResolver(jobSeekerSchema),
     defaultValues: {
@@ -64,40 +64,18 @@ export function LoginForm() {
       ? "/job-seeker/dashboard"
       : "/employer/dashboard";
 
-  const onJobSeekerSubmit = async (data: JobSeekerFormData) => {
-    try {
-      setIsLoading(true);
-      const result = await loginUser(activeTab, data);
-
-      if (result.success) {
-        router.push(path);
-        jobSeekerForm.reset();
-      } else {
-        toast.error(result.message);
-      }
-    } catch (error: any) {
-      console.log(error.message || "something went wrong");
-    } finally {
-      setIsLoading(false);
-    }
+  const onJobSeekerSubmit = (data: JobSeekerFormData) => {
+    loginUser({
+      role: "job_seeker",
+      data,
+    });
   };
 
-  const onEmployerSubmit = async (data: EmployerFormData) => {
-    try {
-      setIsLoading(true);
-      const result = await loginUser(activeTab, data);
-
-      if (result.success) {
-        router.push(path);
-        employerForm.reset();
-      } else {
-        toast.error(result.message);
-      }
-    } catch (error: any) {
-      console.log(error.message || "something went wrong");
-    } finally {
-      setIsLoading(false);
-    }
+  const onEmployerSubmit = (data: EmployerFormData) => {
+    loginUser({
+      role: "employer",
+      data,
+    });
   };
 
   const handleSignup = async (provider: "google" | "github") => {
@@ -140,7 +118,7 @@ export function LoginForm() {
           <Button
             variant="outline"
             className="flex-1 h-12 border border-border hover:bg-muted bg-transparent"
-            disabled={isLoading}
+            disabled={isPending}
             onClick={() => handleSignup("github")}
           >
             <Github className="w-5 h-5" />
@@ -148,7 +126,7 @@ export function LoginForm() {
           <Button
             variant="outline"
             className="flex-1 h-12 border border-border hover:bg-muted bg-transparent"
-            disabled={isLoading}
+            disabled={isPending}
             onClick={() => handleSignup("google")}
           >
             <Chrome className="w-5 h-5" />
@@ -201,9 +179,9 @@ export function LoginForm() {
               <Button
                 type="submit"
                 className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-base rounded-lg"
-                disabled={isLoading}
+                disabled={isPending}
               >
-                {isLoading ? "Signing In..." : "Sign In"}
+                {isPending ? "Signing In..." : "Sign In"}
               </Button>
             </form>
           </Form>
@@ -228,7 +206,7 @@ export function LoginForm() {
                   placeholder="company@example.com"
                   {...employerForm.register("workEmail")}
                   className="h-11 bg-accent border-border text-foreground placeholder:text-muted-foreground"
-                  disabled={isLoading}
+                  disabled={isPending}
                 />
                 <FieldError
                   errors={
@@ -262,7 +240,7 @@ export function LoginForm() {
                   placeholder="••••••••"
                   {...employerForm.register("password")}
                   className="h-11 bg-accent border-border text-foreground placeholder:text-muted-foreground"
-                  disabled={isLoading}
+                  disabled={isPending}
                 />
                 <FieldError
                   errors={
@@ -277,9 +255,9 @@ export function LoginForm() {
             <Button
               type="submit"
               className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-base rounded-lg"
-              disabled={isLoading}
+              disabled={isPending}
             >
-              {isLoading ? "Signing In..." : "Sign In"}
+              {isPending ? "Signing In..." : "Sign In"}
             </Button>
           </form>
         </TabsContent>

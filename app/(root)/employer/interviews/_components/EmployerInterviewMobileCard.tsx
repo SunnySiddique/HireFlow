@@ -49,12 +49,12 @@ const EmployerInterviewMobileCard = ({
     isJoinAvailable;
 
   return (
-    <div className="bg-card border border-border rounded-xl p-4 flex flex-col gap-3 shadow-sm">
+    <div className="bg-card border border-border rounded-xl p-4 grid grid-cols-1 md:grid-cols-2 gap-3 shadow-sm">
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-3">
           <CandidateAvatar
             name={interview.interviewer_name}
-            profileUrl={interview.seeker?.profile_url}
+            profileUrl={interview.seeker?.profile_url ?? "N/A"}
             size="md"
           />
           <div>

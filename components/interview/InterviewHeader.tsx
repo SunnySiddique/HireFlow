@@ -6,22 +6,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { InterviewFilters } from "@/types/interview";
+
+interface InterviewHeaderProps {
+  totalInterviews: number;
+  filters: InterviewFilters;
+  updateFilter: (key: string, value: string) => void;
+  resetFilters: () => void;
+  role: "employer" | "seeker";
+}
 
 const InterviewHeader = ({
   totalInterviews,
   filters,
   updateFilter,
   resetFilters,
-}: {
-  totalInterviews: number;
-  filters: {
-    search: string;
-    status: string;
-  };
-  updateFilter: (key: string, value: string) => void;
-  resetFilters: () => void;
-  role: "employer" | "seeker";
-}) => {
+}: InterviewHeaderProps) => {
   return (
     <>
       <div className="space-y-1">

@@ -19,44 +19,36 @@ export interface sendInterviewInviteType {
 }
 
 // interview type for interview table
-export interface Interview {
-  id: string;
-  interviewer_id: string;
-  seeker_id: string;
-  application_id: string;
-  candidate_name: string;
-  status: "upcoming" | "pending_confirm" | "completed" | "cancelled";
-  interview_type: string;
-  scheduled_at: string;
-  duration_minutes: number;
-  meeting_link?: string;
-  interviewer_name: string;
-  interviewer_title?: string;
-  message?: string;
-  notes?: string;
-  feedback?: string;
-  created_at: string;
-  updated_at: string;
-  seeker?: {
-    auth_id?: string;
-    profile_url?: string;
-  };
-  employer?: {
-    company_name?: string;
-    company_logo_url?: string;
-  };
-  applicant?: {
-    job: {
-      job_title: string;
-      job_description: string;
-      experience_level: string;
-    };
-  };
+// @/types/interview.ts
+
+export interface InterviewSeeker {
+  auth_id: string;
+  profile_url: string | null;
 }
 
+export interface Interview {
+  id: string;
+  seeker_id: string | null;
+  application_id: string | null;
+  interviewer_id: string | null;
+  status: string; // keep required, fix at source below
+  interview_type: string; // keep required
+  scheduled_at: string; // keep required
+  duration_minutes: number;
+  meeting_link: string | null;
+  interviewer_name: string;
+  interviewer_title: string | null;
+  message: string | null;
+  notes: string | null;
+  feedback: string | null;
+  seeker: InterviewSeeker | null;
+  candidate_name?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
 export type InterviewFilters = {
-  search?: string;
-  status?: string;
+  search: string;
+  status: string;
   type?: string;
   page?: number;
 };

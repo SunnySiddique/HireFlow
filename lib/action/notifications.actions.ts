@@ -1,98 +1,64 @@
-import { toError } from "../errors";
+"use server";
+
+import { serverAuth } from "../auth/serverAuth";
 import { createClient } from "../supabase/client";
 
 // read notification
 export async function markNotificationAsRead(notifyId: string) {
-  try {
-    const supabase = createClient();
+  const supabase = createClient();
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-    if (authError || !user) return;
+  const user = await serverAuth();
 
-    const { error } = await supabase
-      .from("notifications")
-      .update({ is_read: true })
-      .eq("id", notifyId)
-      .eq("user_id", user.id)
-      .eq("is_read", false);
+  const { error } = await supabase
+    .from("notifications")
+    .update({ is_read: true })
+    .eq("id", notifyId)
+    .eq("user_id", user.id)
+    .eq("is_read", false);
 
-    if (error) throw new Error(error.message);
-  } catch (error) {
-    console.log("[markNotificationAsRead]", error);
-    throw toError(error);
-  }
+  if (error) throw new Error(error.message);
 }
 
 // read all notifications
 export async function markAllNotificationAsRead() {
-  try {
-    const supabase = createClient();
+  const supabase = createClient();
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-    if (authError || !user) return;
+  const user = await serverAuth();
 
-    const { error } = await supabase
-      .from("notifications")
-      .update({ is_read: true })
-      .eq("user_id", user.id)
-      .eq("is_read", false);
+  const { error } = await supabase
+    .from("notifications")
+    .update({ is_read: true })
+    .eq("user_id", user.id)
+    .eq("is_read", false);
 
-    if (error) throw new Error(error.message);
-  } catch (error) {
-    console.log("[markAllNotificationAsRead]", error);
-    throw toError(error);
-  }
+  if (error) throw new Error(error.message);
 }
 
 // delete single notification
 export async function deleteNotification(notifyId: string) {
-  try {
-    const supabase = createClient();
+  const supabase = createClient();
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-    if (authError || !user) return;
+  const user = await serverAuth();
 
-    const { error } = await supabase
-      .from("notifications")
-      .delete()
-      .eq("id", notifyId)
-      .eq("user_id", user.id);
+  const { error } = await supabase
+    .from("notifications")
+    .delete()
+    .eq("id", notifyId)
+    .eq("user_id", user.id);
 
-    if (error) throw new Error(error.message);
-  } catch (error) {
-    console.log("[deleteAllNotifications]", error);
-    throw toError(error);
-  }
+  if (error) throw new Error(error.message);
 }
 
 // delete all notifications
 export async function deleteAllNotifications() {
-  try {
-    const supabase = createClient();
+  const supabase = createClient();
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-    if (authError || !user) return;
+  const user = await serverAuth();
 
-    const { error } = await supabase
-      .from("notifications")
-      .delete()
-      .eq("user_id", user.id);
+  const { error } = await supabase
+    .from("notifications")
+    .delete()
+    .eq("user_id", user.id);
 
-    if (error) throw new Error(error.message);
-  } catch (error) {
-    console.log("[deleteAllNotifications]", error);
-    throw toError(error);
-  }
+  if (error) throw new Error(error.message);
 }

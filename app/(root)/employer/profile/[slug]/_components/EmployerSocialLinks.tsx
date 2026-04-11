@@ -1,12 +1,12 @@
 import CustomField from "@/components/CustomField";
-import { EmployerFormData } from "@/types/employer";
+import { Employer, EmployerFormData } from "@/types/employer";
 import { Globe, Linkedin, Twitter } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
 interface EmployerSocialLinksProps {
   editMode: boolean;
   form: UseFormReturn<EmployerFormData>;
-  employer: any;
+  employer?: Employer;
 }
 
 const EmployerSocialLinks = ({

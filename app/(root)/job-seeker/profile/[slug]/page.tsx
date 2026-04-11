@@ -18,12 +18,7 @@ import {
   useUploadProfileAndResume,
 } from "@/hooks/useJobSeeker";
 import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
-import {
-  getReadableError,
-  hasAccess,
-  MAX_PROFILE_SIZE,
-  MAX_RESUME_SIZE,
-} from "@/lib/utils";
+import { hasAccess, MAX_PROFILE_SIZE, MAX_RESUME_SIZE } from "@/lib/utils";
 import {
   EducationItem,
   ExperienceItem,
@@ -144,23 +139,16 @@ const ProfilePage = () => {
         if (profileFile.size > MAX_PROFILE_SIZE) {
           return toast.error("Profile image too large. Max size: 1MB.");
         }
-        try {
-          const result = await uploadImage({
-            bucketName: "job_seeker_profile",
-            file: profileFile,
-            currentFilePath: jobSeekerProfile?.profile_path || undefined,
-          });
 
-          if (result.success) {
-            profileUrl = result.url;
-            profilePath = result.path;
-          } else {
-            return toast.error(
-              result.message || "Failed to upload profile image",
-            );
-          }
-        } catch (err: any) {
-          return toast.error(getReadableError(err.message));
+        const result = await uploadImage({
+          bucketName: "job_seeker_profile",
+          file: profileFile,
+          currentFilePath: jobSeekerProfile?.profile_path || undefined,
+        });
+
+        if (result.success) {
+          profileUrl = result.url;
+          profilePath = result.path;
         }
       }
 
@@ -169,21 +157,15 @@ const ProfilePage = () => {
           return toast.error("Resume too large. Max size: 5MB.");
         }
 
-        try {
-          const result = await uploadImage({
-            bucketName: "resumes",
-            file: resumeFile,
-            currentFilePath: jobSeekerProfile?.resume_path || undefined,
-          });
+        const result = await uploadImage({
+          bucketName: "resumes",
+          file: resumeFile,
+          currentFilePath: jobSeekerProfile?.resume_path || undefined,
+        });
 
-          if (result.success) {
-            resumeUrl = result.url;
-            resumePath = result.path;
-          } else {
-            return toast.error(result.message || "Failed to upload resume");
-          }
-        } catch (err: any) {
-          return toast.error(getReadableError(err.message));
+        if (result.success) {
+          resumeUrl = result.url;
+          resumePath = result.path;
         }
       }
 

@@ -10,8 +10,8 @@ export const exportToExcel = (applicants: ApplicantType[]) => {
     Email: a.seeker?.email ?? "",
     JobTitle: a.job?.job_title ?? "",
     Resume: a.seeker?.resume_url ?? "",
-    Applied: formatDate(a.applied_at),
-    Status: a.status ?? "",
+    Applied: a.applied_at ? formatDate(a.applied_at) : "N/A",
+    Status: a.status ?? "pending",
   }));
 
   // 2. Create worksheet

@@ -88,9 +88,10 @@ export const useUploadProfileAndResume = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["jobSeekerProfile"] });
     },
-    onError: () =>
+    onError: (error) =>
       toast.error(
-        `Something went wrong. uploading proifleImage or Resume try again`,
+        error.message ||
+          `Something went wrong. uploading proifleImage or Resume try again`,
       ),
   });
 };

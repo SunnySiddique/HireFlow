@@ -8,7 +8,7 @@ import {
   useUploadCompanyLogo,
 } from "@/hooks/useEmployer";
 import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
-import { getReadableError, hasAccess, MAX_PROFILE_SIZE } from "@/lib/utils";
+import { hasAccess, MAX_PROFILE_SIZE } from "@/lib/utils";
 import { EmployerFormData, EmployerType } from "@/types/employer";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
@@ -40,10 +40,11 @@ const employerSchema = z.object({
   operatingLocations: z.string().optional().default(""),
 
   openPositionsCount: z.string().optional().or(z.literal("")),
+  coreValues: z.array(z.string()).optional().default([]),
 
   hiringStatus: z
-    .enum(["actively hiring", "selective", "not hiring"])
-    .default("actively hiring"),
+    .enum(["actively_hiring", "selective", "not_hiring"])
+    .default("actively_hiring"),
 
   foundedYear: z.coerce.number().nullable().optional(),
   linkedinUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
@@ -71,10 +72,11 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
     subscription?.subscription_status as string,
     subscription?.plan_expires_at as string,
   );
+
+  console.log(employerProfile);
   // states
   const [editMode, setEditMode] = useState(false);
   const [activeSection, setActiveSection] = useState("about");
-  const [coreValues, setCoreValues] = useState<string[]>([]);
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
   const form = useForm<EmployerFormData>({
@@ -92,65 +94,54 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
       foundedYear: "",
       linkedinUrl: "",
       twitterUrl: "",
+      coreValues: employerProfile?.core_values ?? [],
     },
   });
 
   const onSubmit = async (data: EmployerFormData) => {
-    try {
-      let logoUrl;
-      let comLogoPath;
-      if (!employerProfile?.auth_id) {
-        toast.error("User auth_id is missing");
-        return;
+    if (!employerProfile?.id) return;
+    let logoUrl;
+    let comLogoPath;
+
+    if (logoFile instanceof File) {
+      if (logoFile.size > MAX_PROFILE_SIZE) {
+        return toast.error("Company image too large. Max size: 1MB.");
       }
 
-      if (logoFile instanceof File) {
-        if (logoFile.size > MAX_PROFILE_SIZE) {
-          return toast.error("Company image too large. Max size: 1MB.");
-        }
-        try {
-          const result = await uploadCompanyLogo({
-            file: logoFile,
-            logoPath: employerProfile?.logo_path || undefined,
-          });
-
-          if (result.success) {
-            logoUrl = result.url;
-            comLogoPath = result.path;
-          } else {
-            return toast.error("Failed to upload profile image");
-          }
-        } catch (err: any) {
-          return toast.error(getReadableError(err.message));
-        }
-      }
-      const payload: EmployerType = {
-        company_name: data.companyName,
-        website: data.website,
-        company_logo_url: logoUrl,
-        industry: data.industry,
-        company_size: data.companySize,
-        description: data.description,
-        headquarters_location: data.headquartersLocation,
-        open_positions_count: Number(data.openPositionsCount) || 0, // if DB expects number
-        hiring_status: data.hiringStatus,
-        core_values: coreValues.length ? coreValues : [],
-        founded_year: data.foundedYear ? Number(data.foundedYear) : null,
-        linkedin_url: data.linkedinUrl,
-        twitter_url: data.twitterUrl,
-        operating_locations: data.operatingLocations || "",
-        logo_path: comLogoPath || "",
-      };
-
-      await updateEmployerProfile(payload, {
-        onSuccess: () => {
-          toast.success("Profile Updated Successfully");
-          setEditMode(false);
-        },
+      const result = await uploadCompanyLogo({
+        file: logoFile,
+        logoPath: employerProfile?.logo_path || undefined,
       });
-    } catch (error: any) {
-      toast.error(error.message || "Something went wrong ");
+
+      if (result.success) {
+        logoUrl = result.url;
+        comLogoPath = result.path;
+      }
     }
+    const payload: EmployerType = {
+      company_name: data.companyName,
+      website: data.website,
+      company_logo_url: logoUrl,
+      industry: data.industry,
+      company_size: data.companySize,
+      description: data.description,
+      headquarters_location: data.headquartersLocation,
+      open_positions_count: Number(data.openPositionsCount) || 0,
+      hiring_status: data.hiringStatus,
+      core_values: data.coreValues || [],
+      founded_year: data.foundedYear ? Number(data.foundedYear) : null,
+      linkedin_url: data.linkedinUrl,
+      twitter_url: data.twitterUrl,
+      operating_locations: data.operatingLocations || "",
+      logo_path: comLogoPath || "",
+    };
+
+    await updateEmployerProfile(payload, {
+      onSuccess: () => {
+        toast.success("Profile Updated Successfully");
+        setEditMode(false);
+      },
+    });
   };
 
   const onError = (errors: any) => {
@@ -164,7 +155,6 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
 
   useEffect(() => {
     if (employerProfile) {
-      setCoreValues(employerProfile?.core_values ?? []);
       form.reset({
         companyName: employerProfile.company_name ?? "",
         website: employerProfile.website ?? "",
@@ -178,6 +168,7 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
         foundedYear: String(employerProfile.founded_year ?? ""), // ✅ String()
         linkedinUrl: employerProfile.linkedin_url ?? "",
         twitterUrl: employerProfile.twitter_url ?? "",
+        coreValues: employerProfile.core_values ?? [], // ← this was missing
       });
     }
   }, [employerProfile, editMode, form]);
@@ -234,11 +225,7 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
             )}
             {/* Culture Section */}
             {activeSection === "culture" && (
-              <EmployerCulture
-                coreValues={coreValues}
-                setCoreValues={setCoreValues}
-                editMode={editMode}
-              />
+              <EmployerCulture form={form} editMode={editMode} />
             )}
             {/* Locations Section */}
             {activeSection === "locations" && (

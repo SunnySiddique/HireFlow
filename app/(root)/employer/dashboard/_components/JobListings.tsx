@@ -96,11 +96,14 @@ const JobListings = () => {
 
                   {/* Posted Date */}
                   <TableCell className="text-muted-foreground text-xs lg:text-sm hidden md:table-cell">
-                    {new Date(job.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
+                    {new Date(job.created_at as string).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      },
+                    )}
                   </TableCell>
 
                   {/* Actions */}
