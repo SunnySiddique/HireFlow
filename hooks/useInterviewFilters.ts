@@ -6,16 +6,24 @@ export const useInterviewFilters = () => {
     status: "all",
     page: 1,
     limit: 5,
+    archived: false,
+    search: "",
   });
 
   const updateFilter = (
     key: keyof InterviewFilters,
-    value: string | number,
+    value: string | number | boolean,
   ) => {
     setFilters((prev) => ({
       ...prev,
       [key]: value,
-      page: key === "status" ? 1 : prev.page,
+      page:
+        key === "status" ||
+        key === "archived" ||
+        key === "search" ||
+        key === "limit"
+          ? 1
+          : prev.page,
     }));
   };
 
@@ -25,6 +33,7 @@ export const useInterviewFilters = () => {
       status: "all",
       page: 1,
       limit: 5,
+      archived: false,
     });
   };
 

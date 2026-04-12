@@ -2,113 +2,157 @@
 
 import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useInterviewFilters } from "@/hooks/useInterviewFilters";
 import { useGetAllApplicants } from "@/hooks/useJobs";
+import { cn } from "@/lib/utils";
 import { exportToExcel } from "@/lib/utils/excel";
-import { ApplicantType } from "@/types/jobs";
-import { Download } from "lucide-react";
+import { applicantFiltersType } from "@/types/interview";
+import { Download, Filter, Inbox } from "lucide-react";
 import { useState } from "react";
-import ApplicantsSearchBar from "./_component/ApplicantsSearchBar";
-import ApplicantsStatsCards from "./_component/ApplicantsStatsCards";
-import ApplicantsTable from "./_component/ApplicantsTable";
+import Pagination from "../../job-seeker/jobs/_components/Pagination";
+import { ApplicantCard } from "./_component/ApplicantCard";
 
-const ApplicantsPage = () => {
-  const [filters, setFilters] = useState({
-    search: "",
-    status: "all",
-  });
-  const [activeTab, setActiveTab] = useState("active");
-  const debouncedSearch = useDebounce(filters.search, 500);
+const EmployerApplicantsPage = () => {
+  const [filter, setFilter] = useState<applicantFiltersType>("all");
+  const [activeTab, setActiveTab] = useState<"active" | "archived">("active");
 
-  const { data: applicants, isLoading } = useGetAllApplicants();
+  const { filters, updateFilter, resetFilters } = useInterviewFilters();
 
-  const filteredApplicants = (applicants ?? [])
-    .filter((applicant) => {
-      const search = debouncedSearch.toLowerCase();
-      const applicantStatus = applicant.status ?? "pending";
+  const { data, isLoading } = useGetAllApplicants(filters);
 
-      const searchFilter =
-        applicant.seeker?.full_name?.toLowerCase().includes(search) ||
-        applicant.job?.job_title?.toLowerCase().includes(search);
+  const applicants = data?.data ?? [];
+  const totalPages = data?.totalPages ?? 0;
 
-      const statusFilter =
-        filters.status === "all" ||
-        applicantStatus.toLowerCase() === filters.status.toLowerCase();
+  const handleReset = () => {
+    resetFilters();
+    setFilter("all");
+  };
 
-      const archivedFilter =
-        activeTab === "active" ? !applicant.archived : applicant.archived;
-
-      return searchFilter && statusFilter && archivedFilter;
-    })
-    .map((applicant) => ({
-      ...applicant,
-      status: applicant.status ?? "pending",
-    })) as ApplicantType[];
+  const handleTabChange = (tab: "active" | "archived") => {
+    setActiveTab(tab);
+    updateFilter("archived", tab === "archived");
+  };
 
   if (isLoading) return <Loader mode="inline" />;
-  console.log(applicants);
-  return (
-    <div className="flex-1 flex flex-col w-full min-w-0">
-      {/* Page Header */}
-      <div className="bg-background border-b border-border sticky top-0 z-10">
-        <div className="px-3 sm:px-4 md:px-6 lg:px-8">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-1">
-            Applicants
-          </h1>
-          <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
-            Manage and review job applications
-          </p>
-        </div>
 
-        {/* Search and Filter Bar */}
-        <div className="px-3 sm:px-4 md:px-6 lg:px-8 pb-3 sm:pb-4 md:pb-5 lg:pb-6 flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center">
-          <ApplicantsSearchBar filters={filters} setFilters={setFilters} />
+  return (
+    <>
+      <div className="px-4 sm:px-6 lg:px-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground mb-3">
+              Applicants
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Manage and review job applications from candidates.
+            </p>
+          </div>
 
           <Button
-            onClick={() => exportToExcel(filteredApplicants)}
-            className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-sm gap-2"
-            disabled={filteredApplicants.length === 0}
+            onClick={() => exportToExcel(applicants)}
+            className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-sm gap-2 rounded-xl h-11 px-6 font-bold"
+            disabled={applicants.length === 0}
           >
             <Download className="w-4 h-4" />
-            <span className="sm:hidden md:inline">Export</span>
+            <span>Export</span>
           </Button>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-y-auto bg-background">
-        <div className="p-3 sm:p-4 md:p-5 lg:p-6 space-y-4 sm:space-y-6">
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="w-full"
-          >
-            <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="active">Active Applicants</TabsTrigger>
-              <TabsTrigger value="archived">Archived</TabsTrigger>
-            </TabsList>
+        {/* Tabs & Filters */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center mb-8">
+          <div className="flex items-center gap-2 bg-card p-1.5 rounded-xl border border-border/50 shadow-sm">
+            <button
+              onClick={() => handleTabChange("active")}
+              className={cn(
+                "px-6 py-2 rounded-lg text-sm font-semibold transition-all",
+                activeTab === "active"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              Active
+            </button>
+            <button
+              onClick={() => handleTabChange("archived")}
+              className={cn(
+                "px-6 py-2 rounded-lg text-sm font-semibold transition-all",
+                activeTab === "archived"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              Archived
+            </button>
+          </div>
 
-            <TabsContent value="active" className="space-y-4 sm:space-y-6">
-              {/* Stats Cards */}
-              <ApplicantsStatsCards applicants={filteredApplicants} />
-
-              {/* Applicants Table */}
-              <ApplicantsTable applicants={filteredApplicants} />
-            </TabsContent>
-
-            <TabsContent value="archived" className="space-y-4 sm:space-y-6">
-              {/* Stats Cards */}
-              <ApplicantsStatsCards applicants={filteredApplicants} />
-
-              {/* Applicants Table */}
-              <ApplicantsTable applicants={filteredApplicants} />
-            </TabsContent>
-          </Tabs>
+          <div className="flex items-center gap-2 bg-card p-1.5 rounded-xl border border-border/50 shadow-sm overflow-x-auto hide-scrollbar w-full sm:w-auto">
+            {[
+              "all",
+              "pending",
+              "reviewing",
+              "shortlisted",
+              "rejected",
+              "accepted",
+            ].map((f) => (
+              <button
+                key={f}
+                onClick={() => {
+                  updateFilter("status", f);
+                  setFilter(f as applicantFiltersType);
+                }}
+                className={cn(
+                  "px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all whitespace-nowrap",
+                  filter === f
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                {f}
+              </button>
+            ))}
+            <button
+              onClick={handleReset}
+              className="px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all whitespace-nowrap text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
+              Reset
+            </button>
+          </div>
         </div>
+
+        <div className="grid grid-cols-1 gap-6">
+          {applicants.length > 0 ? (
+            applicants.map((applicant) => (
+              <ApplicantCard key={applicant.id} applicant={applicant} />
+            ))
+          ) : (
+            <div className="col-span-full py-24 flex flex-col items-center justify-center text-center bg-card/50 rounded-3xl border border-dashed border-border">
+              <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-6">
+                {activeTab === "archived" ? (
+                  <Inbox className="w-10 h-10 text-muted-foreground" />
+                ) : (
+                  <Filter className="w-10 h-10 text-muted-foreground" />
+                )}
+              </div>
+              <h3 className="text-2xl font-bold text-foreground mb-3">
+                No applicants found
+              </h3>
+              <p className="text-lg text-muted-foreground max-w-md">
+                {activeTab === "archived"
+                  ? "You don't have any archived applicants."
+                  : `You don't have any ${filter !== "all" ? filter : ""} applicants at the moment.`}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <Pagination
+          page={filters.page ?? 1}
+          totalPages={totalPages}
+          onPageChange={(newPage) => updateFilter("page", newPage)}
+        />
       </div>
-    </div>
+    </>
   );
 };
 
-export default ApplicantsPage;
+export default EmployerApplicantsPage;

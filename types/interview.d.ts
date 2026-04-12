@@ -68,9 +68,18 @@ export interface Interview {
 }
 
 export type InterviewFilters = {
-  status: string;
-  page: number;
-  limit: number;
+  status?: string;
+  page?: number;
+  limit?: number;
+  archived?: boolean;
+  search?: string;
 };
 
 export type filtersType = "all" | "upcoming" | "completed" | "canceled";
+export type applicantFiltersType =
+  | "all"
+  | "pending"
+  | "reviewing"
+  | "shortlisted"
+  | "rejected"
+  | "accepted";

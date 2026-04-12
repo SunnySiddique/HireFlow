@@ -126,11 +126,47 @@ export type Job = {
 
 export type ApplicantType = {
   id: string;
-  status: string;
-  applied_at: string | null;
+  status: "pending" | "reviewing" | "shortlisted" | "rejected" | "accepted";
+  applied_at: string;
   cover_letter: string | null;
   employer_notes: string | null;
   archived: boolean;
-  job: Job;
-  seeker: Seeker;
+  job: {
+    id: string;
+    job_title: string;
+  };
+  seeker: {
+    id: string;
+    slug: string;
+    email: string;
+    auth_id: string;
+    full_name: string;
+    resume_url: string | null;
+    profile_url: string | null;
+  };
+};
+
+export type MappedAppliedJobType = {
+  id: string;
+  job_id: string;
+  application_status: ApplicantStatus | null;
+  employer_notes: string | null;
+  cover_letter: string | null;
+  applied_at: string | null;
+  job_title: string | null;
+  location: string | null;
+  salary_min: number | null;
+  salary_max: number | null;
+  job_status: string | null;
+  job_slug: string | null;
+  skills_required: string[] | null;
+  employment_type: string | null;
+  created_at: string | null;
+  currency: string | null;
+  employer: {
+    id: string;
+    website: string | null;
+    company_name: string | null;
+    company_logo_url: string | null;
+  } | null;
 };
