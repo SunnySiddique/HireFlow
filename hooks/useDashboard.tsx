@@ -25,6 +25,7 @@ export const useGetJobSeekerApplicationStats = () =>
         { count: thisWeek = 0 },
         { count: thisMonth = 0 },
         { count: totalProfileViews = 0 },
+        { count: thisWeekUpcomingInterview = 0 },
       ] = await Promise.all([
         supabase
           .from("applicants")
@@ -42,12 +43,18 @@ export const useGetJobSeekerApplicationStats = () =>
           .eq("target_id", user.id)
           .eq("target_type", "seeker")
           .gte("viewed_at", pastWeekDate.toISOString()),
+        supabase
+          .from("interviews")
+          .select("*", { count: "exact", head: true })
+          .eq("seeker_id", user.id)
+          .gte("scheduled_at", pastWeekDate.toISOString()),
       ]);
 
       return {
         thisWeekApplications: thisWeek,
         thisMonthSavedJobs: thisMonth,
         thisWeekProfileviews: totalProfileViews,
+        thisWeekUpcomingInterview,
       };
     },
   });

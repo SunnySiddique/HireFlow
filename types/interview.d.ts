@@ -28,54 +28,49 @@ export interface InterviewSeeker {
 
 export interface Interview {
   id: string;
+
   seeker_id: string | null;
   application_id: string | null;
   interviewer_id: string | null;
-  status: string; // keep required, fix at source below
-  interview_type: string; // keep required
-  scheduled_at: string; // keep required
-  duration_minutes: number;
+
+  status: string | null;
+  interview_type: string | null;
+
+  scheduled_at: string | null;
+  duration_minutes: number | null;
+
   meeting_link: string | null;
-  interviewer_name: string;
+
+  interviewer_name: string | null;
   interviewer_title: string | null;
+  candidate_name?: string | null;
+
   message: string | null;
   notes: string | null;
   feedback: string | null;
-  seeker: InterviewSeeker | null;
-  candidate_name?: string | null;
-  created_at?: string | null;
-  updated_at?: string | null;
+
+  employer: {
+    company_name: string;
+    company_logo_url: string | null;
+  } | null;
+
+  seeker?: {
+    auth_id: string;
+    profile_url: string;
+    full_name: string;
+  };
+
+  applicant?: {
+    job: {
+      job_title: string;
+    };
+  } | null;
 }
+
 export type InterviewFilters = {
-  search: string;
   status: string;
-  type?: string;
-  page?: number;
+  page: number;
+  limit: number;
 };
 
-export interface notifyInterview {
-  id: string;
-  application_id: string;
-  interviewer_id: string;
-  seeker_id: string;
-  status: string;
-  interview_type: string;
-  scheduled_at: string;
-  duration_minutes: number;
-  meeting_link: string;
-  interviewer_name: string;
-  interviewer_title: string;
-  message: string;
-  notes: string;
-  feedback: string;
-  employer: {
-    company_logo_url: string;
-    company_name: string;
-  };
-  applicant: {
-    job: {
-      title: string;
-      company_name: string;
-    };
-  };
-}
+export type filtersType = "all" | "upcoming" | "completed" | "canceled";

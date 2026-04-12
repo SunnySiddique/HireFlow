@@ -28,7 +28,6 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { stagger } from "./animation";
 
 const HeaderCard = ({
   job,
@@ -104,12 +103,7 @@ const HeaderCard = ({
               </div>
             </div>
 
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={stagger}
-              className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm text-muted-foreground"
-            >
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm text-muted-foreground">
               {[
                 { icon: MapPin, text: job.location },
                 {
@@ -131,7 +125,7 @@ const HeaderCard = ({
                   <span>{text}</span>
                 </div>
               ))}
-            </motion.div>
+            </div>
           </div>
 
           {/* Action Buttons */}

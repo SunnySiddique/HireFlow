@@ -1,7 +1,8 @@
+import { JobSeekerProfile } from "@/types/job-seeker";
 import { Briefcase, Mail, MapPin } from "lucide-react";
 import Image from "next/image";
 
-export function TalentCard({ talent }: { talent: any }) {
+export function TalentCard({ talent }: { talent: JobSeekerProfile }) {
   return (
     <div className="group flex flex-col overflow-hidden rounded-xl bg-card border border-border shadow-sm transition-all duration-300 hover:shadow-md hover:border-border/80 hover:-translate-y-1">
       <div className="p-5 flex-1 flex flex-col">

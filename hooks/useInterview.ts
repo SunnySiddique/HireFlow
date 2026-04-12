@@ -6,9 +6,13 @@ import {
 import { sendNotification } from "@/lib/notifications.helper";
 import { invalidateQuery } from "@/lib/react-query/invalidateQueries";
 import { createClient } from "@/lib/supabase/client";
-import { InterviewFilters, sendInterviewInviteType } from "@/types/interview";
+import {
+  Interview,
+  InterviewFilters,
+  sendInterviewInviteType,
+} from "@/types/interview";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { redirect, useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import toast from "react-hot-toast";
 
 // employer
@@ -33,26 +37,16 @@ export const useInterviews = (
   filters?: InterviewFilters,
   role: "employer" | "seeker" = "employer",
 ) => {
-  const router = useRouter();
-
   return useQuery({
-    queryKey: [
-      "interviews",
-      role,
-      filters?.search,
-      filters?.status,
-      filters?.type,
-      filters?.page,
-    ],
+    queryKey: ["interviews", role, filters?.status, filters?.page],
     queryFn: async () => {
-      const supabase = await createClient();
+      const supabase = createClient();
       const {
         data: { user },
         error: authError,
       } = await supabase.auth.getUser();
 
       if (!user || authError) {
-        router.push("/auth/signin");
         throw new Error("Unauthorized");
       }
 
@@ -60,10 +54,7 @@ export const useInterviews = (
       const selectedField =
         role === "employer"
           ? `seeker:seeker_id(auth_id, profile_url)`
-          : `
-      employer:interviewer_id(company_logo_url, company_name)
-    `;
-
+          : `employer:interviewer_id(company_logo_url, company_name)`;
       let query = supabase
         .from("interviews")
         .select(
@@ -82,22 +73,20 @@ export const useInterviews = (
           message,
           notes,
           feedback,
-        ${selectedField}
+          candidate_name,
+        ${selectedField},
+        applicant:application_id(
+       job:job_id(
+        job_title
+      )
+    )
           `,
           { count: "exact" },
         )
         .eq(queryId, user.id);
 
-      if (filters?.search) {
-        query = query.ilike("interviewer_name", `%${filters.search}%`);
-      }
-
       if (filters?.status && filters?.status !== "all") {
         query = query.eq("status", filters?.status);
-      }
-
-      if (filters?.type && filters?.type !== "all") {
-        query = query.eq("interview_type", filters?.type);
       }
 
       // pagnination
@@ -112,8 +101,10 @@ export const useInterviews = (
       const { data, error, count } = await query;
 
       if (error) throw error;
-      const totalPages = Math.ceil((count || 0) / limit);
-      return { data, totalPages };
+      return {
+        data: data as unknown as Interview[],
+        totalPages: Math.ceil((count || 0) / limit),
+      };
     },
   });
 };
@@ -143,8 +134,7 @@ export const useInterview = (interviewId: string) => {
     `,
         )
         .eq("id", interviewId)
-        .eq("seeker_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -226,5 +216,69 @@ export const useNotifyBeforeInterview = () => {
         data.id,
       );
     },
+  });
+};
+
+// upcoming interveiw
+
+export const useUpcomingInterviews = (isView: boolean = false) => {
+  return useQuery({
+    queryKey: ["upcoming-interviews", isView],
+
+    queryFn: async () => {
+      const supabase = createClient();
+
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        throw new Error("Unauthorized");
+      }
+
+      const now = new Date().toISOString();
+
+      let query = supabase
+        .from("interviews")
+        .select(
+          `
+          *,
+          employer:interviewer_id(
+            company_logo_url,
+            company_name
+          ),
+          applicant:application_id(
+            job:job_id(job_title)
+          )
+        `,
+        )
+        .eq("seeker_id", user.id)
+        .eq("status", "upcoming")
+        .gte("scheduled_at", now)
+        .order("scheduled_at", { ascending: true });
+
+      if (isView) {
+        query = query.limit(4);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data ?? [];
+    },
+
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 10,
+
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+
+    retry: 2,
+
+    enabled: true,
   });
 };

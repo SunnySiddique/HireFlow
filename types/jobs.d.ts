@@ -28,7 +28,7 @@ export type JobFormValues = z.infer<typeof jobFormSchema>;
 
 export type Employer = {
   id: string;
-  slug: string | null;
+  slug?: string | null;
   company_logo_url: string | null;
   company_name: string;
   website: string | null;
@@ -74,6 +74,7 @@ export interface JobFiltersType {
   page?: number;
   limit?: number;
   sort?: "recent" | "salary-high" | "salary-low" | "all";
+  featured?: boolean;
 }
 
 // save job types

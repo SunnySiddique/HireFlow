@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -287,29 +286,43 @@ const EmployerInterviewModal = ({
 
           {/* Status — view mode only */}
           {isView &&
-            ["upcoming", "completed"].includes(interviewData.status) && (
+            ["upcoming", "completed", "cancelled"].includes(
+              interviewData.status,
+            ) && (
               <div className="mt-4">
                 <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                   Status
                 </label>
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id="completed"
-                    checked={interviewData.status === "completed"}
-                    onCheckedChange={(checked) => {
-                      setInterviewData((prev) => ({
-                        ...prev,
-                        status: checked ? "completed" : "upcoming",
-                      }));
-                    }}
-                  />
-                  <label
-                    htmlFor="completed"
-                    className={`text-sm cursor-pointer text-foreground`}
-                  >
-                    Mark as completed
-                  </label>
-                </div>
+                <Select
+                  value={interviewData.status}
+                  onValueChange={(value) =>
+                    setInterviewData((prev) => ({ ...prev, status: value }))
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="upcoming">
+                      <span className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-blue-500" />
+                        Upcoming
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="completed">
+                      <span className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                        Completed
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="cancelled">
+                      <span className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-destructive" />
+                        Cancelled
+                      </span>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             )}
 

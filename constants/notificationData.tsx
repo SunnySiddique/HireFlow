@@ -78,6 +78,10 @@ export function getNotificationLink(
     case "job_post_limit":
       return `/${role}/billing`;
 
+    // applicant
+    case "new_applicant":
+      return `/${role}/${referenceId}`;
+
     // interview notificaitons
     case "new_interview_invite":
     case "interview_accepted":

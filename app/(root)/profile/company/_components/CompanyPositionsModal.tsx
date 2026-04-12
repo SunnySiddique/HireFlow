@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { formatDate, formatSalary } from "@/lib/utils";
+import { Job } from "@/types/jobs";
 import { Briefcase, Clock, MapPin, Search, X } from "lucide-react";
 import { useState } from "react";
 
@@ -17,7 +18,7 @@ interface CompanyPositionsModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   companyName: string;
-  companyJobs: any;
+  companyJobs: Job[];
 }
 
 const CompanyPositionsModal = ({
@@ -38,7 +39,7 @@ const CompanyPositionsModal = ({
 
     const matchesFilter =
       activeFilter === "all" ||
-      activeFilter === job.employment_type.toLowerCase();
+      activeFilter === (job.employment_type ?? "N/A").toLowerCase();
 
     return matchesSearch && matchesFilter;
   });
@@ -152,25 +153,25 @@ const CompanyPositionsModal = ({
                       </span>
                       <span className="flex items-center gap-1">
                         {formatSalary(
-                          selectedJob.salary_min,
-                          selectedJob.salary_max,
-                          selectedJob.currency,
+                          selectedJob.salary_min ?? 0,
+                          selectedJob.salary_max ?? 0,
+                          selectedJob.currency ?? "$",
                         )}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {formatDate(selectedJob.created_at)}
+                        {formatDate(selectedJob.created_at ?? "N/A")}
                       </span>
                     </div>
                   </div>
 
-                  {selectedJob.description && (
+                  {(selectedJob.job_description ?? "N/A") && (
                     <div>
                       <h4 className="font-semibold text-foreground mb-2">
                         Description
                       </h4>
                       <p className="text-sm text-muted-foreground">
-                        {selectedJob.description}
+                        {selectedJob.job_description}
                       </p>
                     </div>
                   )}
@@ -181,7 +182,10 @@ const CompanyPositionsModal = ({
                         Requirements
                       </h4>
                       <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                        {selectedJob.requirements.map((req, index) => (
+                        {(
+                          (selectedJob.requirements ??
+                            []) as unknown as string[]
+                        ).map((req, index) => (
                           <li key={index}>{req}</li>
                         ))}
                       </ul>
@@ -223,14 +227,14 @@ const CompanyPositionsModal = ({
                       </span>
                       <span className="flex items-center gap-1">
                         {formatSalary(
-                          job.salary_min,
-                          job.salary_max,
-                          job.currency,
+                          job.salary_min ?? 0,
+                          job.salary_max ?? 0,
+                          job.currency ?? "$",
                         )}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {formatDate(job.created_at)}
+                        {formatDate(job.created_at ?? "N/A")}
                       </span>
                     </div>
                   </div>

@@ -1,3 +1,4 @@
+import { Employer } from "@/types/employer";
 import {
   Briefcase,
   ExternalLink,
@@ -8,7 +9,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 
-export function FeaturedEmployerCard({ employer }: { employer: any }) {
+export function FeaturedEmployerCard({ employer }: { employer: Employer }) {
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl bg-gradient-to-br from-primary/5 via-card to-card border border-primary/20 shadow-md transition-all duration-300 hover:shadow-xl hover:border-primary/40 hover:-translate-y-1">
       <div className="absolute top-0 right-0 p-3">

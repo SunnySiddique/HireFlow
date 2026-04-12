@@ -1,11 +1,11 @@
 "use server";
 
-import { JobSeekerProfile } from "@/types/job-seeker";
+import { JobSeekerProfileDB } from "@/types/job-seeker";
 import { serverAuth } from "../auth/serverAuth";
 import { sendProfileCompletionNotifications } from "../notifications.helper";
 import { createClient } from "../supabase/server";
 
-export async function saveProfile(profileData: JobSeekerProfile) {
+export async function saveProfile(profileData: JobSeekerProfileDB) {
   const supabase = await createClient();
 
   const user = await serverAuth();

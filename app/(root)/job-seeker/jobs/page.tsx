@@ -29,6 +29,7 @@ const BrowseJobs = () => {
     page: 1,
     limit: 10,
     sort: "all",
+    featured: false,
   });
 
   const [salaryLabel, setSalaryLabel] = useState("");
@@ -41,7 +42,8 @@ const BrowseJobs = () => {
 
   const { jobs, totalCount, totalPages } = data;
 
-  const featuredJobs = jobs.filter((job: any) => job.is_featured);
+  const featuredJobs = jobs.filter((job) => job.is_featured);
+  const regularJobs = jobs.filter((job) => !job.is_featured);
 
   const updateFilters = (updated: Partial<typeof filters>) => {
     setFilters((prev) => ({ ...prev, ...updated, page: 1 }));
@@ -97,9 +99,10 @@ const BrowseJobs = () => {
         sort={filters.sort}
         onSortChange={(val) => updateFilters({ sort: val })}
         featuredCount={featuredJobs.length}
+        featured={filters.featured}
+        onFeaturedChange={(val) => updateFilters({ featured: val })}
       />
 
-      {/* 🚀 Loading States */}
       {isLoading ? (
         <Loader mode="full" />
       ) : isFetching ? (
@@ -112,15 +115,14 @@ const BrowseJobs = () => {
         <NoJobsFound />
       ) : (
         <div className="space-y-6">
-          {featuredJobs.length > 0 && (
+          {filters.featured && featuredJobs.length > 0 && (
             <div className="space-y-3">
               <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                 <span className="inline-block w-0.5 h-3 bg-primary rounded-full" />
                 Featured Opportunities
               </p>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {featuredJobs.map((job: any) => (
+                {featuredJobs.map((job) => (
                   <JobCard
                     key={job.id}
                     job={job}
@@ -133,29 +135,30 @@ const BrowseJobs = () => {
             </div>
           )}
 
-          <div className="space-y-3">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-              All Jobs
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-              {jobs.map((job: any) => (
-                <JobCard
-                  key={job.id}
-                  job={job}
-                  variant="browse"
-                  isSubscribed={isSubscribed}
-                  featured={job.is_featured}
-                />
-              ))}
+          {/* ✅ Regular jobs — hidden when featured filter is on */}
+          {!filters.featured && regularJobs.length > 0 && (
+            <div className="space-y-3">
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                All Jobs
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                {regularJobs.map((job) => (
+                  <JobCard
+                    key={job.id}
+                    job={job}
+                    variant="browse"
+                    isSubscribed={isSubscribed}
+                    featured={job.is_featured}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
       <Pagination
         page={filters.page ?? 1}
-        totalItems={totalCount}
         totalPages={totalPages}
         onPageChange={(newPage) =>
           setFilters((prev) => ({ ...prev, page: newPage }))

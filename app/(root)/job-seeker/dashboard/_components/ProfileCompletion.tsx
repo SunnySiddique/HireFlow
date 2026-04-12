@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useGetJobSeekerProfile } from "@/hooks/useJobSeeker";
+import { JobSeekerProfile } from "@/types/job-seeker";
 import {
   Briefcase,
   CheckCircle2,
@@ -9,12 +10,18 @@ import {
   Edit3,
   FileText,
   GraduationCap,
+  LucideIcon,
   Plus,
   User,
 } from "lucide-react";
 import Link from "next/link";
 
-const profileTabs = [
+const profileTabs: {
+  id: string;
+  label: string;
+  fields: (keyof JobSeekerProfile)[];
+  icon: LucideIcon;
+}[] = [
   {
     id: "about",
     label: "About",
@@ -56,9 +63,9 @@ const profileTabs = [
 const ProfileCompletion = () => {
   const { data: jobSeekerProfile } = useGetJobSeekerProfile();
 
-  const isSectionCompleted = (fields: string[]) => {
+  const isSectionCompleted = (fields: (keyof JobSeekerProfile)[]) => {
     return fields.some((field) => {
-      const value = (jobSeekerProfile as any)?.[field];
+      const value = jobSeekerProfile?.[field];
       if (value === null || value === undefined) return false;
       if (Array.isArray(value)) return value.length > 0;
       if (typeof value === "string") return value.trim() !== "";

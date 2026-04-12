@@ -1,7 +1,7 @@
 import CustomField from "@/components/CustomField";
 import EmptyState from "@/components/EmptyState";
 import { jobType } from "@/constants";
-import { ProfileFormData } from "@/types/job-seeker";
+import { JobSeekerProfile, ProfileFormData } from "@/types/job-seeker";
 import { Target } from "lucide-react";
 import { FormProvider, UseFormReturn } from "react-hook-form";
 
@@ -12,7 +12,7 @@ const JobPreferences = ({
 }: {
   editMode: boolean;
   form: UseFormReturn<ProfileFormData>;
-  profile: any;
+  profile: JobSeekerProfile;
 }) => {
   if (!profile) return;
   const isEmpty =

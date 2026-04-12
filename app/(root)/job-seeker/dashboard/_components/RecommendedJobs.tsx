@@ -110,7 +110,7 @@ const RecommendedJobs = () => {
 
                       {/* Skills */}
                       <div className="flex flex-wrap gap-1.5 mt-3">
-                        {skills.map((skill) => (
+                        {(skills ?? []).map((skill) => (
                           <span
                             key={skill}
                             className="text-[10px] px-2 py-1 rounded-md bg-muted text-muted-foreground border border-border"

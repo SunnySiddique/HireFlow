@@ -1,6 +1,6 @@
 import CustomField from "@/components/CustomField";
 import { Button } from "@/components/ui/button";
-import { ProfileFormData } from "@/types/job-seeker";
+import { JobSeekerProfile, ProfileFormData } from "@/types/job-seeker";
 import { Edit2, Save, Star, Upload, User } from "lucide-react";
 import Image from "next/image";
 import { ChangeEvent, useRef, useState } from "react";
@@ -13,7 +13,7 @@ interface HeroProifleProps {
   handleProfileSave: () => void;
   isPending: boolean;
   setProfileFile: React.Dispatch<React.SetStateAction<File | null>>;
-  jobSeekerProfile: any;
+  jobSeekerProfile: JobSeekerProfile;
 }
 
 const HeroProfile = ({
@@ -26,7 +26,7 @@ const HeroProfile = ({
   jobSeekerProfile: profile,
 }: HeroProifleProps) => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const profileImageRef = useRef<null>(null);
+  const profileImageRef = useRef<HTMLInputElement>(null);
 
   const handleProfileImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

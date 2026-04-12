@@ -2,14 +2,16 @@
 
 import { useEmployerProfiles } from "@/hooks/useEmployer";
 import { useSeekerProfiles } from "@/hooks/useJobSeeker";
+import { Employer } from "@/types/employer";
+import { JobSeekerProfile } from "@/types/job-seeker";
 import { Search, Star } from "lucide-react";
 import { useState } from "react";
 import Loader from "../Loader";
 import { Input } from "../ui/input";
-import EmployerCard from "./EmployerCard";
 import { FeaturedEmployerCard } from "./FeaturedEmployerCard";
 import { FeaturedTalentCard } from "./FeaturedTalentCard";
-import { TalentCard } from "./TalentCard";
+
+type Profile = JobSeekerProfile | Employer;
 
 const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
   const { data: seekerProfiles, isLoading: isSeekerProfileLoading } =
@@ -18,29 +20,31 @@ const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
     useEmployerProfiles();
 
   const [search, setSearch] = useState("");
+
   const isJobSeeker = role === "job-seeker";
 
-  const baseProfiles = (isJobSeeker ? employerProfiles : seekerProfiles) ?? [];
+  const baseProfiles: Profile[] = ((isJobSeeker
+    ? employerProfiles
+    : seekerProfiles) ?? []) as Profile[];
+  const isEmployer = (p: Profile): p is Employer => {
+    return "company_name" in p;
+  };
 
-  const matchesSearch = (profile: any) => {
+  const matchesSearch = (profile: Profile) => {
     const searchTrim = search.trim().toLowerCase();
 
-    const name = isJobSeeker ? profile.company_name : profile.full_name;
+    const name = isEmployer(profile) ? profile.company_name : profile.full_name;
 
     if (!name) return false;
 
     return name.toLowerCase().includes(searchTrim);
   };
 
-  const featuredProfiles = baseProfiles?.filter((p) => p.is_featured) ?? [];
-  const regularProfiles = baseProfiles.filter((p) => !p.is_featured) ?? [];
+  const featuredProfiles = baseProfiles.filter((p) => p.is_featured);
+  const regularProfiles = baseProfiles.filter((p) => !p.is_featured);
 
-  const filteredFeaturedProfiles = featuredProfiles.filter((profile) =>
-    matchesSearch(profile),
-  );
-  const filteredRegularProfiles = regularProfiles.filter((profile) =>
-    matchesSearch(profile),
-  );
+  const filteredFeaturedProfiles = featuredProfiles.filter(matchesSearch);
+  const filteredRegularProfiles = regularProfiles.filter(matchesSearch);
 
   if (isSeekerProfileLoading || isEmployerProfileLoading)
     return <Loader mode="inline" />;
@@ -83,8 +87,8 @@ const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredFeaturedProfiles.map((profile: any) =>
-              role === "job-seeker" ? (
+            {filteredFeaturedProfiles.map((profile) =>
+              isEmployer(profile) ? (
                 <FeaturedEmployerCard key={profile.id} employer={profile} />
               ) : (
                 <FeaturedTalentCard key={profile.id} talent={profile} />
@@ -122,11 +126,11 @@ const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
 
         {filteredRegularProfiles.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredRegularProfiles.map((profile: any) =>
-              role === "job-seeker" ? (
-                <EmployerCard key={profile.id} employer={profile} />
+            {filteredFeaturedProfiles.map((profile) =>
+              isEmployer(profile) ? (
+                <FeaturedEmployerCard key={profile.id} employer={profile} />
               ) : (
-                <TalentCard key={profile.id} talent={profile} />
+                <FeaturedTalentCard key={profile.id} talent={profile} />
               ),
             )}
           </div>

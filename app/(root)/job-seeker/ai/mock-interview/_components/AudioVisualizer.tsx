@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
+const BAR_HEIGHTS = Array.from({ length: 5 }, () => Math.random() * 24 + 16);
+
 const AudioVisualizer = ({
   active,
   colorClass = "bg-primary",
@@ -15,7 +17,7 @@ const AudioVisualizer = ({
           key={i}
           initial={{ height: 4 }}
           animate={{
-            height: active ? [8, Math.random() * 24 + 16, 8] : 4,
+            height: active ? [8, BAR_HEIGHTS[i], 8] : 4,
             opacity: active ? 1 : 0.3,
           }}
           transition={{

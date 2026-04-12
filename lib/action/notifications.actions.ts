@@ -1,11 +1,11 @@
 "use server";
 
 import { serverAuth } from "../auth/serverAuth";
-import { createClient } from "../supabase/client";
+import { createClient } from "../supabase/server";
 
 // read notification
 export async function markNotificationAsRead(notifyId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const user = await serverAuth();
 
@@ -21,7 +21,7 @@ export async function markNotificationAsRead(notifyId: string) {
 
 // read all notifications
 export async function markAllNotificationAsRead() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const user = await serverAuth();
 
@@ -36,7 +36,7 @@ export async function markAllNotificationAsRead() {
 
 // delete single notification
 export async function deleteNotification(notifyId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const user = await serverAuth();
 
@@ -51,7 +51,7 @@ export async function deleteNotification(notifyId: string) {
 
 // delete all notifications
 export async function deleteAllNotifications() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const user = await serverAuth();
 

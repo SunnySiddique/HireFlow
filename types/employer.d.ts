@@ -19,7 +19,7 @@ export interface EmployerType {
 }
 
 export type Employer = {
-  id?: string;
+  id: string;
   auth_id?: string;
   company_name: string;
   company_logo_url: string | null;

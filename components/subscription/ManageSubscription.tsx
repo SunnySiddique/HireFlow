@@ -12,6 +12,7 @@ const ManageSubscription = ({
   isSubscribed: boolean;
   userRole: "employer" | "job-seeker";
 }) => {
+  console.log(subscription);
   const [isPending, startTransition] = useTransition();
   const palns = userRole === "employer" ? employerPlans : seekerPlans;
   const subCost = palns.find(

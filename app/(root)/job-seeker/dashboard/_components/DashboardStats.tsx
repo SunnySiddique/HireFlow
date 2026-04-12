@@ -2,7 +2,14 @@
 
 import { Card } from "@/components/ui/card";
 import { useGetJobSeekerApplicationStats } from "@/hooks/useDashboard";
-import { Eye, FileText, Heart, TrendingDown, TrendingUp } from "lucide-react";
+import {
+  Clock,
+  Eye,
+  FileText,
+  Heart,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 
 const DashboardStats = ({
   isSubscribed,
@@ -16,6 +23,7 @@ const DashboardStats = ({
   const totalProfileViews = data?.thisWeekProfileviews ?? 0;
 
   const thisMonthSavedJobs = data?.thisMonthSavedJobs ?? 0;
+  const upcomingInteview = data?.thisWeekUpcomingInterview ?? 0;
 
   const statsData = [
     {
@@ -46,15 +54,19 @@ const DashboardStats = ({
       iconBg: "bg-red-50",
       iconColor: "text-red-500",
     },
-    // {
-    //   title: "Interview Scheduled",
-    //   value: "3",
-    //   change: "2 this week",
-    //   changeType: "neutral",
-    //   icon: Clock,
-    //   iconBg: "bg-blue-50",
-    //   iconColor: "text-blue-500",
-    // },
+    {
+      title: "Interview Scheduled",
+      value: upcomingInteview,
+      change:
+        upcomingInteview > 0
+          ? `+${upcomingInteview} this ween`
+          : "No applications this ween",
+      arrowIcon: upcomingInteview > 0 ? TrendingUp : TrendingDown,
+      arrowColor: upcomingInteview > 0 ? "text-green-600" : "text-red-600",
+      icon: Clock,
+      iconBg: "bg-red-50",
+      iconColor: "text-red-500",
+    },
     {
       id: "profile-views",
       title: "Profile Views",

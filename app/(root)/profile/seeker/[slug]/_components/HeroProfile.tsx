@@ -1,8 +1,9 @@
+import { JobSeekerProfile } from "@/types/job-seeker";
 import { User } from "lucide-react";
 import Image from "next/image";
 
 interface HeroProfileProps {
-  jobSeekerProfile: any;
+  jobSeekerProfile: JobSeekerProfile;
 }
 
 const HeroProfile = ({ jobSeekerProfile: profile }: HeroProfileProps) => {

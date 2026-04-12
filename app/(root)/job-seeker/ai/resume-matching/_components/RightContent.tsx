@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { AICareerAnalysisResult, JobMatch } from "@/types/aiJobseeker";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -63,38 +64,6 @@ const CircularFitScore = ({
   );
 };
 
-const apiData = {
-  job_matches: [
-    {
-      job_id: "JOB-7d5b5512-ffab-497b-9583-d0c1af58a050",
-      job_title: "Dynamic Data Coordinator",
-      company: "TechNova Solutions",
-      location: "Remote",
-      fit_score: 43,
-      strengths: [
-        "Basic understanding of HTML, CSS, and JS",
-        "Experience with Node.js and REST APIs",
-        "Familiarity with modern databases",
-      ],
-      skill_gaps: [
-        "No direct experience with Dynamic Data Coordinator role",
-        "Limited experience with HTML, CSS, and JS",
-        "No experience with TechNova Solutions' specific tools and technologies",
-      ],
-      learning_path: [
-        {
-          skill: "HTML, CSS, and JS fundamentals",
-          resource:
-            "FreeCodeCamp's HTML/CSS/JS courses + official documentation",
-          time: "2-4 weeks",
-        },
-      ],
-      why_this_match:
-        "Although you don't have direct experience with the Dynamic Data Coordinator role, your background in Full Stack Development and experience with Node.js and REST APIs make you a strong candidate for this position. With some additional learning and training, you can bridge the skill gaps and excel in this role.",
-    },
-  ],
-};
-
 function getScoreColors(score: number) {
   if (score >= 80)
     return { colorClass: "text-green-500", strokeClass: "text-green-500" };
@@ -103,11 +72,11 @@ function getScoreColors(score: number) {
   return { colorClass: "text-secondary", strokeClass: "text-secondary" };
 }
 
-const RightContent = ({ result }: { result: any }) => {
+const RightContent = ({ result }: { result: AICareerAnalysisResult }) => {
   const [activeFilter, setActiveFilter] = useState("All");
   const filters = ["All", "≥80%", "≥60%", "<60%"];
 
-  const jobs = result.job_matches.map((job) => ({
+  const jobs = result.job_matches.map((job: JobMatch) => ({
     id: job.job_id,
     title: job.job_title,
     job_slug: job.job_slug,
@@ -171,18 +140,13 @@ const RightContent = ({ result }: { result: any }) => {
       </div>
 
       <div className="flex flex-col gap-4 mt-2">
-        {filteredJobs.map((job, index) => (
+        {filteredJobs.map((job, index: number) => (
           <motion.div
             key={job.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            className={cn(
-              "p-6 rounded-2xl bg-card border transition-all duration-300 hover:shadow-lg group flex flex-col gap-5",
-              job.expanded
-                ? "border-primary/40 shadow-md shadow-primary/5"
-                : "border-border hover:border-primary/30",
-            )}
+            className="p-6 rounded-2xl bg-card border transition-all duration-300 hover:shadow-lg group flex flex-col gap-5"
           >
             {/* Card Top: Info & Score */}
             <div className="flex flex-col sm:flex-row justify-between gap-6">
@@ -336,7 +300,7 @@ const RightContent = ({ result }: { result: any }) => {
                     </span>
                   </div>
                   <div className="flex flex-col gap-3 relative before:absolute before:inset-y-2 before:left-[11px] before:w-[2px] before:bg-border">
-                    {job.learningPath.map((step, i) => (
+                    {job.learningPath.map((step, i: number) => (
                       <div
                         key={i}
                         className="flex items-center gap-4 relative z-10"

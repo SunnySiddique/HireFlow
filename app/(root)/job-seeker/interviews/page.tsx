@@ -1,80 +1,64 @@
 "use client";
 
+import InterviewCard from "@/components/interview/InterviewCard";
 import InterviewHeader from "@/components/interview/InterviewHeader";
-import Pagination from "@/components/pagination/Pagination";
-import { Card, CardContent } from "@/components/ui/card";
+import Loader from "@/components/Loader";
 import { useInterviews } from "@/hooks/useInterview";
 import { useInterviewFilters } from "@/hooks/useInterviewFilters";
-import { Calendar } from "lucide-react";
-import JobSeekerInterviewTable from "./_components/JobSeekerInterviewTable";
-import JobSeekerStatsCard from "./_components/JobSeekerStatsCard";
+import { filtersType, Interview } from "@/types/interview";
+import { Filter } from "lucide-react";
+import { useState } from "react";
+import Pagination from "../jobs/_components/Pagination";
 
 const JobSeekerInterviewsPage = () => {
-  const { filters, queryFilters, updateFilter, resetFilters } =
-    useInterviewFilters();
+  const { filters, updateFilter, resetFilters } = useInterviewFilters();
+  const [filter, setFilter] = useState<filtersType>("all");
 
-  // hooks
-  const { data, isLoading } = useInterviews(queryFilters, "seeker");
+  const { data, isLoading } = useInterviews(filters, "seeker");
 
-  const interviews = data?.data ?? [];
+  const interviews = (data?.data ?? []) as Interview[];
   const totalPages = data?.totalPages ?? 0;
 
-  const handleUpdateFilter = (key: string, value: string) => {
-    updateFilter(key as keyof typeof filters, value);
-  };
-
-  const stats = {
-    total: interviews.length,
-    upcoming: interviews.filter((i) => i.status === "upcoming").length,
-    pending_confirm: interviews.filter((i) => i.status === "pending_confirm")
-      .length,
-    completed: interviews.filter((i) => i.status === "completed").length,
-    cancelled: interviews.filter((i) => i.status === "cancelled").length,
-  };
+  if (isLoading) return <Loader mode="inline" />;
   return (
-    <div className="p-8">
-      {/* Page Header */}
+    <div className="px-4 sm:px-6 lg:px-8 py-4">
       <InterviewHeader
-        totalInterviews={interviews.length}
-        filters={filters}
-        updateFilter={handleUpdateFilter}
         resetFilters={resetFilters}
+        updateFilter={updateFilter}
+        filter={filter}
+        setFilter={setFilter}
+        role={"seeker"}
       />
-
-      {/* Stats Cards */}
-      <JobSeekerStatsCard stats={stats} />
-
-      {/* Interviews Table / Cards */}
-      <Card className="border-border shadow-sm overflow-hidden">
-        <CardContent className="p-0">
-          {isLoading ? (
-            <div className="py-12 text-center">
-              <Calendar className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4 animate-pulse" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                Loading interviews...
-              </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {interviews.length > 0 ? (
+          interviews.map((interview: Interview) => (
+            <InterviewCard
+              key={interview.id}
+              interview={interview}
+              role={"seeker"}
+            />
+          ))
+        ) : (
+          <div className="col-span-full py-20 flex flex-col items-center justify-center text-center bg-card/50 rounded-3xl border border-dashed border-border">
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+              <Filter className="w-8 h-8 text-muted-foreground" />
             </div>
-          ) : interviews.length > 0 ? (
-            <JobSeekerInterviewTable interviews={interviews} />
-          ) : (
-            <div className="py-12 text-center">
-              <Calendar className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                No interviews found
-              </h3>
-              <p className="text-muted-foreground">
-                Try adjusting your search or filters
-              </p>
-            </div>
-          )}
-        </CardContent>
-        <Pagination
-          currentPage={filters.page}
-          totalPages={totalPages}
-          onNext={() => updateFilter("page", (filters?.page ?? 1) + 1)}
-          onPrev={() => updateFilter("page", (filters?.page ?? 1) - 1)}
-        />
-      </Card>
+            <h3 className="text-xl font-bold text-foreground mb-2">
+              No interviews found
+            </h3>
+            <p className="text-muted-foreground max-w-md">
+              You {`don't`} have any {filter !== "all" ? filter : ""} interviews
+              at the moment.
+            </p>
+          </div>
+        )}
+      </div>
+
+      <Pagination
+        page={filters.page ?? 1}
+        totalPages={totalPages}
+        onPageChange={(newPage) => updateFilter("page", newPage)}
+      />
     </div>
   );
 };

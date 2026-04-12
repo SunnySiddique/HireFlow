@@ -5,6 +5,7 @@ import DashboardNavbar from "@/components/navbar/DashboardNavbar";
 import DashboardSidebar from "@/components/sidebar/DashboardSidebar";
 import { useEmployerProfile } from "@/hooks/useEmployer";
 import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 export default function EmployerLayout({
@@ -12,10 +13,18 @@ export default function EmployerLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
   const { isLoading } = useEmployerProfile();
   const { isLoading: isGetSub } = useGetCurrentUserSubscription();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const isInterviewDetail = /^\/employer\/interviews\/[^/]+$/.test(pathname);
+
+  if (isInterviewDetail) {
+    return <>{children}</>;
+  }
 
   if (isLoading || isGetSub) return <Loader mode="full" />;
   return (

@@ -3,14 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ExperienceItem } from "@/types/job-seeker";
+import { ExperienceItem, JobSeekerProfile } from "@/types/job-seeker";
 import { Briefcase, Plus, X } from "lucide-react";
 
 interface ExperienceProps {
   editMode: boolean;
   experiences: ExperienceItem[];
   setExperiences: React.Dispatch<React.SetStateAction<ExperienceItem[]>>;
-  jobSeekerProfile: any;
+  jobSeekerProfile: JobSeekerProfile;
 }
 
 const Experience = ({

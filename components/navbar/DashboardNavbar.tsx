@@ -247,52 +247,45 @@ const DashboardNavbar = ({
           </div>
 
           <div className="hidden sm:block">
-            <Link
-              href={
-                role === "job-seeker"
-                  ? `/job-seeker/profile/${jobSeekerProfile?.slug ?? "profile"}`
-                  : `/employer/profile/${employerProfile?.slug ?? "company"}`
-              }
-            >
-              {role === "job-seeker" ? (
-                <Link href={`/job-seeker/profile/${jobSeekerProfile?.slug}`}>
-                  <Avatar className="h-10 w-10 lg:h-12 lg:w-12 border-2 border-primary cursor-pointer hover:scale-105 transition-transform shadow-sm">
-                    {jobSeekerProfile?.profile_url ? (
-                      <AvatarImage
-                        src={
-                          jobSeekerProfile?.profile_url || "/placeholder.svg"
-                        }
-                        alt={jobSeekerProfile?.full_name || "Job-seeker logo"}
-                      />
-                    ) : (
-                      <AvatarFallback className="bg-primary text-primary-foreground font-bold">
-                        {getInitials(jobSeekerProfile?.full_name ?? "Jone")}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                </Link>
-              ) : (
-                <Link href={`/job-seeker/profile/${employerProfile?.slug}`}>
-                  <Avatar className="h-10 w-10 lg:h-12 lg:w-12 cursor-pointer hover:scale-105 transition-transform shadow-sm">
-                    {employerProfile?.company_logo_url ? (
-                      <AvatarImage
-                        src={
-                          employerProfile?.company_logo_url ||
-                          "/placeholder.svg"
-                        }
-                        alt={employerProfile?.company_name || "Employer logo"}
-                      />
-                    ) : (
-                      <AvatarFallback className="bg-primary text-primary-foreground font-bold">
-                        {getInitials(
-                          (employerProfile?.company_name as string) ?? "MT",
-                        )}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                </Link>
-              )}
-            </Link>
+            {role === "job-seeker" ? (
+              <Link
+                href={`/job-seeker/profile/${jobSeekerProfile?.slug ?? "profile"}`}
+              >
+                <Avatar className="h-10 w-10 lg:h-12 lg:w-12 border-2 border-primary cursor-pointer hover:scale-105 transition-transform shadow-sm">
+                  {jobSeekerProfile?.profile_url ? (
+                    <AvatarImage
+                      src={jobSeekerProfile?.profile_url || "/placeholder.svg"}
+                      alt={jobSeekerProfile?.full_name || "Job-seeker logo"}
+                    />
+                  ) : (
+                    <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+                      {getInitials(jobSeekerProfile?.full_name ?? "Jone")}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+              </Link>
+            ) : (
+              <Link
+                href={`/employer/profile/${employerProfile?.slug ?? "company"}`}
+              >
+                <Avatar className="h-10 w-10 lg:h-12 lg:w-12 cursor-pointer hover:scale-105 transition-transform shadow-sm">
+                  {employerProfile?.company_logo_url ? (
+                    <AvatarImage
+                      src={
+                        employerProfile?.company_logo_url || "/placeholder.svg"
+                      }
+                      alt={employerProfile?.company_name || "Employer logo"}
+                    />
+                  ) : (
+                    <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+                      {getInitials(
+                        (employerProfile?.company_name as string) ?? "MT",
+                      )}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+              </Link>
+            )}
           </div>
 
           {/* Menu icon — mobile only */}

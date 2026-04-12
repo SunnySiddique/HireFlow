@@ -7,6 +7,7 @@ import {
 } from "@/constants/BillingData";
 import { redirect } from "next/navigation";
 import Stripe from "stripe";
+import { serverAuth } from "../auth/serverAuth";
 import { createClient } from "../supabase/server";
 
 const stripe = new Stripe(process.env.STRIPE_SK!);
@@ -17,13 +18,8 @@ export async function createCheckoutSession(
 ) {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) redirect("/auth/signin");
-
+  const user = await serverAuth();
+  console.log("plaName", planName);
   const { data: existingSubscription } = await supabase
     .from("subscriptions")
     .select("stripe_customer_id")
