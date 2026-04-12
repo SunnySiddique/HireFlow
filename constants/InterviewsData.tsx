@@ -1,5 +1,14 @@
 import { Badge } from "@/components/ui/badge";
-import { MapPin, MonitorSmartphone, Phone, Users, Video } from "lucide-react";
+import {
+  AlertCircle,
+  Clock,
+  MapPin,
+  MonitorSmartphone,
+  Phone,
+  User,
+  Users,
+  Video,
+} from "lucide-react";
 // employer
 export const DURATION_OPTIONS = ["30", "45", "60", "90"];
 
@@ -47,4 +56,51 @@ export const typeLabel: Record<string, string> = {
   ms_teams: "MS Teams",
   phone: "Phone",
   in_person: "In Person",
+};
+
+// interviews
+
+export const getStatusConfig = (status: string | null) => {
+  switch (status) {
+    case "upcoming":
+      return {
+        label: "Upcoming",
+        color: "text-primary",
+        bg: "bg-primary/10",
+        border: "border-primary/20",
+        icon: Clock,
+      };
+    case "completed":
+      return {
+        label: "Completed",
+        color: "text-emerald-500",
+        bg: "bg-emerald-500/10",
+        border: "border-emerald-500/20",
+        icon: User,
+      };
+    case "cancelled":
+      return {
+        label: "Cancelled",
+        color: "text-red-500",
+        bg: "bg-red-500/10",
+        border: "border-red-500/20",
+        icon: AlertCircle,
+      };
+    case "pending_confirm":
+      return {
+        label: "Pending",
+        color: "text-amber-500",
+        bg: "bg-amber-500/10",
+        border: "border-amber-500/20",
+        icon: Clock,
+      };
+    default:
+      return {
+        label: status ?? "Unknown",
+        color: "text-muted-foreground",
+        bg: "bg-muted",
+        border: "border-border",
+        icon: Clock,
+      };
+  }
 };

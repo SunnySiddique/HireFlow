@@ -17,7 +17,7 @@ const Experience = ({ experiences }: ExperienceProps) => {
 
       <div className="space-y-6">
         {exps.length > 0 ? (
-          exps.map((exp: ExperienceItem) => (
+          exps.map((exp) => (
             <div
               key={exp.id}
               className="pb-6 border-b border-border last:border-b-0 last:pb-0"

@@ -5,6 +5,11 @@ import NavigationSidebar from "@/components/NavigationSidebar";
 import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
 import { useGetJobSeekerProfileBySlug } from "@/hooks/useJobSeeker";
 import { useTrackSeekerProfileView } from "@/hooks/useViews";
+import {
+  EducationItem,
+  ExperienceItem,
+  JobSeekerProfile,
+} from "@/types/job-seeker";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -35,7 +40,8 @@ const PublicProfilePage = () => {
     trackView(jobSeekerProfile.auth_id);
   }, [jobSeekerProfile?.id]);
 
-  if (isJobSeekerProfileLoading) return <Loader mode="full" />;
+  if (isJobSeekerProfileLoading || !jobSeekerProfile)
+    return <Loader mode="full" />;
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <div className="bg-background border-b border-border px-4 lg:px-8 py-2 sticky top-0 z-50">
@@ -48,7 +54,7 @@ const PublicProfilePage = () => {
         </Link>
       </div>
       {/* Hero Profile Section */}
-      <HeroProfile jobSeekerProfile={jobSeekerProfile} />
+      <HeroProfile jobSeekerProfile={jobSeekerProfile as JobSeekerProfile} />
 
       {/* Main Content */}
       <div className="max-w-370 mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -70,22 +76,32 @@ const PublicProfilePage = () => {
 
             {/* Experience Section */}
             {activeSection === "experience" && (
-              <Experience experiences={jobSeekerProfile?.experience} />
+              <Experience
+                experiences={
+                  (jobSeekerProfile?.experience ??
+                    []) as unknown as ExperienceItem[]
+                }
+              />
             )}
 
             {/* Education Section */}
             {activeSection === "education" && (
-              <Education education={jobSeekerProfile?.education} />
+              <Education
+                education={
+                  (jobSeekerProfile?.education ??
+                    []) as unknown as EducationItem[]
+                }
+              />
             )}
 
             {/* Skills Section */}
             {activeSection === "skills" && (
-              <Skills skills={jobSeekerProfile?.skills} />
+              <Skills skills={jobSeekerProfile?.skills as string[]} />
             )}
 
             {/* Job Preferences Section */}
             {activeSection === "preferences" && (
-              <JobPreferences profile={jobSeekerProfile} />
+              <JobPreferences profile={jobSeekerProfile as JobSeekerProfile} />
             )}
 
             {/* Documents Section */}

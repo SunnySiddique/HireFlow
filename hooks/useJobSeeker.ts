@@ -2,7 +2,7 @@ import { saveProfile } from "@/lib/action/job-seeker.actions";
 import { uploadJobSeekerImage } from "@/lib/action/media.actions";
 import { invalidateQuery } from "@/lib/react-query/invalidateQueries";
 import { createClient } from "@/lib/supabase/client";
-import { JobSeekerProfile } from "@/types/job-seeker";
+import { JobSeekerProfileDB } from "@/types/job-seeker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
 import toast from "react-hot-toast";
@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 export const useSaveJobSeekerProfile = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (profileData: JobSeekerProfile) => saveProfile(profileData),
+    mutationFn: (profileData: JobSeekerProfileDB) => saveProfile(profileData),
     onSuccess: () => {
       toast.success("Profile saved successfully");
       invalidateQuery(queryClient, ["jobSeekerProfile"]);

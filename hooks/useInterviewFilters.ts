@@ -1,20 +1,12 @@
-import { useDebounce } from "@/hooks/useDebounce";
 import { InterviewFilters } from "@/types/interview";
 import { useState } from "react";
 
 export const useInterviewFilters = () => {
   const [filters, setFilters] = useState<InterviewFilters>({
-    search: "",
     status: "all",
     page: 1,
+    limit: 5,
   });
-
-  const debouncedSearch = useDebounce(filters.search, 500);
-
-  const queryFilters = {
-    ...filters,
-    search: debouncedSearch,
-  };
 
   const updateFilter = (
     key: keyof InterviewFilters,
@@ -23,22 +15,21 @@ export const useInterviewFilters = () => {
     setFilters((prev) => ({
       ...prev,
       [key]: value,
-      page: key === "search" || key === "status" ? 1 : prev.page,
+      page: key === "status" ? 1 : prev.page,
     }));
   };
 
   // reset all filters
   const resetFilters = () => {
     setFilters({
-      search: "",
       status: "all",
-      type: "all",
+      page: 1,
+      limit: 5,
     });
   };
 
   return {
     filters,
-    queryFilters,
     updateFilter,
     resetFilters,
   };

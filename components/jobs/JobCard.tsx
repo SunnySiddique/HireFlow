@@ -39,7 +39,7 @@ const JobCard = ({
 
   return (
     <Card
-      className={`
+      className={` p-0
       relative w-full rounded-xl border text-card-foreground overflow-hidden
       transition-all duration-300 ease-out group
       hover:-translate-y-0.5 hover:shadow-md

@@ -402,6 +402,10 @@ export const useGetAllJobsForJobSeeker = (filters: JobFiltersType) => {
         query = query.ilike("location", `%${filters.location}%`);
       }
 
+      if (filters.featured) {
+        query = query.eq("is_featured", true);
+      }
+
       /* ---------------- SORTING ---------------- */
 
       if (filters.sort !== "all") {

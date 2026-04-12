@@ -1,7 +1,8 @@
+import { JobSeekerProfile } from "@/types/job-seeker";
 import { Briefcase, Clock, DollarSign, MapPin } from "lucide-react";
 
 interface JobPreferencesProps {
-  profile: any;
+  profile: JobSeekerProfile;
 }
 
 const JobPreferences = ({ profile }: JobPreferencesProps) => {

@@ -25,7 +25,7 @@ function OverviewRow({
 }: {
   icon: React.ElementType;
   label: string;
-  value: string;
+  value: string | number;
   delay: number;
 }) {
   return (
@@ -98,7 +98,7 @@ const JobSidebar = ({
               <OverviewRow
                 icon={Users}
                 label="Open Positions"
-                value={job.open_positions}
+                value={job.open_positions ?? 0}
                 delay={5}
               />
               <OverviewRow
@@ -135,7 +135,7 @@ const JobSidebar = ({
                       />
                     ) : (
                       <AvatarFallback className="rounded-lg text-white font-bold">
-                        {getInitials(job?.employer?.company_name)}
+                        {getInitials(job?.employer?.company_name ?? "N/A")}
                       </AvatarFallback>
                     )}
                   </Avatar>
@@ -145,7 +145,7 @@ const JobSidebar = ({
                     {job?.employer?.company_name}
                   </h4>
                   <a
-                    href={job?.employer?.website}
+                    href={job?.employer?.website ?? "N/A"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-primary hover:underline flex items-center gap-1"

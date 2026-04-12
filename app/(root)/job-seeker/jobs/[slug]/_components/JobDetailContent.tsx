@@ -4,7 +4,6 @@ import { Job } from "@/types/jobs";
 import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 import { useRef } from "react";
-import { stagger } from "./animation";
 
 function CheckList({ items }: { items: string[] }) {
   const ref = useRef(null);
@@ -51,13 +50,7 @@ const JobDetailContent = ({ job }: { job: Job }) => {
           <h2 className="text-xl font-bold text-foreground mb-4">
             Skills Required
           </h2>
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={stagger}
-            className="flex flex-wrap gap-2"
-          >
+          <div className="flex flex-wrap gap-2">
             {(job.skills_required ?? []).map((skill) => (
               <motion.div key={skill} whileTap={{ scale: 0.97 }}>
                 <Badge className="bg-primary/10 text-primary border border-primary/20 cursor-default">
@@ -65,7 +58,7 @@ const JobDetailContent = ({ job }: { job: Job }) => {
                 </Badge>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         </Card>
 
         <Card className="p-6 border border-border hover:border-primary/30 transition-colors duration-200">

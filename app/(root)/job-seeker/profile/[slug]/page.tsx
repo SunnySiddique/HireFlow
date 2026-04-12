@@ -23,6 +23,7 @@ import {
   EducationItem,
   ExperienceItem,
   JobSeekerProfile,
+  JobSeekerProfileDB,
   ProfileFormData,
 } from "@/types/job-seeker";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -92,7 +93,6 @@ const ProfilePage = () => {
     subscription?.subscription_status as string,
     subscription?.plan_expires_at as string,
   );
-  const isChampion = subscription?.plan?.toLowerCase() === "champion";
   //states
   const [editMode, setEditMode] = useState(false);
   const [activeSection, setActiveSection] = useState("about");
@@ -169,7 +169,7 @@ const ProfilePage = () => {
         }
       }
 
-      const payload: JobSeekerProfile = {
+      const payload = {
         full_name: data.fullName.trim(),
         headline: data.headline.trim(),
         bio: data.bio.trim(),
@@ -181,8 +181,8 @@ const ProfilePage = () => {
         portfolio_url: data.portfolioUrl?.trim(),
         open_to_work: data.openToWork,
         preferred_job_type: data.preferred_job_type,
-        profile_url: profileUrl || jobSeekerProfile.profile_url || undefined,
-        resume_url: resumeUrl || jobSeekerProfile.resume_url || undefined,
+        profile_url: (profileUrl || jobSeekerProfile.profile_url) ?? "N/A",
+        resume_url: (resumeUrl || jobSeekerProfile.resume_url) ?? "N/A",
         profile_path: profilePath || "",
         resume_path: resumePath || "",
         experience: experiences.length
@@ -194,7 +194,7 @@ const ProfilePage = () => {
         skills: skills.map((s) => s.toLowerCase()),
       };
 
-      await saveProfile(payload, {
+      await saveProfile(payload as JobSeekerProfileDB, {
         onSuccess: () => {
           setEditMode(false);
         },
@@ -208,22 +208,26 @@ const ProfilePage = () => {
     if (!jobSeekerProfile) return;
 
     setExperiences(
-      (jobSeekerProfile.experience ?? []).map((exp: any, idx: number) => ({
-        id: idx,
-        title: exp.title ?? "",
-        company: exp.company ?? "",
-        duration: exp.duration ?? "",
-        description: exp.description ?? "",
-      })),
+      ((jobSeekerProfile.experience ?? []) as unknown as ExperienceItem[]).map(
+        (exp: ExperienceItem, idx: number) => ({
+          id: idx,
+          title: exp.title ?? "",
+          company: exp.company ?? "",
+          duration: exp.duration ?? "",
+          description: exp.description ?? "",
+        }),
+      ),
     );
 
     setEducaiton(
-      (jobSeekerProfile.education ?? []).map((edu: any, idx: number) => ({
-        id: idx,
-        degree: edu.degree ?? "",
-        school: edu.school ?? "",
-        year: edu.year ?? "",
-      })),
+      ((jobSeekerProfile.education ?? []) as unknown as EducationItem[]).map(
+        (edu: EducationItem, idx: number) => ({
+          id: idx,
+          degree: edu.degree ?? "",
+          school: edu.school ?? "",
+          year: edu.year ?? "",
+        }),
+      ),
     );
 
     setSkills(jobSeekerProfile.skills ?? []);
@@ -249,7 +253,10 @@ const ProfilePage = () => {
       toast.error(firstError.message);
     }
   };
-  if (isJobSeekerProfileLoading) return <Loader mode="inline" />;
+
+  if (isJobSeekerProfileLoading || !jobSeekerProfile)
+    return <Loader mode="inline" />;
+
   return (
     <>
       {/* Hero Profile Section */}
@@ -260,7 +267,7 @@ const ProfilePage = () => {
         setEditMode={setEditMode}
         isPending={isSubmitting}
         setProfileFile={setProfileFile}
-        jobSeekerProfile={jobSeekerProfile}
+        jobSeekerProfile={jobSeekerProfile as JobSeekerProfile}
       />
       {/* Main Content */}
       <div className="p-8 py-12">
@@ -290,7 +297,7 @@ const ProfilePage = () => {
                 experiences={experiences}
                 setExperiences={setExperiences}
                 editMode={editMode}
-                jobSeekerProfile={jobSeekerProfile}
+                jobSeekerProfile={jobSeekerProfile as JobSeekerProfile}
               />
             )}
 
@@ -317,7 +324,7 @@ const ProfilePage = () => {
               <JobPreferences
                 editMode={editMode}
                 form={form}
-                profile={jobSeekerProfile}
+                profile={jobSeekerProfile as JobSeekerProfile}
               />
             )}
 

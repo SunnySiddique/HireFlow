@@ -1,132 +1,63 @@
 "use client";
 
-import EmployerInterviewModal from "@/components/employer/interviews/EmployerInterviewModal";
-import Pagination from "@/components/pagination/Pagination";
-import { Card, CardContent } from "@/components/ui/card";
-import { useDeleteInterview, useInterviews } from "@/hooks/useInterview";
+import InterviewCard from "@/components/interview/InterviewCard";
+import InterviewHeader from "@/components/interview/InterviewHeader";
+import { useInterviews } from "@/hooks/useInterview";
 import { useInterviewFilters } from "@/hooks/useInterviewFilters";
-import { Interview } from "@/types/interview";
-import { Calendar } from "lucide-react";
+import { filtersType, Interview } from "@/types/interview";
+import { Filter } from "lucide-react";
 import { useState } from "react";
-import InterviewHeader from "../../../../components/interview/InterviewHeader";
-import EmployerInterviewsTable from "./_components/EmployerInterviewsTable";
-import EmployerStatsCard from "./_components/EmployerStatsCard";
+import Pagination from "../../job-seeker/jobs/_components/Pagination";
 
 const EmployerInterviewsPage = () => {
-  const [selectedInterview, setSelectedInterview] = useState<Interview | null>(
-    null,
-  );
+  const { filters, updateFilter, resetFilters } = useInterviewFilters();
+  const [filter, setFilter] = useState<filtersType>("all");
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { filters, queryFilters, updateFilter, resetFilters } =
-    useInterviewFilters();
+  const { data } = useInterviews(filters, "employer");
 
-  // hooks
-  const { data, isLoading } = useInterviews(queryFilters, "employer");
-
-  const { mutateAsync: deleteInterview, isPending: isDeleting } =
-    useDeleteInterview();
-
-  const interviews = (data?.data ?? []).map((i) => ({
-    ...i,
-    status: i.status ?? "upcoming",
-    interview_type: i.interview_type ?? "",
-    scheduled_at: i.scheduled_at ?? "",
-  })) as Interview[];
-
+  const interviews = (data?.data ?? []) as Interview[];
   const totalPages = data?.totalPages ?? 0;
 
-  const handleView = (interview: Interview) => {
-    setSelectedInterview(interview);
-    setIsModalOpen(true);
-  };
-
-  const handleUpdateFilter = (key: string, value: string) => {
-    updateFilter(key as keyof typeof filters, value);
-  };
-
-  const handleDelete = async (interview: Interview) => {
-    await deleteInterview({
-      interviewId: interview.id,
-      seekerId: interview.seeker_id ?? "",
-    });
-  };
-
-  const stats = {
-    total: interviews.length,
-    upcoming: interviews.filter((i) => i.status === "upcoming").length,
-    pending_confirm: interviews.filter((i) => i.status === "pending_confirm")
-      .length,
-    completed: interviews.filter((i) => i.status === "completed").length,
-    cancelled: interviews.filter((i) => i.status === "cancelled").length,
-  };
-  console.log(interviews);
   return (
-    <main>
+    <div className="px-4 sm:px-6 lg:px-8 py-4">
       <InterviewHeader
-        totalInterviews={interviews.length}
-        filters={filters}
-        updateFilter={handleUpdateFilter}
         resetFilters={resetFilters}
-        role="employer"
+        updateFilter={updateFilter}
+        filter={filter}
+        setFilter={setFilter}
+        role={"employer"}
       />
-      {/* Stats Cards */}
-      <div className="pb-8">
-        <EmployerStatsCard stats={stats} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {interviews.length > 0 ? (
+          interviews.map((interview: Interview) => (
+            <InterviewCard
+              key={interview.id}
+              interview={interview}
+              role="employer"
+            />
+          ))
+        ) : (
+          <div className="col-span-full py-20 flex flex-col items-center justify-center text-center bg-card/50 rounded-3xl border border-dashed border-border">
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+              <Filter className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-2">
+              No interviews found
+            </h3>
+            <p className="text-muted-foreground max-w-md">
+              You {`don't`} have any {filter !== "all" ? filter : ""} interviews
+              at the moment.
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Main Content */}
-      <div>
-        <Card className="border-border shadow-lg">
-          <CardContent className="pt-6">
-            {/* Table */}
-            {isLoading ? (
-              <div className="py-12 text-center">
-                <Calendar className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4 animate-pulse" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  Loading interviews...
-                </h3>
-              </div>
-            ) : interviews.length > 0 ? (
-              <EmployerInterviewsTable
-                interviews={interviews}
-                onView={handleView}
-                onDeleteClick={handleDelete}
-                isDeleting={isDeleting}
-              />
-            ) : (
-              <div className="py-12 text-center">
-                <Calendar className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  No interviews found
-                </h3>
-                <p className="text-muted-foreground">
-                  Try adjusting your search or filters
-                </p>
-              </div>
-            )}
-          </CardContent>
-          <Pagination
-            currentPage={filters.page}
-            totalPages={totalPages}
-            onNext={() => updateFilter("page", (filters?.page ?? 1) + 1)}
-            onPrev={() => updateFilter("page", (filters?.page ?? 1) - 1)}
-          />
-        </Card>
-      </div>
-
-      {/* Modal */}
-      {selectedInterview && (
-        <EmployerInterviewModal
-          isView={true}
-          interview={selectedInterview}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          seekerId={selectedInterview?.seeker_id ?? ""}
-          applicationId={selectedInterview?.application_id ?? ""}
-        />
-      )}
-    </main>
+      <Pagination
+        page={filters.page ?? 1}
+        totalPages={totalPages}
+        onPageChange={(newPage) => updateFilter("page", newPage)}
+      />
+    </div>
   );
 };
 

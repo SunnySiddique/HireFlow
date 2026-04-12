@@ -34,11 +34,11 @@ export async function POST(req: Request) {
 
       const current_period_end = subscription.items.data[0].current_period_end;
 
-      const { userId, planKey } = session.metadata!;
+      const { userId, planName } = session.metadata!;
       const { error } = await supabase
         .from("subscriptions")
         .update({
-          plan: planKey,
+          plan: planName,
           subscription_id: session.subscription as string,
           subscription_status: "active",
           job_posts_used: 0,

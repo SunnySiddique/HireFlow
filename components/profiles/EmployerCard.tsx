@@ -1,7 +1,8 @@
+import { Employer } from "@/types/employer";
 import { Mail, MapPin, Users } from "lucide-react";
 import Image from "next/image";
 
-const EmployerCard = ({ employer }: { employer: any }) => {
+const EmployerCard = ({ employer }: { employer: Employer }) => {
   return (
     <div className="group flex flex-col overflow-hidden rounded-xl bg-card border border-border shadow-sm transition-all duration-300 hover:shadow-md hover:border-border/80 hover:-translate-y-1">
       <div className="p-5 flex-1 flex flex-col">

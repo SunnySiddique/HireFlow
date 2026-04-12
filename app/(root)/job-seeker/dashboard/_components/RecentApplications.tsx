@@ -19,61 +19,6 @@ import {
 import Link from "next/link";
 import EmptyState from "./EmptyState";
 
-const applications = [
-  {
-    id: 1,
-    company: "TechCorp Inc.",
-    logo: "TC",
-    logoColor: "from-blue-500 to-blue-700",
-    jobTitle: "Senior React Developer",
-    location: "San Francisco, CA",
-    type: "Full-time",
-    salary: "$120k - $150k",
-    appliedDate: "2 days ago",
-    status: "Under Review",
-    statusColor: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  },
-  {
-    id: 2,
-    company: "StartupXYZ",
-    logo: "SX",
-    logoColor: "from-purple-500 to-purple-700",
-    jobTitle: "Full Stack Engineer",
-    location: "Remote",
-    type: "Full-time",
-    salary: "$100k - $130k",
-    appliedDate: "4 days ago",
-    status: "Interview Scheduled",
-    statusColor: "bg-green-100 text-green-800 border-green-200",
-  },
-  {
-    id: 3,
-    company: "DesignStudio",
-    logo: "DS",
-    logoColor: "from-pink-500 to-pink-700",
-    jobTitle: "Frontend Developer",
-    location: "New York, NY",
-    type: "Hybrid",
-    salary: "$90k - $120k",
-    appliedDate: "1 week ago",
-    status: "Rejected",
-    statusColor: "bg-red-100 text-red-800 border-red-200",
-  },
-  {
-    id: 4,
-    company: "CloudTech",
-    logo: "CT",
-    logoColor: "from-cyan-500 to-cyan-700",
-    jobTitle: "React Native Developer",
-    location: "Austin, TX",
-    type: "Remote",
-    salary: "$110k - $140k",
-    appliedDate: "1 week ago",
-    status: "Applied",
-    statusColor: "bg-blue-100 text-blue-800 border-blue-200",
-  },
-];
-
 const jobStatusConfig: Record<string, string> = {
   open: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800",
   closed: "bg-muted text-muted-foreground border-border",

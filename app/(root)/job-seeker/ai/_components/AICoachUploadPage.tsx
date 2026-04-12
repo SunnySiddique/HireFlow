@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { extractPdfText } from "@/lib/utils/pdfExatact";
+import { AICareerAnalysisResult } from "@/types/aiJobseeker";
 import { motion } from "framer-motion";
 import { ShieldCheck, Sparkles, UploadCloud, Zap } from "lucide-react";
 import Image from "next/image";
@@ -56,7 +57,7 @@ const MiniCircularFitScore = ({
 
 const AICoachUploadPage = () => {
   const [isDragging, setIsDragging] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<AICareerAnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -90,7 +91,7 @@ const AICoachUploadPage = () => {
     await analyzeResume(text);
   };
 
-  const handleFileUpload = async (e) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -129,8 +130,10 @@ const AICoachUploadPage = () => {
       if (!json.success) throw new Error(json.error || "Analysis failed");
 
       setResult(json.data);
-    } catch (err) {
-      toast.error(err.message || "Something went wrong");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Something went wrong";
+      toast.error(message);
     } finally {
       setIsAnalyzing(false);
     }
