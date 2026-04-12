@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { twMerge } from "tailwind-merge";
 
@@ -55,13 +56,6 @@ export const formatSalary = (min: number, max: number, currency: string) => {
 };
 
 // fromate date
-export const formatDate = (dateStr: string) => {
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-};
 
 // formatLabel
 export const formatLabel = (value: string): string => {
@@ -124,4 +118,9 @@ export const interviewTime = (scheduledAt: string) => {
   const joinAvailableAt = new Date(interviewTime.getTime() - 5 * 60 * 1000);
 
   return new Date() >= joinAvailableAt;
+};
+
+// format date
+export const formatDate = (date: string | Date): string => {
+  return format(new Date(date), "MMM d, yyyy");
 };

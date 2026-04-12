@@ -10,7 +10,9 @@ import {
 } from "@/lib/action/jobs.actions";
 import { invalidateQuery } from "@/lib/react-query/invalidateQueries";
 import { createClient } from "@/lib/supabase/client";
+import { InterviewFilters } from "@/types/interview";
 import {
+  ApplicantType,
   JobFiltersType,
   jobFormData,
   jobUpdateFormData,
@@ -116,9 +118,9 @@ export const useDeleteJob = () => {
 };
 
 // get employer all applicants
-export const useGetAllApplicants = () => {
+export const useGetAllApplicants = (filters?: InterviewFilters) => {
   return useQuery({
-    queryKey: ["allApplicants"],
+    queryKey: ["applicants", filters?.status, filters?.page, filters?.archived],
     queryFn: async () => {
       const supabase = createClient();
 
@@ -126,9 +128,9 @@ export const useGetAllApplicants = () => {
         data: { user },
         error: authError,
       } = await supabase.auth.getUser();
-      if (!user || authError) redirect("/auth/signin");
+      if (!user || authError) throw new Error("Unathorized");
 
-      const { data, error } = await supabase
+      let query = supabase
         .from("applicants")
         .select(
           `
@@ -145,8 +147,30 @@ export const useGetAllApplicants = () => {
         .eq("employer_id", user.id)
         .order("applied_at", { ascending: false });
 
+      if (filters?.status && filters?.status !== "all") {
+        query = query.eq("status", filters?.status);
+      }
+
+      if (filters?.archived !== undefined) {
+        query = query.eq("archived", filters.archived);
+      }
+
+      // pagnination
+      const page = filters?.page ?? 1;
+      const limit = 5;
+
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+
+      query = query.range(from, to);
+
+      const { data, error, count } = await query;
+
       if (error) throw error;
-      return data;
+      return {
+        data: data as unknown as ApplicantType[],
+        totalPages: Math.ceil((count || 0) / limit),
+      };
     },
   });
 };
@@ -163,7 +187,7 @@ export const useArchiveApplicant = () => {
       isArchived: boolean;
     }) => archiveApplicant(applicationId, isArchived),
     onSuccess: () => {
-      invalidateQuery(queryClient, ["allApplicants"]);
+      invalidateQuery(queryClient, ["applicants"]);
     },
     onError: (error) => {
       toast.error(
@@ -188,7 +212,7 @@ export const useUpdateApplicantStatus = () => {
       employer_notes: string;
     }) => updateApplicantStatus(applicantId, status, employer_notes),
     onSuccess: () => {
-      invalidateQuery(queryClient, ["allApplicants"]);
+      invalidateQuery(queryClient, ["applicants"]);
     },
     onError: (error: any) => {
       toast.error(
@@ -529,9 +553,9 @@ export const useApplyJob = () => {
 };
 
 // get all applied jobs for current user
-export const useGetCurrentUserAppliedJobs = () => {
+export const useGetCurrentUserAppliedJobs = (filters?: InterviewFilters) => {
   return useQuery({
-    queryKey: ["getAllApplicants"],
+    queryKey: ["getAllApplicants", filters?.search, filters?.status],
     queryFn: async () => {
       const supabase = createClient();
 
@@ -541,7 +565,7 @@ export const useGetCurrentUserAppliedJobs = () => {
       } = await supabase.auth.getUser();
       if (userError || !user) redirect("/auth/signin");
 
-      const { data, error } = await supabase
+      let query = supabase
         .from("applicants")
         .select(
           `
@@ -573,16 +597,36 @@ export const useGetCurrentUserAppliedJobs = () => {
         )
         .eq("user_id", user.id);
 
+      if (filters?.search && filters.search.trim()) {
+        query = query.or(
+          `job.job_title.ilike.%${filters.search}%,job.employer.company_name.ilike.%${filters.search}%`,
+          { referencedTable: "job" },
+        );
+      }
+
+      if (filters?.status && filters.status !== "all") {
+        query = query.eq("status", filters.status);
+      }
+
+      const { data, error, count } = await query;
+
+      const page = filters?.page ?? 1;
+      const limit = filters?.limit ?? 10;
+
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+
+      query = query.range(from, to);
+
       if (error) throw error;
 
-      return data.map((appliedJob: any) => ({
+      const mapped = data.map((appliedJob: any) => ({
         id: appliedJob.id,
         job_id: appliedJob.job_id,
         application_status: appliedJob.status,
         employer_notes: appliedJob.employer_notes,
         cover_letter: appliedJob.cover_letter,
         applied_at: appliedJob.applied_at,
-
         job_title: appliedJob.job?.job_title,
         location: appliedJob.job?.location ?? null,
         salary_min: appliedJob.job?.salary_min ?? null,
@@ -595,6 +639,11 @@ export const useGetCurrentUserAppliedJobs = () => {
         currency: appliedJob.job?.currency ?? null,
         employer: appliedJob.job?.employer ?? null,
       }));
+
+      return {
+        data: mapped,
+        totalPages: Math.ceil((count || 0) / limit),
+      };
     },
   });
 };

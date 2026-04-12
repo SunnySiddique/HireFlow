@@ -41,6 +41,7 @@ const ApplicantDialog = ({
     status: applicant?.status || "pending",
     employer_notes: applicant?.employer_notes || "",
   });
+
   const handleUpdateApplicant = async () => {
     await updateApplicantStatus(
       {
@@ -217,6 +218,7 @@ const ApplicantDialog = ({
           <Button
             onClick={handleUpdateApplicant}
             className="w-full sm:w-1/2 bg-primary hover:bg-primary/90 text-primary-foreground"
+            disabled={isPending}
           >
             {isPending ? "Saving..." : "Save Changes"}
           </Button>
