@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 
 export const useGetCurrentUser = () => {
   return useQuery({
-    queryKey: ["currentUser"],
+    queryKey: ["current-user"],
     queryFn: async () => {
       const supabase = createClient();
 

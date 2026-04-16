@@ -11,10 +11,10 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import {
   useApplyJob,
-  useGetCurrentUserAppliedJobs,
-  useGetCurrentUserSaveJobs,
   useSavedJob,
-} from "@/hooks/useJobs";
+  useSeekerAppliedJobs,
+  useSeekerSavedJobs,
+} from "@/hooks/jobs/useSeekerJob";
 import { formatDeadline, formatLabel, formatSalary } from "@/lib/utils";
 import { Job } from "@/types/jobs";
 import { motion } from "framer-motion";
@@ -40,12 +40,12 @@ const HeaderCard = ({
   const [coverLetter, setCoverLetter] = useState("");
   const { mutate: applyJob, isPending: isApplying } = useApplyJob();
   const { mutate: saveJob } = useSavedJob();
-  const { data: appliedJob } = useGetCurrentUserAppliedJobs();
-  const { data: savedJobs } = useGetCurrentUserSaveJobs();
-
+  const { data } = useSeekerAppliedJobs();
+  const { data: savedJobs } = useSeekerSavedJobs();
+  const appliedJobs = data?.jobs;
   const router = useRouter();
 
-  const isApplied = appliedJob?.some(
+  const isApplied = appliedJobs?.some(
     (applicant) => applicant.job_id === job.id,
   );
   const isSaved = savedJobs?.some((save) => save.job_id === job.id);

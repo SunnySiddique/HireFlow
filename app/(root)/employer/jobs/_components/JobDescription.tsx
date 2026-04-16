@@ -5,6 +5,7 @@ import {
   Briefcase,
   Calendar,
   Check,
+  CircleDot,
   FileText,
   Star,
   Target,
@@ -17,9 +18,6 @@ import { UseFormReturn } from "react-hook-form";
 interface JobDescriptionProps {
   form: UseFormReturn<JobFormValues>;
 }
-
-//TODO: fix the profile featured button. and add the the featured button when employer create job
-// TODO: then filter the featured job in the browse job page
 
 const JobDescription = ({ form }: JobDescriptionProps) => {
   const [skillInput, setSkillInput] = useState<string>("");
@@ -372,20 +370,43 @@ const JobDescription = ({ form }: JobDescriptionProps) => {
       </div>
 
       {/* Application Deadline */}
-      <div className="space-y-2 pt-6 border-t border-border">
-        <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-secondary" />
-          <label className="text-sm font-bold text-foreground">
-            Application Deadline
-          </label>
+      <div className="grid grid-cols-2 gap-2 pt-6 border-t border-">
+        <div>
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-secondary" />
+            <label className="text-sm font-bold text-foreground">
+              Application Deadline
+            </label>
+          </div>
+          <CustomField
+            control={form.control}
+            name="applicationDeadline"
+            label=""
+            type="date"
+            placeholder=""
+          />
         </div>
-        <CustomField
-          control={form.control}
-          name="applicationDeadline"
-          label=""
-          type="date"
-          placeholder=""
-        />
+        {/* job status */}
+        <div>
+          <div className="flex items-center gap-2">
+            <CircleDot className="w-4 h-4 text-secondary" />
+            <label className="text-sm font-bold text-foreground">
+              Job Status
+            </label>
+          </div>
+          <CustomField
+            type="select"
+            control={form.control}
+            name="status"
+            label=""
+            options={[
+              { label: "Open", value: "open" },
+              { label: "Closed", value: "close" },
+              { label: "Pending", value: "pending" },
+            ]}
+            placeholder="Select Status"
+          />
+        </div>
       </div>
     </>
   );

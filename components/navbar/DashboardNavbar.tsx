@@ -4,13 +4,13 @@ import {
   getNotificationLink,
   NotificationIcon,
 } from "@/constants/notificationData";
-import { useEmployerProfile } from "@/hooks/useEmployer";
-import { useGetJobSeekerProfile } from "@/hooks/useJobSeeker";
+import { useEmployerProfile } from "@/hooks/employer-profile/useEmployer";
 import {
   useMarkAllNotificationsAsRead,
   useMarkNotificationAsRead,
   useNotifications,
-} from "@/hooks/useNotifications";
+} from "@/hooks/notification/useNotifications";
+import { useGetJobSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
 import { createClient } from "@/lib/supabase/client";
 import { getInitials, timeAgo } from "@/lib/utils";
 import { RealtimeChannel } from "@supabase/supabase-js";

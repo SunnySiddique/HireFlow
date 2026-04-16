@@ -1,7 +1,7 @@
 "use client";
 
-import { useEmployerProfiles } from "@/hooks/useEmployer";
-import { useSeekerProfiles } from "@/hooks/useJobSeeker";
+import { useEmployerProfiles } from "@/hooks/employer-profile/useEmployer";
+import { useSeekerProfiles } from "@/hooks/seeker-profile/useSeeker";
 import { Employer } from "@/types/employer";
 import { JobSeekerProfile } from "@/types/job-seeker";
 import { Search, Star } from "lucide-react";

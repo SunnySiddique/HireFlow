@@ -12,13 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEmployerProfile } from "@/hooks/useEmployer";
-import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
 import {
   useDeleteJob,
-  useGetEmployerJobs,
+  useEmployerJobs,
   useUpdateJobStatus,
-} from "@/hooks/useJobs";
+} from "@/hooks/jobs/useEmployerJobs";
 import { formatLabel, formatSalary } from "@/lib/utils";
 import { Job } from "@/types/jobs";
 import { motion } from "framer-motion";
@@ -39,21 +37,19 @@ import { useEffect, useState } from "react";
 const getStatusColor = (status: string) => {
   switch (status) {
     case "open":
-      return "bg-green-50 text-green-700 ...";
+      return "bg-emerald-50 text-emerald-700 border-emerald-200 ring-1 ring-emerald-600/20";
     case "closed":
-      return "bg-red-50 text-red-700 ...";
+      return "bg-rose-50 text-rose-700 border-rose-200 ring-1 ring-rose-600/20";
+    case "pending":
+      return "bg-amber-50 text-amber-700 border-amber-200 ring-1 ring-amber-600/20";
     default:
       return "bg-muted text-muted-foreground border-border";
   }
 };
 
 const ManageJobsPage = () => {
-  const { data: user } = useGetCurrentUser();
-  useEmployerProfile();
   const { mutateAsync: updateStatus } = useUpdateJobStatus();
-  const { data: empJobs, isLoading: empJobLoading } = useGetEmployerJobs(
-    user?.id as string,
-  );
+  const { data: empJobs, isLoading: empJobLoading } = useEmployerJobs();
   const { mutateAsync: deleteJobPost, isPending: isDeletingJob } =
     useDeleteJob();
 
@@ -139,6 +135,7 @@ const ManageJobsPage = () => {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="open">Open</SelectItem>
+                            <SelectItem value="pending">Pending</SelectItem>
                             <SelectItem value="closed">Closed</SelectItem>
                           </SelectContent>
                         </Select>

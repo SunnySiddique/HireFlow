@@ -18,8 +18,8 @@ import {
 import { Button } from "../ui/button";
 
 import { getStatusConfig } from "@/constants/InterviewsData";
-import { useDeleteInterview } from "@/hooks/useInterview";
-import { useInterviewTimer } from "@/hooks/useInterviewTimer";
+import { useDeleteInterview } from "@/hooks/interview/useInterview";
+import { useInterviewTimer } from "@/hooks/interview/useInterviewTimer";
 import { Interview } from "@/types/interview";
 import { useState } from "react";
 import EmployerInterviewModal from "../employer/interviews/EmployerInterviewModal";

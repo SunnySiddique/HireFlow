@@ -3,9 +3,9 @@
 import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useInterviewFilters } from "@/hooks/interview/useInterviewFilters";
+import { useSeekerAppliedJobs } from "@/hooks/jobs/useSeekerJob";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useInterviewFilters } from "@/hooks/useInterviewFilters";
-import { useGetCurrentUserAppliedJobs } from "@/hooks/useJobs";
 import { cn } from "@/lib/utils";
 import { applicantFiltersType } from "@/types/interview";
 import { BriefcaseBusiness, Search, X } from "lucide-react";
@@ -18,13 +18,14 @@ const JobSeekerApplicationsPage = () => {
   const [filter, setFilter] = useState<applicantFiltersType>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const debounceSearch = useDebounce(searchQuery, 500);
-  const { data, isLoading } = useGetCurrentUserAppliedJobs({
+  const { data, isLoading } = useSeekerAppliedJobs({
     ...filters,
     search: debounceSearch,
   });
-  const applications = data?.data ?? [];
+  const applications = data?.jobs ?? [];
 
   const totalPages = data?.totalPages ?? 0;
+
   const statuses = [
     "pending",
     "reviewing",
@@ -71,7 +72,10 @@ const JobSeekerApplicationsPage = () => {
 
           <div className="flex items-center gap-2 bg-card p-1.5 rounded-xl border border-border/50 shadow-sm overflow-x-auto hide-scrollbar w-full md:w-auto">
             <button
-              onClick={() => setFilter("all")}
+              onClick={() => {
+                updateFilter("status", "all");
+                setFilter("all");
+              }}
               className={cn(
                 "px-5 py-2.5 rounded-lg text-sm font-bold capitalize transition-all whitespace-nowrap",
                 filter === "all"

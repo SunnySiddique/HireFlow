@@ -4,12 +4,12 @@ import JobCard from "@/components/jobs/JobCard";
 import JobCardSkeleton from "@/components/jobs/JobCardSkeleton";
 import Loader from "@/components/Loader";
 import { SALARY_RANGES } from "@/constants/jobsData";
-import { useGetAllJobsForJobSeeker } from "@/hooks/useJobs";
-import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
+import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { hasAccess } from "@/lib/utils";
 import { JobFiltersType } from "@/types/jobs";
 import { useState } from "react";
 
+import { useSeekerJobs } from "@/hooks/jobs/useSeekerJob";
 import JobTopBar from "./_components/JobTopBar";
 import NoJobsFound from "./_components/NoJobsFound";
 import Pagination from "./_components/Pagination";
@@ -38,7 +38,7 @@ const BrowseJobs = () => {
     data = { jobs: [], totalCount: 0, totalPages: 0 },
     isLoading,
     isFetching,
-  } = useGetAllJobsForJobSeeker(filters);
+  } = useSeekerJobs(filters);
 
   const { jobs, totalCount, totalPages } = data;
 

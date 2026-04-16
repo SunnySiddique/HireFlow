@@ -3,8 +3,8 @@
 import InterviewCard from "@/components/interview/InterviewCard";
 import InterviewHeader from "@/components/interview/InterviewHeader";
 import Loader from "@/components/Loader";
-import { useInterviews } from "@/hooks/useInterview";
-import { useInterviewFilters } from "@/hooks/useInterviewFilters";
+import { useInterviews } from "@/hooks/interview/useInterview";
+import { useInterviewFilters } from "@/hooks/interview/useInterviewFilters";
 import { filtersType, Interview } from "@/types/interview";
 import { Filter } from "lucide-react";
 import { useState } from "react";

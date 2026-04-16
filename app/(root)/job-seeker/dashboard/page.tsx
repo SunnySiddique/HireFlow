@@ -2,7 +2,7 @@
 
 import Loader from "@/components/Loader";
 import UnSubscribeEmptyState from "@/components/UnSubscribeEmptyState";
-import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
+import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { hasAccess } from "@/lib/utils";
 import DashboardStats from "./_components/DashboardStats";
 import ProfileCompletion from "./_components/ProfileCompletion";

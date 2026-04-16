@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useRecommandedJobs } from "@/hooks/useJobs";
+import { useRecommandedJobs } from "@/hooks/jobs/useSeekerJob";
 import {
   formatDate,
   formatLabel,

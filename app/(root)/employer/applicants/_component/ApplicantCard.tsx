@@ -1,7 +1,7 @@
 import EmployerInterviewModal from "@/components/employer/interviews/EmployerInterviewModal";
 import { Button } from "@/components/ui/button";
-import { useInterviews } from "@/hooks/useInterview";
-import { useArchiveApplicant } from "@/hooks/useJobs";
+import { useInterviews } from "@/hooks/interview/useInterview";
+import { useArchiveApplicant } from "@/hooks/jobs/useApplicants";
 import { cn } from "@/lib/utils";
 import { randomImage } from "@/lib/utils/randomImage";
 import { ApplicantType } from "@/types/jobs";

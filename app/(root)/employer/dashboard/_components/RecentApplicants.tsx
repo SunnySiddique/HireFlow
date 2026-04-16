@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import { useRecentApplicants } from "@/hooks/useJobs";
+import { useRecentApplicants } from "@/hooks/jobs/useEmployerJobs";
 import { getInitials, timeAgo } from "@/lib/utils";
 import Image from "next/image";
 

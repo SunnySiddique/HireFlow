@@ -2,11 +2,11 @@
 
 import SavedJobCard from "@/components/jobs/SavedJobCard";
 import Loader from "@/components/Loader";
-import { useGetCurrentUserSaveJobs } from "@/hooks/useJobs";
+import { useSeekerSavedJobs } from "@/hooks/jobs/useSeekerJob";
 import { Bookmark } from "lucide-react";
 
 const SavedJobsPage = () => {
-  const { data: savedJobs, isLoading } = useGetCurrentUserSaveJobs();
+  const { data: savedJobs, isLoading } = useSeekerSavedJobs();
 
   if (isLoading) return <Loader mode="inline" />;
 

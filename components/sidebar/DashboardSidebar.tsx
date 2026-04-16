@@ -19,9 +19,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { employerLinks, FREE_LINKS, jobSeekerLinks } from "@/constants";
-import { useEmployerProfile } from "@/hooks/useEmployer";
-import { useGetJobSeekerProfile } from "@/hooks/useJobSeeker";
-import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
+import { useEmployerProfile } from "@/hooks/employer-profile/useEmployer";
+import { useGetJobSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
+import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { createClient } from "@/lib/supabase/client";
 import { getInitials, hasAccess } from "@/lib/utils";
 import { Check, MonitorIcon, Moon, PaletteIcon, Sun } from "lucide-react";
@@ -81,7 +81,7 @@ const DashboardSidebar = ({
 
   const mainLinks = filteredLinks.filter((l) => l.section === "main");
   const manageLinks = filteredLinks.filter((l) => l.section === "manage");
-
+  console.log("emp:", employerProfile);
   const renderLink = (link: any) => {
     const href =
       typeof link.href === "function"

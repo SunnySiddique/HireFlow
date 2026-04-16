@@ -2,7 +2,7 @@
 
 import InterviewCard from "@/components/interview/InterviewCard";
 import Loader from "@/components/Loader";
-import { useUpcomingInterviews } from "@/hooks/useInterview";
+import { useUpcomingInterviews } from "@/hooks/interview/useInterview";
 
 const UpcomingInterviewsPage = () => {
   const { data: upcomingInterviews = [], isLoading } =

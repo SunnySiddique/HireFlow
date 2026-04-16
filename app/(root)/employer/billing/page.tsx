@@ -2,7 +2,7 @@
 
 import Checkout from "@/components/subscription/Checkout";
 import { employerPlans } from "@/constants/BillingData";
-import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
+import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { cn } from "@/lib/utils";
 import { Check, Info } from "lucide-react";
 

@@ -2,12 +2,14 @@
 
 import InterviewCard from "@/components/interview/InterviewCard";
 import InterviewHeader from "@/components/interview/InterviewHeader";
-import { useInterviews } from "@/hooks/useInterview";
-import { useInterviewFilters } from "@/hooks/useInterviewFilters";
+import { useInterviews } from "@/hooks/interview/useInterview";
+import { useInterviewFilters } from "@/hooks/interview/useInterviewFilters";
 import { filtersType, Interview } from "@/types/interview";
 import { Filter } from "lucide-react";
 import { useState } from "react";
 import Pagination from "../../job-seeker/jobs/_components/Pagination";
+
+//TODO check the entier app from screatch and responsive
 
 const EmployerInterviewsPage = () => {
   const { filters, updateFilter, resetFilters } = useInterviewFilters();

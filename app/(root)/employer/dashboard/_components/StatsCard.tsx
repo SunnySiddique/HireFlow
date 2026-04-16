@@ -1,77 +1,33 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { useGetEmployerApplicationStats } from "@/hooks/useDashboard";
-import {
-  BarChart3,
-  Briefcase,
-  EyeIcon,
-  TrendingDown,
-  TrendingUp,
-  Users,
-} from "lucide-react";
+import { EMPLOYER_STATS_CONFIG } from "@/constants/dashboard.config";
+import { useEmployerApplicationStats } from "@/hooks/stats/useStats";
+import { createEmployerStatsData } from "@/lib/dashboard/stats-data";
+import { TrendingDown, TrendingUp } from "lucide-react";
 
 const StatsCard = () => {
-  const { data } = useGetEmployerApplicationStats();
-  const totalActiveJobs = data?.totalActiveJobs ?? 0;
-  const totalApplicants = data?.thisWeekApplicants ?? 0;
-  const thisWeekTotalViews = data?.totalProfileViews ?? 0;
-  const thisWeekJobViews = data?.thisWeekJobViews ?? 0;
+  const { data } = useEmployerApplicationStats();
+  const stats = createEmployerStatsData({
+    totalActiveJobs: data?.totalActiveJobs ?? 0,
+    weeklyApplicants: data?.weeklyApplicants ?? 0,
+    totalProfileViews: data?.totalProfileViews ?? 0,
+    weeklyJobViews: data?.weeklyJobViews ?? 0,
+  });
 
-  const statsData = [
-    {
-      title: "Active Jobs",
-      value: totalActiveJobs,
-      change:
-        totalActiveJobs > 0
-          ? `+${totalActiveJobs} this week`
-          : "No active jobs this week",
-      arrowIcon: totalActiveJobs > 0 ? TrendingUp : TrendingDown,
-      arrowColor: totalActiveJobs > 0 ? "text-green-600" : "text-red-600",
-      icon: Briefcase,
-      iconBg: "bg-primary/10",
-      iconColor: "text-primary",
-    },
-    {
-      title: "Total Applicants",
-      value: totalApplicants,
-      change:
-        totalApplicants > 0
-          ? `+${totalApplicants} new`
-          : "No applicants this week",
-      arrowIcon: totalApplicants > 0 ? TrendingUp : TrendingDown,
-      arrowColor: totalApplicants > 0 ? "text-green-600" : "text-red-600",
-      icon: Users,
-      iconBg: "bg-blue-500/10",
-      iconColor: "text-blue-500",
-    },
-    {
-      title: "Profile Views",
-      value: thisWeekTotalViews,
-      change:
-        thisWeekTotalViews > 0
-          ? `+${thisWeekTotalViews} new`
-          : "No profile views this week",
-      arrowIcon: thisWeekTotalViews > 0 ? TrendingUp : TrendingDown,
-      arrowColor: thisWeekTotalViews > 0 ? "text-green-600" : "text-red-600",
-      icon: EyeIcon,
-      iconBg: "bg-purple-500/10",
-      iconColor: "text-purple-500",
-    },
-    {
-      title: "Job Views",
-      value: thisWeekJobViews,
-      change:
-        thisWeekJobViews > 0
-          ? `+${thisWeekJobViews} this week`
-          : "No job views this week",
-      arrowIcon: thisWeekJobViews > 0 ? TrendingUp : TrendingDown,
-      arrowColor: thisWeekJobViews > 0 ? "text-green-600" : "text-red-600",
-      icon: BarChart3,
-      iconBg: "bg-blue-500/10",
-      iconColor: "text-blue-500",
-    },
-  ];
+  const statsData = stats.map((stat) => {
+    const config = EMPLOYER_STATS_CONFIG[stat.id];
+
+    return {
+      ...stat,
+      title: config.title,
+      icon: config.icon,
+      iconBg: config.iconBg,
+      iconColor: config.iconColor,
+      arrowIcon: stat.trend === "up" ? TrendingUp : TrendingDown,
+      arrowColor: stat.trend === "up" ? "text-green-600" : "text-red-600",
+    };
+  });
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 mb-10">

@@ -2,7 +2,7 @@
 
 import Loader from "@/components/Loader";
 import { getStatusConfig } from "@/constants/InterviewsData";
-import { useInterview } from "@/hooks/useInterview";
+import { useInterview } from "@/hooks/interview/useInterview";
 import { cn } from "@/lib/utils";
 import { Calendar, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { useGetJobSeekerProfile } from "@/hooks/useJobSeeker";
+import { useGetJobSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
 import { JobSeekerProfile } from "@/types/job-seeker";
 import {
   Briefcase,

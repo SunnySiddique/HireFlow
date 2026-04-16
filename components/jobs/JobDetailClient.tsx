@@ -1,9 +1,9 @@
 "use client";
 
+import { useSeekerSimilerJobs } from "@/hooks/jobs/useSeekerJob";
+import { useTrackJobView } from "@/hooks/profile-view/useViews";
+import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
-import { useGetSimilarJobs } from "@/hooks/useJobs";
-import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
-import { useTrackJobView } from "@/hooks/useViews";
 import { hasAccess } from "@/lib/utils";
 import { Job } from "@/types/jobs";
 import { useEffect } from "react";
@@ -14,7 +14,7 @@ import Loader from "../Loader";
 import JobCard from "./JobCard";
 
 const JobDetailClient = ({ job }: { job: Job }) => {
-  const { data: similarJobs = [], isLoading } = useGetSimilarJobs(job.id);
+  const { data: similarJobs = [], isLoading } = useSeekerSimilerJobs(job.id);
   const { data: currentUser } = useGetCurrentUser();
   const { mutate: trackView } = useTrackJobView();
   const { data: subscription } = useGetCurrentUserSubscription();

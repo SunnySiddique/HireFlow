@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useUpdateApplicantStatus } from "@/hooks/useJobs";
+import { useUpdateApplicantStatus } from "@/hooks/jobs/useApplicants";
 import { formatDate, getInitials } from "@/lib/utils";
 import { ApplicantType } from "@/types/jobs";
 import { ExternalLink } from "lucide-react";
