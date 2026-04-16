@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useGetJobSeekerProfile } from "@/hooks/useJobSeeker";
+import { useGetJobSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
 import { getInitials } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";

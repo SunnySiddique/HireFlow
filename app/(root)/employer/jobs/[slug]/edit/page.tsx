@@ -1,4 +1,4 @@
-import { getJobPostBySlug } from "@/lib/action/jobs.actions";
+import { getJobBySlug } from "@/lib/action/jobs/employer-jobs.actions";
 import NoJobsFound from "../../../../../../components/jobs/NoJobsFound";
 import CreateJobForm from "../../_components/CreateJobForm";
 interface PageProps {
@@ -7,7 +7,7 @@ interface PageProps {
 
 const EditJobPage = async ({ params }: PageProps) => {
   const { slug } = await params;
-  const result = await getJobPostBySlug(slug);
+  const result = await getJobBySlug(slug);
 
   if (!result) return <NoJobsFound isEmployer={true} />;
   return (

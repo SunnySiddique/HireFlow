@@ -1,7 +1,7 @@
 "use client";
 
 import UnSubscribeEmptyState from "@/components/UnSubscribeEmptyState";
-import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
+import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { hasAccess } from "@/lib/utils";
 import JobListings from "./_components/JobListings";
 import RecentApplicants from "./_components/RecentApplicants";

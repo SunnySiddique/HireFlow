@@ -6,10 +6,10 @@ import {
   useEmployerProfileBySlug,
   useUpdateEmployer,
   useUploadCompanyLogo,
-} from "@/hooks/useEmployer";
-import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
+} from "@/hooks/employer-profile/useEmployer";
+import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { hasAccess, MAX_PROFILE_SIZE } from "@/lib/utils";
-import { EmployerFormData, EmployerType } from "@/types/employer";
+import { EmployerFormData } from "@/types/employer";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -73,7 +73,6 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
     subscription?.plan_expires_at as string,
   );
 
-  console.log(employerProfile);
   // states
   const [editMode, setEditMode] = useState(false);
   const [activeSection, setActiveSection] = useState("about");

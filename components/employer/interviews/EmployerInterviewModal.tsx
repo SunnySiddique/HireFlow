@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { DURATION_OPTIONS } from "@/constants/InterviewsData";
-import { useSendInterviewInvite } from "@/hooks/useInterview";
+import { useSendInterviewInvite } from "@/hooks/interview/useInterview";
 import { Interview } from "@/types/interview";
 import { CalendarDays, Clock, MapPin, Phone, Timer, Video } from "lucide-react";
 import { ChangeEvent, useState } from "react";

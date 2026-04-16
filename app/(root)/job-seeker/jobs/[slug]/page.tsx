@@ -1,5 +1,5 @@
 import NoJobsFound from "@/components/jobs/NoJobsFound";
-import { getJobPostBySlug } from "@/lib/action/jobs.actions";
+import { getJobPostBySlug } from "@/lib/action/jobs/employer-jobs.actions";
 import JobDetailClient from "../../../../../components/jobs/JobDetailClient";
 
 interface JobDetailsPageProps {

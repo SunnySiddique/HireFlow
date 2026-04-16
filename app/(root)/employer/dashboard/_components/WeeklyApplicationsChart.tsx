@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { useChartApplicants } from "@/hooks/useJobs";
+import { useChartApplicants } from "@/hooks/jobs/useEmployerJobs";
 import {
   Bar,
   BarChart,

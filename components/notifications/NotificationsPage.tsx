@@ -8,7 +8,7 @@ import {
   useDeleteAllNotifications,
   useMarkAllNotificationsAsRead,
   useNotifications,
-} from "@/hooks/useNotifications";
+} from "@/hooks/notification/useNotifications";
 import { NotificationType } from "@/types/notification";
 import { useState } from "react";
 import { NotificationActions } from "./NotificationActions";

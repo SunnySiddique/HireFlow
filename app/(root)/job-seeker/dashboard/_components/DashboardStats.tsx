@@ -1,15 +1,10 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { useGetJobSeekerApplicationStats } from "@/hooks/useDashboard";
-import {
-  Clock,
-  Eye,
-  FileText,
-  Heart,
-  TrendingDown,
-  TrendingUp,
-} from "lucide-react";
+import { DASHBOARD_STATS_CONFIG } from "@/constants/dashboard.config";
+import { useSeekerApplicationStats } from "@/hooks/stats/useStats";
+import { createStatsData } from "@/lib/dashboard/stats-data";
+import { TrendingDown, TrendingUp } from "lucide-react";
 
 const DashboardStats = ({
   isSubscribed,
@@ -18,70 +13,28 @@ const DashboardStats = ({
   isSubscribed: boolean;
   isAcceleratorPlan: boolean;
 }) => {
-  const { data } = useGetJobSeekerApplicationStats();
-  const thisWeekApplications = data?.thisWeekApplications ?? 0;
-  const totalProfileViews = data?.thisWeekProfileviews ?? 0;
+  const { data } = useSeekerApplicationStats();
 
-  const thisMonthSavedJobs = data?.thisMonthSavedJobs ?? 0;
-  const upcomingInteview = data?.thisWeekUpcomingInterview ?? 0;
+  const stats = createStatsData({
+    weeklyApplications: data?.weeklyApplications ?? 0,
+    monthlySavedJobs: data?.monthlySavedJobs ?? 0,
+    weeklyInterviews: data?.weeklyInterviews ?? 0,
+    weeklyProfileViews: data?.weeklyProfileViews ?? 0,
+  });
 
-  const statsData = [
-    {
-      id: "applications-sent",
-      title: "Applications Sent",
-      value: thisWeekApplications,
-      change:
-        thisWeekApplications > 0
-          ? `+${thisWeekApplications} this week`
-          : "No applications this week",
-      arrowIcon: thisWeekApplications > 0 ? TrendingUp : TrendingDown,
-      arrowColor: thisWeekApplications > 0 ? "text-green-600" : "text-red-600",
-      icon: FileText,
-      iconBg: "bg-primary/10",
-      iconColor: "text-primary",
-    },
-    {
-      id: "saved-jobs",
-      title: "Saved Jobs",
-      value: thisMonthSavedJobs,
-      change:
-        thisMonthSavedJobs > 0
-          ? `+${thisMonthSavedJobs} this month`
-          : "No applications this month",
-      arrowIcon: thisMonthSavedJobs > 0 ? TrendingUp : TrendingDown,
-      arrowColor: thisMonthSavedJobs > 0 ? "text-green-600" : "text-red-600",
-      icon: Heart,
-      iconBg: "bg-red-50",
-      iconColor: "text-red-500",
-    },
-    {
-      title: "Interview Scheduled",
-      value: upcomingInteview,
-      change:
-        upcomingInteview > 0
-          ? `+${upcomingInteview} this ween`
-          : "No applications this ween",
-      arrowIcon: upcomingInteview > 0 ? TrendingUp : TrendingDown,
-      arrowColor: upcomingInteview > 0 ? "text-green-600" : "text-red-600",
-      icon: Clock,
-      iconBg: "bg-red-50",
-      iconColor: "text-red-500",
-    },
-    {
-      id: "profile-views",
-      title: "Profile Views",
-      value: totalProfileViews,
-      change:
-        totalProfileViews > 0
-          ? `+${totalProfileViews} this week`
-          : "No views this week",
-      arrowIcon: totalProfileViews > 0 ? TrendingUp : TrendingDown,
-      arrowColor: totalProfileViews > 0 ? "text-green-600" : "text-red-600",
-      icon: Eye,
-      iconBg: "bg-red-50",
-      iconColor: "text-red-500",
-    },
-  ];
+  const statsData = stats.map((stat) => {
+    const config = DASHBOARD_STATS_CONFIG[stat.id];
+
+    return {
+      ...stat,
+      title: config.title,
+      icon: config.icon,
+      iconBg: config.iconBg,
+      iconColor: config.iconColor,
+      arrowIcon: stat.trend === "up" ? TrendingUp : TrendingDown,
+      arrowColor: stat.trend === "up" ? "text-green-600" : "text-red-600",
+    };
+  });
 
   const filteredStats = statsData.filter((stat) => {
     if (!isSubscribed && stat.id === "profile-views") return false;

@@ -2,9 +2,9 @@
 
 import Loader from "@/components/Loader";
 import NavigationSidebar from "@/components/NavigationSidebar";
+import { useTrackSeekerProfileView } from "@/hooks/profile-view/useViews";
+import { useGetJobSeekerProfileBySlug } from "@/hooks/seeker-profile/useSeeker";
 import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
-import { useGetJobSeekerProfileBySlug } from "@/hooks/useJobSeeker";
-import { useTrackSeekerProfileView } from "@/hooks/useViews";
 import {
   EducationItem,
   ExperienceItem,

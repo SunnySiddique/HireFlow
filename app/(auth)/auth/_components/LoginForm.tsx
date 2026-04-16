@@ -10,7 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AUTH_TABS } from "@/constants";
-import { useLoginUser } from "@/hooks/useAuth";
+import { useLoginUser } from "@/hooks/auth/useAuth";
+import { createClient } from "@/lib/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Chrome, Github } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -21,7 +22,6 @@ import { z } from "zod";
 import { Form } from "../../../../components/ui/form";
 import AuthField from "./AuthField";
 import AuthTabs from "./AuthTabs";
-import { createClient } from "@/lib/supabase/client";
 
 const jobSeekerSchema = z.object({
   email: z.string().email("Invalid email address"),

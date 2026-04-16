@@ -3,8 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { buttonText } from "@/constants/employerData";
-import { useEmployerProfile } from "@/hooks/useEmployer";
-import { useCreateJob, useUpdateJob } from "@/hooks/useJobs";
+import { useEmployerProfile } from "@/hooks/employer-profile/useEmployer";
+import { useCreateJob, useUpdateJob } from "@/hooks/jobs/useEmployerJobs";
 import { createSlug } from "@/lib/utils";
 import { JobFormValues } from "@/types/jobs";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,7 +49,7 @@ const jobFormSchema = z
       .min(1, "At least one responsibility is needed"),
     applicationDeadline: z.string().optional(),
     isFeatured: z.boolean().default(false),
-    status: z.string().default("draft"),
+    status: z.string().default("open"),
   })
   .refine((data) => data.maximumSalary >= data.minimumSalary, {
     message: "Maximum salary must be greater than or equal to minimum salary",
@@ -88,8 +88,11 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
       requirements: initialData?.requirements || [],
       responsibilities: initialData?.responsibilities || [],
       skills: initialData?.skills_required || [],
-      applicationDeadline: initialData?.application_deadline || "",
+      applicationDeadline: initialData?.application_deadline
+        ? new Date(initialData.application_deadline).toISOString().split("T")[0]
+        : "",
       isFeatured: initialData?.is_featured || false,
+      status: initialData.status || "open",
     },
   });
 

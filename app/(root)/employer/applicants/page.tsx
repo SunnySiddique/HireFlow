@@ -2,8 +2,8 @@
 
 import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
-import { useInterviewFilters } from "@/hooks/useInterviewFilters";
-import { useGetAllApplicants } from "@/hooks/useJobs";
+import { useInterviewFilters } from "@/hooks/interview/useInterviewFilters";
+import { useEmployerApplicants } from "@/hooks/jobs/useApplicants";
 import { cn } from "@/lib/utils";
 import { exportToExcel } from "@/lib/utils/excel";
 import { applicantFiltersType } from "@/types/interview";
@@ -18,7 +18,7 @@ const EmployerApplicantsPage = () => {
 
   const { filters, updateFilter, resetFilters } = useInterviewFilters();
 
-  const { data, isLoading } = useGetAllApplicants(filters);
+  const { data, isLoading } = useEmployerApplicants(filters);
 
   const applicants = data?.data ?? [];
   const totalPages = data?.totalPages ?? 0;

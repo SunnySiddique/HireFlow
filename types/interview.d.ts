@@ -1,4 +1,4 @@
-export interface sendInterviewInviteType {
+export interface InterviewInvite {
   id?: string;
   interviewer_id?: string | null;
   seeker_id: string;

@@ -1,8 +1,8 @@
 "use client";
 
 import Loader from "@/components/Loader";
-import { useGetJobSeekerProfile } from "@/hooks/useJobSeeker";
-import { useVapi } from "@/hooks/useVapi";
+import { useGetJobSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
+import { useVapi } from "@/hooks/vapi/useVapi";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { MessageSquare, Phone, PhoneOff, Sparkles } from "lucide-react";

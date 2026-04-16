@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useTrackEmployerProfileView } from "@/hooks/profile-view/useViews";
+import { useCompanyProfile } from "@/hooks/public-profile/usePublicProfile";
 import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
-import { useCompanyProfile } from "@/hooks/usePublicProfile";
-import { useTrackEmployerProfileView } from "@/hooks/useViews";
 import { formatDate } from "@/lib/utils";
 import {
   ArrowLeft,

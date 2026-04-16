@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { getStatusBadge } from "@/constants/InterviewsData";
-import { useUpdateInterviewStatus } from "@/hooks/useInterview";
+import { useUpdateInterviewStatus } from "@/hooks/interview/useInterview";
 import { interviewTime } from "@/lib/utils";
 import { Interview } from "@/types/interview";
 import {

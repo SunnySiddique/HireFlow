@@ -14,7 +14,7 @@ import {
 import {
   useDeleteNotification,
   useMarkNotificationAsRead,
-} from "@/hooks/useNotifications";
+} from "@/hooks/notification/useNotifications";
 import { Notification } from "@/types/notification";
 import { MoreVertical } from "lucide-react";
 import toast from "react-hot-toast";

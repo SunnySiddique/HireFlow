@@ -16,8 +16,8 @@ import {
   useGetJobSeekerProfileBySlug,
   useSaveJobSeekerProfile,
   useUploadProfileAndResume,
-} from "@/hooks/useJobSeeker";
-import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
+} from "@/hooks/seeker-profile/useSeeker";
+import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { hasAccess, MAX_PROFILE_SIZE, MAX_RESUME_SIZE } from "@/lib/utils";
 import {
   EducationItem,

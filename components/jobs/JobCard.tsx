@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useGetCurrentUserSaveJobs, useSavedJob } from "@/hooks/useJobs";
+import { useSavedJob, useSeekerSavedJobs } from "@/hooks/jobs/useSeekerJob";
 import { formatLabel, formatSalary, getInitials } from "@/lib/utils";
 import { Job } from "@/types/jobs";
 import {
@@ -32,7 +32,7 @@ const JobCard = ({
   featured = false,
 }: JobCardProps) => {
   const { mutate: saveJob } = useSavedJob();
-  const { data: savedJobs } = useGetCurrentUserSaveJobs();
+  const { data: savedJobs } = useSeekerSavedJobs();
   const isSaved = savedJobs?.some((s) => s.job_id === job.id);
 
   const detailHref = href ?? `/job-seeker/jobs/${job.job_slug}`;

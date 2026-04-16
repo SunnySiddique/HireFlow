@@ -1,5 +1,5 @@
 import JobDetailClient from "@/components/jobs/JobDetailClient";
-import { getJobPostBySlug } from "@/lib/action/jobs.actions";
+import { getJobBySlug } from "@/lib/action/jobs/employer-jobs.actions";
 import { Job } from "@/types/jobs";
 import NoJobsFound from "../../../../../components/jobs/NoJobsFound";
 
@@ -12,8 +12,7 @@ const EmployerDetailViewPage = async ({
 }: EmployerDetailViewPageProps) => {
   const { slug } = await params;
 
-  const jobPost = await getJobPostBySlug(slug);
-  console.log(jobPost);
+  const jobPost = await getJobBySlug(slug);
   if (!jobPost) return <NoJobsFound isEmployer={true} />;
   return (
     <>

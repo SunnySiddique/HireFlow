@@ -1,4 +1,4 @@
-import { analyzeResumeAndJobMatch } from "@/lib/ai/mentor";
+import { analyzeResumeAndJobMatchService } from "@/lib/services/ai/job-matching.service";
 
 export async function POST(req: Request) {
   try {
@@ -11,14 +11,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const data = await analyzeResumeAndJobMatch(resume);
+    const data = await analyzeResumeAndJobMatchService(resume);
     return Response.json({ success: true, data });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     console.error("Resume analysis error:", error);
     return Response.json(
       {
         success: false,
-        error: error.message || "Something went wrong during AI analysis",
+        error: message || "Something went wrong during AI analysis",
       },
       { status: 500 },
     );

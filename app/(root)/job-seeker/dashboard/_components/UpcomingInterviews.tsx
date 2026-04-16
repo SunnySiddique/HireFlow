@@ -1,5 +1,5 @@
 import InterviewCard from "@/components/interview/InterviewCard";
-import { useUpcomingInterviews } from "@/hooks/useInterview";
+import { useUpcomingInterviews } from "@/hooks/interview/useInterview";
 import Link from "next/link";
 
 const UpcomingInterviews = () => {

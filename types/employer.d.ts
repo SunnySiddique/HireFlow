@@ -1,6 +1,6 @@
 export type EmployerFormData = z.infer<typeof employerSchema>;
 
-export interface EmployerType {
+export interface EmployerDB {
   company_name: string;
   website?: string;
   company_logo_url?: string | null;

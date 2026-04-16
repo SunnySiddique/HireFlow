@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useActiveJobs, useDeleteJob } from "@/hooks/useJobs";
+import { useActiveJobs, useDeleteJob } from "@/hooks/jobs/useEmployerJobs";
 import { formatLabel } from "@/lib/utils";
 import { Edit, Eye, Loader2, Trash2 } from "lucide-react";
 import Link from "next/link";

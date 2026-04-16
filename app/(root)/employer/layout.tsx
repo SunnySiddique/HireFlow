@@ -3,8 +3,8 @@
 import Loader from "@/components/Loader";
 import DashboardNavbar from "@/components/navbar/DashboardNavbar";
 import DashboardSidebar from "@/components/sidebar/DashboardSidebar";
-import { useEmployerProfile } from "@/hooks/useEmployer";
-import { useGetCurrentUserSubscription } from "@/hooks/useSubscripiton";
+import { useEmployerProfile } from "@/hooks/employer-profile/useEmployer";
+import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 

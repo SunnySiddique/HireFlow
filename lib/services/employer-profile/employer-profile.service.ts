@@ -1,0 +1,73 @@
+import { getServerUser } from "@/lib/auth/serverAuth";
+import { EmployerDB } from "@/types/employer";
+
+// update employer profile
+export async function updateEmployerProfileService(profileData: EmployerDB) {
+  const { supabase, user } = await getServerUser();
+
+  if (!user) throw new Error("Unauthorized: Please login to continue");
+
+  const { data, error } = await supabase
+    .from("employers")
+    .update(profileData)
+    .eq("auth_id", user.id)
+    .select()
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+
+  if (!data) throw new Error("UPDATE_FAILED");
+
+  return data;
+}
+
+// fetch employer profile
+export async function employerProfileService() {
+  const { supabase, user } = await getServerUser();
+
+  if (!user) throw new Error("Unauthorized: Please login to continue");
+
+  const { data, error } = await supabase
+    .from("employers")
+    .select("*")
+    .eq("auth_id", user.id)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) throw new Error("FAiled to fetch profile. Try again!");
+
+  return data;
+}
+
+// fetch employer by slug
+export async function employerProfileBySlugService(slug: string) {
+  const { supabase, user } = await getServerUser();
+
+  if (!user) throw new Error("Unauthorized: Please login to continue");
+
+  const { data, error } = await supabase
+    .from("employers")
+    .select(`*`)
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return data;
+}
+
+// employer profiles
+export async function employerProfilesService() {
+  const { supabase, user } = await getServerUser();
+
+  if (!user) throw new Error("Unauthorized: Please login to continue");
+
+  const { data, error } = await supabase
+    .from("employers")
+    .select("*")
+    .neq("auth_id", user.id);
+
+  if (error) throw error;
+
+  return data;
+}
