@@ -1,3 +1,5 @@
+"use server";
+
 import {
   applyJobService,
   seekerAppliedJobsService,
@@ -36,8 +38,8 @@ export async function seekerAppliedJobs(filters?: InterviewFilters) {
 }
 
 // seeker saved jobs
-export async function seekerSavedJobs() {
-  return seekerSavedJobsService();
+export async function seekerSavedJobs(filters?: InterviewFilters) {
+  return seekerSavedJobsService(filters);
 }
 
 // seeker recent jobs

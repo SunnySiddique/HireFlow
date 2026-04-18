@@ -10,7 +10,7 @@ import {
   useMarkNotificationAsRead,
   useNotifications,
 } from "@/hooks/notification/useNotifications";
-import { useGetJobSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
+import { useSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
 import { createClient } from "@/lib/supabase/client";
 import { getInitials, timeAgo } from "@/lib/utils";
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -36,7 +36,7 @@ const DashboardNavbar = ({
   isSidebarOpen = false,
 }: DashboardNavbarProps) => {
   // hooks
-  const { data: jobSeekerProfile } = useGetJobSeekerProfile();
+  const { data: jobSeekerProfile } = useSeekerProfile();
   const { data: employerProfile } = useEmployerProfile();
   const { mutate: markNotificationAsRead } = useMarkNotificationAsRead();
   const { mutate: markAllNotificationsAsRead } =
@@ -159,13 +159,15 @@ const DashboardNavbar = ({
                 <Separator />
                 <ScrollArea className="h-[300px] sm:h-[400px]">
                   <div className="flex flex-col">
-                    {notifications.map((notification, index) => (
+                    {notifications.map((notification) => (
                       <a
-                        href={getNotificationLink(
-                          notification.type as string,
-                          notification.reference_id,
-                          role,
-                        )}
+                        href={
+                          getNotificationLink(
+                            notification.type ?? "",
+                            notification.reference_id ?? "",
+                            role,
+                          ) || undefined
+                        }
                         key={notification.id}
                         onClick={() => {
                           markNotificationAsRead(notification.id as string);
@@ -187,7 +189,9 @@ const DashboardNavbar = ({
                                   : "bg-muted"
                               }`}
                             >
-                              <NotificationIcon type={notification.type} />
+                              <NotificationIcon
+                                type={notification.type ?? ""}
+                              />
                             </div>
 
                             {/* Text Content */}

@@ -1,11 +1,13 @@
 import InterviewCard from "@/components/interview/InterviewCard";
+import Loader from "@/components/Loader";
 import { useUpcomingInterviews } from "@/hooks/interview/useInterview";
 import Link from "next/link";
 
 const UpcomingInterviews = () => {
   const { data: upcomingInterviews = [], isLoading } =
     useUpcomingInterviews(true);
-  console.log(upcomingInterviews.length);
+
+  if (isLoading) return <Loader mode="inline" />;
   return (
     <div>
       <div className="flex items-center justify-between mb-4 lg:mb-6">
@@ -22,15 +24,17 @@ const UpcomingInterviews = () => {
       </div>
 
       <div className="space-y-3 lg:space-y-4">
-        {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        ) : upcomingInterviews.length === 0 ? (
+        {upcomingInterviews.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No upcoming interviews
           </p>
         ) : (
           upcomingInterviews.map((interview) => (
-            <InterviewCard interview={interview} key={interview.id} />
+            <InterviewCard
+              role="seeker"
+              interview={interview}
+              key={interview.id}
+            />
           ))
         )}
       </div>

@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 export const useEmployerApplicants = (filters?: InterviewFilters) => {
   return useQuery({
     queryKey: ["applicants", filters?.status, filters?.page, filters?.archived],
+    staleTime: 1000 * 60 * 2,
     queryFn: () => employerApplicants(filters),
   });
 };

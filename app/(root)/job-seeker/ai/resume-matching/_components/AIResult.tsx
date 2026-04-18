@@ -2,7 +2,6 @@ import LeftSidebar from "./LeftSidebar";
 import RightContent from "./RightContent";
 
 const AIResult = ({ jobs }: { jobs: any }) => {
-  console.log("jobs:", jobs);
   return (
     <>
       <main className="px-6 py-8 flex flex-col lg:flex-row gap-8">

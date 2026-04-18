@@ -1,126 +1,219 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import {
-  formatDate,
-  formatLabel,
-  formatSalary,
-  getInitials,
-} from "@/lib/utils";
+import { cn, formatDate, formatLabel, formatSalary } from "@/lib/utils";
 import { SavedJob } from "@/types/jobs";
 import {
+  AlertCircle,
+  BookmarkMinus,
   Briefcase,
+  Building2,
   CalendarDays,
   ChevronRight,
   Clock,
+  DollarSign,
   ExternalLink,
   MapPin,
 } from "lucide-react";
 
-interface SavedJobCardProps {
-  job: SavedJob;
-  href?: string;
-}
+import { randomImage } from "@/lib/utils/randomImage";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { Button } from "../ui/button";
 
-const statusStyle: Record<string, string> = {
-  open: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800",
-  closed: "bg-muted text-muted-foreground border-border",
-  draft: "bg-muted text-muted-foreground border-border",
+const getStatusConfig = (status: string) => {
+  switch ((status || "").toLowerCase()) {
+    case "open":
+      return {
+        bg: "bg-emerald-500/10",
+        color: "text-emerald-600",
+        border: "border-emerald-500/20",
+        label: "Actively Hiring",
+        pulsing: true,
+      };
+    case "draft":
+      return {
+        bg: "bg-amber-500/10",
+        color: "text-amber-600",
+        border: "border-amber-500/20",
+        label: "Draft",
+        pulsing: false,
+      };
+    case "closed":
+    default:
+      return {
+        bg: "bg-muted",
+        color: "text-muted-foreground",
+        border: "border-border",
+        label: "Closed",
+        pulsing: false,
+      };
+  }
 };
 
-const SavedJobCard = ({ job, href }: SavedJobCardProps) => {
+export const SavedJobCard = ({
+  job,
+  onSave,
+}: {
+  job: SavedJob;
+  index?: number;
+  onSave?: (id: string) => void;
+}) => {
+  const statusConfig = getStatusConfig(job.status || "open");
+  const isClosed = (job.status || "").toLowerCase() === "closed";
+
   return (
-    <Card className="group p-0 border border-border bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200 rounded-xl overflow-hidden">
-      <div className="p-4 flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <Avatar className="h-11 w-11 flex-shrink-0 rounded-lg border border-border">
-            <AvatarImage
-              src={job.employer.company_logo_url}
-              alt={job.employer.company_name}
-              className="object-cover"
+    <div
+      className={cn(
+        "bg-card/80 backdrop-blur-xl rounded-3xl border p-5 sm:p-6 shadow-sm hover:shadow-xl transition-all duration-500 group relative flex flex-col h-full",
+        !isClosed
+          ? "border-border/50 hover:border-primary/30"
+          : "border-border/30 opacity-75 grayscale-[0.2]",
+      )}
+    >
+      {/* Decorative Glow */}
+      {!isClosed && (
+        <div className="absolute -right-20 -top-20 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-500" />
+      )}
+
+      {onSave && (
+        <Button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onSave(job.job_id);
+          }}
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-rose-500/10 hover:text-rose-500  transition-all duration-300 z-20 group/unsave"
+          aria-label="Remove from saved jobs"
+        >
+          <motion.div whileTap={{ scale: 0.9 }}>
+            <BookmarkMinus className="w-5 h-5 group-hover/unsave:fill-rose-500/20" />
+          </motion.div>
+        </Button>
+      )}
+
+      <div className="relative z-10 flex flex-col flex-1">
+        {/* Header: Logo, Company & Title */}
+        <div className="flex items-start gap-4 mb-5 pr-10">
+          <div className="w-14 h-14 rounded-2xl border-2 border-background bg-card shadow-md overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-500">
+            <Image
+              src={
+                job?.employer?.company_logo_url ||
+                randomImage(job?.employer?.company_name || "C")
+              }
+              alt={job?.employer?.company_name || "Company Logo"}
+              width={56}
+              height={56}
+              className="object-cover w-full h-full"
             />
-            <AvatarFallback className="rounded-lg bg-muted text-foreground text-xs font-bold">
-              {getInitials(job.employer.company_name)}
-            </AvatarFallback>
-          </Avatar>
-
-          <div className="flex items-center gap-2">
-            <Badge
-              className={`text-[10px] px-1.5 py-0 rounded-sm border capitalize ${statusStyle[job.status] ?? statusStyle.closed}`}
-            >
-              {job.status}
-            </Badge>
           </div>
-        </div>
-
-        <div className="min-w-0">
-          <h4 className="font-semibold text-foreground text-sm truncate group-hover:text-primary transition-colors duration-200 mb-0.5">
-            {job.job_title}
-          </h4>
-          <a
-            href={job.employer.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-primary transition-colors w-fit"
-          >
-            {job.employer.company_name}
-            <ExternalLink className="h-2.5 w-2.5 ml-0.5 opacity-60" />
-          </a>
-        </div>
-
-        <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[11px] text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <MapPin className="h-3 w-3 text-primary/70 flex-shrink-0" />
-            {job.location}
-          </span>
-          <span className="flex items-center gap-1">
-            <Briefcase className="h-3 w-3 text-primary/70 flex-shrink-0" />
-            {formatLabel(job.employment_type)}
-          </span>
-          <span className="flex items-center gap-1">
-            <CalendarDays className="h-3 w-3 text-primary/70 flex-shrink-0" />
-            Due {formatDate(job.application_deadline)}
-          </span>
-        </div>
-
-        <div className="h-px bg-border" />
-
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">
-              Salary / yr
-            </p>
-            <span className="text-sm font-semibold text-foreground">
-              {formatSalary(job.salary_min, job.salary_max, job.currency)}
-            </span>
-          </div>
-
-          <div className="flex flex-col items-end gap-1.5">
-            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-              <Clock className="h-2.5 w-2.5" />
-              Saved {formatDate(job.saved_at)}
-            </span>
+          <div className="flex-1">
+            <h3 className="text-xl font-black text-foreground leading-tight group-hover:text-primary transition-colors duration-300 line-clamp-2">
+              {job?.job_title || "Untitled Job"}
+            </h3>
             <a
-              href={href ?? `/job-seeker/jobs/${job.job_slug}`}
+              href={job?.employer?.website || "#"}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noreferrer"
+              onClick={(e) => !job?.employer?.website && e.preventDefault()}
+              className="text-sm text-muted-foreground font-medium flex items-center gap-1.5 mt-1.5 hover:text-primary transition-colors w-fit"
             >
-              <Button
-                size="sm"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs h-7 px-2.5 rounded-lg flex items-center gap-1 group/btn"
-              >
-                View
-                <ChevronRight className="h-3 w-3 transition-transform duration-150 group-hover/btn:translate-x-0.5" />
-              </Button>
+              <Building2 className="w-4 h-4" />
+              {job?.employer?.company_name || "Unknown Company"}
+              {job?.employer?.website && (
+                <ExternalLink className="w-3 h-3 opacity-50" />
+              )}
             </a>
           </div>
         </div>
+
+        {/* Badges/Tags Row */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <div
+            className={cn(
+              "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest border shadow-sm",
+              statusConfig.bg,
+              statusConfig.color,
+              statusConfig.border,
+            )}
+          >
+            {statusConfig.pulsing && (
+              <span className="relative flex h-2 w-2 mr-0.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+            )}
+            {!statusConfig.pulsing && <AlertCircle className="w-3 h-3" />}
+            {statusConfig.label}
+          </div>
+
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-secondary border border-border text-secondary-foreground shadow-sm">
+            <Briefcase className="w-3.5 h-3.5" />
+            {formatLabel(job?.employment_type ?? "full_time")}
+          </div>
+        </div>
+
+        {/* Detailed Info Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 bg-muted/30 p-4 rounded-2xl border border-border/50">
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold flex items-center gap-1">
+              <MapPin className="w-3 h-3" /> Location
+            </span>
+            <span className="text-sm font-semibold text-foreground truncate">
+              {job?.location || "Not specified"}
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold flex items-center gap-1">
+              <DollarSign className="w-3 h-3" /> Salary
+            </span>
+            <span className="text-sm font-semibold text-foreground truncate">
+              {formatSalary(
+                job?.salary_min as number,
+                job?.salary_max as number,
+                job?.currency as string,
+              )}
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-1 sm:col-span-2 mt-1">
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold flex items-center gap-1">
+              <CalendarDays className="w-3 h-3" /> Application Deadline
+            </span>
+            <span className="text-sm font-semibold text-foreground">
+              {formatDate(job?.application_deadline as string)}
+            </span>
+          </div>
+        </div>
+
+        {/* Footer Area */}
+        <div className="pt-5 border-t border-border/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-auto">
+          <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground bg-muted py-1.5 px-3 rounded-lg border border-border">
+            <Clock className="w-3.5 h-3.5" />
+            Saved {formatDate(job?.saved_at)}
+          </div>
+
+          <Button
+            className={cn(
+              "w-full sm:w-auto rounded-xl font-bold px-6 h-10 text-sm transition-all duration-300 shadow-md group/btn",
+              isClosed
+                ? "bg-muted text-muted-foreground hover:bg-muted"
+                : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/20",
+              !isClosed && "shadow-lg shadow-primary/30",
+            )}
+            disabled={isClosed}
+            onClick={() => {
+              if (!isClosed)
+                window.open(`/seeker/jobs/${job?.job_slug}`, "_blank");
+            }}
+          >
+            {isClosed ? "No Longer Accepting" : "View & Apply"}
+            {!isClosed && (
+              <ChevronRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover/btn:translate-x-1" />
+            )}
+          </Button>
+        </div>
       </div>
-    </Card>
+    </div>
   );
 };
-
-export default SavedJobCard;

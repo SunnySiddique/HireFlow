@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import { MAX_PROFILE_SIZE } from "@/lib/utils";
 
 // seeker image upload
 export async function uploadSeekerImageService(
@@ -13,7 +12,7 @@ export async function uploadSeekerImageService(
     throw new Error("Invalid file type");
   }
 
-  if (MAX_PROFILE_SIZE > 5 * 1024 * 1024) {
+  if (file.size > 5 * 1024 * 1024) {
     throw new Error("File too large (max 5MB)");
   }
 
@@ -52,7 +51,7 @@ export async function uploadEmployerCompanyLogoService(
     throw new Error("Only image files allowed");
   }
 
-  if (MAX_PROFILE_SIZE > 2 * 1024 * 1024) {
+  if (file.size > 2 * 1024 * 1024) {
     throw new Error("Logo must be under 2MB");
   }
 

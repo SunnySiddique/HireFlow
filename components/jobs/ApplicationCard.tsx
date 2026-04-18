@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { appStatusConfig } from "@/constants/jobsData";
 import { formatDate, formatSalary, getInitials } from "@/lib/utils";
+import { JobApplication } from "@/types/applicant";
 import {
   CalendarDays,
   ChevronRight,
@@ -18,7 +19,7 @@ const jobStatusConfig: Record<string, string> = {
   closed: "bg-muted text-muted-foreground border-border",
 };
 
-const ApplicationCard = ({ app }: { app: any }) => {
+const ApplicationCard = ({ app }: { app: JobApplication }) => {
   const appStatus =
     appStatusConfig[app.application_status] ?? appStatusConfig.pending;
 

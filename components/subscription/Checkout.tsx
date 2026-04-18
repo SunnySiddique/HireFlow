@@ -1,5 +1,6 @@
-import { createCheckoutSession } from "@/lib/action/stripe.actions";
+import { createCheckoutSession } from "@/lib/action/stripe/stripe.actions";
 import { hasAccess } from "@/lib/utils";
+import { UserSubscription } from "@/types";
 import { ArrowRight } from "lucide-react";
 import { useTransition } from "react";
 import { Button } from "../ui/button";
@@ -15,7 +16,7 @@ const Checkout = ({
   isPopular: boolean;
   planName: string;
   userRole: "employer" | "jobseeker";
-  subscription: any;
+  subscription: UserSubscription;
 }) => {
   const [isPending, startTransition] = useTransition();
   const isSubscribed = hasAccess(

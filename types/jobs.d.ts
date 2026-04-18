@@ -78,15 +78,25 @@ export interface JobFiltersType {
 }
 
 // save job types
-interface SavedJob {
+export interface SavedJob {
   id: string;
   job_id: string;
-  saved_at?: string;
-  employer: Employer;
-  location?: string;
-  salary_min?: number;
-  salary_max?: number;
-  currency?: string;
+  saved_at: string;
+
+  job_title: string | null;
+  location: string | null;
+
+  salary_min: number | null;
+  salary_max: number | null;
+  currency: string | null;
+
+  status: string | null;
+  job_slug: string | null;
+
+  application_deadline: string | null;
+  employment_type: string | null;
+
+  employer: Employer | null;
 }
 
 // Add TypeScript schema for jobs with employer subset

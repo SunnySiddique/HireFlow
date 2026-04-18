@@ -135,8 +135,8 @@ const HeroProfile = ({
                           No Profile Bio and headline Yet
                         </p>
                         <p className="text-muted-foreground text-sm">
-                          Click the "Edit Profile" button to add your personal
-                          information, experience, and education.
+                          Click the {`"Edit Profile"`} button to add your
+                          personal information, experience, and education.
                         </p>
                       </div>
                     )}

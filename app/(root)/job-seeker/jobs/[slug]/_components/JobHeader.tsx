@@ -41,9 +41,11 @@ const HeaderCard = ({
   const { mutate: applyJob, isPending: isApplying } = useApplyJob();
   const { mutate: saveJob } = useSavedJob();
   const { data } = useSeekerAppliedJobs();
-  const { data: savedJobs } = useSeekerSavedJobs();
+  const { data: saveJobs } = useSeekerSavedJobs();
   const appliedJobs = data?.jobs;
   const router = useRouter();
+
+  const savedJobs = saveJobs?.saved_jobs ?? [];
 
   const isApplied = appliedJobs?.some(
     (applicant) => applicant.job_id === job.id,

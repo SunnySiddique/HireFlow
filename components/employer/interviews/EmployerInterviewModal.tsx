@@ -18,7 +18,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { DURATION_OPTIONS } from "@/constants/InterviewsData";
 import { useSendInterviewInvite } from "@/hooks/interview/useInterview";
-import { Interview } from "@/types/interview";
+import { Interview, InterviewInvite } from "@/types/interview";
 import { CalendarDays, Clock, MapPin, Phone, Timer, Video } from "lucide-react";
 import { ChangeEvent, useState } from "react";
 import toast from "react-hot-toast";
@@ -78,7 +78,7 @@ const EmployerInterviewModal = ({
   };
 
   const handleSubmit = async () => {
-    const { interview_date, interview_time, ...rest } = interviewData;
+    const { interview_date, interview_time, status, ...rest } = interviewData;
     const scheduled_at = `${interview_date}T${interview_time}:00`;
     await sendInterviewInvite(
       {
@@ -89,6 +89,7 @@ const EmployerInterviewModal = ({
         seeker_id: seekerId!,
         application_id: applicationId as string,
         scheduled_at,
+        status: status as InterviewInvite["status"],
       },
       {
         onSuccess: () => {

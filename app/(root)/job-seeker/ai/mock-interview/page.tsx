@@ -1,15 +1,13 @@
 "use client";
 
 import Loader from "@/components/Loader";
-import { useGetJobSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
+import { useSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
 import { useVapi } from "@/hooks/vapi/useVapi";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { MessageSquare, Phone, PhoneOff, Sparkles } from "lucide-react";
 import Image from "next/image";
 import AudioVisualizer from "./_components/AudioVisualizer";
-
-// --- Main Page ---
 
 const AIMockInterviewPage = () => {
   const {
@@ -22,7 +20,7 @@ const AIMockInterviewPage = () => {
     transcriptEndRef,
   } = useVapi();
 
-  const { data: seeker, isLoading } = useGetJobSeekerProfile();
+  const { data: seeker, isLoading } = useSeekerProfile();
 
   if (isLoading) return <Loader mode="inline" />;
   return (

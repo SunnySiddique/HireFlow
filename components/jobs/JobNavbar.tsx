@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useGetJobSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
+import { useSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
 import { getInitials } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 const JobsNavbar = () => {
-  const { data: seeker } = useGetJobSeekerProfile();
+  const { data: seeker } = useSeekerProfile();
   const router = useRouter();
 
   const handleLogout = async () => {

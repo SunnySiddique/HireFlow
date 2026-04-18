@@ -1,32 +1,43 @@
 "use client";
 
-import SavedJobCard from "@/components/jobs/SavedJobCard";
+import { SavedJobCard } from "@/components/jobs/SavedJobCard";
 import Loader from "@/components/Loader";
-import { useSeekerSavedJobs } from "@/hooks/jobs/useSeekerJob";
+import { useInterviewFilters } from "@/hooks/interview/useInterviewFilters";
+import { useSavedJob, useSeekerSavedJobs } from "@/hooks/jobs/useSeekerJob";
 import { Bookmark } from "lucide-react";
+import Pagination from "../jobs/_components/Pagination";
+import Header from "./_components/Header";
 
 const SavedJobsPage = () => {
-  const { data: savedJobs, isLoading } = useSeekerSavedJobs();
+  const { filters, updateFilter } = useInterviewFilters();
 
+  const { data, isLoading } = useSeekerSavedJobs(filters);
+  const { mutate: saveJob } = useSavedJob();
+
+  const savedJobs = data?.saved_jobs ?? [];
+
+  const totalPages = data?.totalPages ?? 0;
+
+  const handleSave = (jobId: string) => {
+    saveJob(jobId);
+  };
+  console.log("sss:", savedJobs);
   if (isLoading) return <Loader mode="inline" />;
-
   return (
     <div className="flex flex-col gap-4 p-8">
       <div className="space-y-8">
         {/* Header */}
-        <div>
-          <h1 className="text-4xl font-bold text-foreground">Saved Jobs</h1>
-          <p className="text-muted-foreground mt-2">
-            {(savedJobs ?? []).length} job
-            {(savedJobs ?? []).length !== 1 ? "s" : ""} saved
-          </p>
-        </div>
+        <Header
+          jobs={savedJobs}
+          filters={filters}
+          updateFilter={updateFilter}
+        />
 
         {/* List */}
         {(savedJobs ?? []).length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
             {(savedJobs ?? []).map((job) => (
-              <SavedJobCard job={job} key={job.id} />
+              <SavedJobCard job={job} key={job.id} onSave={handleSave} />
             ))}
           </div>
         ) : (
@@ -48,6 +59,12 @@ const SavedJobsPage = () => {
           </div>
         )}
       </div>
+
+      <Pagination
+        page={filters.page ?? 1}
+        totalPages={totalPages}
+        onPageChange={(newPage) => updateFilter("page", newPage)}
+      />
     </div>
   );
 };

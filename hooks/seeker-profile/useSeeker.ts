@@ -1,10 +1,13 @@
-import { saveProfile } from "@/lib/action/seeker-profile/seeker.actions";
-import { uploadJobSeekerImage } from "@/lib/media/media.actions";
+import { uploadJobSeekerImage } from "@/lib/action/media/media.actions";
+import {
+  saveProfile,
+  seekerProfile,
+  seekerProfileBySlug,
+  seekerProfiles,
+} from "@/lib/action/seeker-profile/seeker.actions";
 import { invalidateQuery } from "@/lib/react-query/invalidateQueries";
-import { createClient } from "@/lib/supabase/client";
 import { JobSeekerProfileDB } from "@/types/job-seeker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { redirect } from "next/navigation";
 import toast from "react-hot-toast";
 
 // save job seeker profile
@@ -14,7 +17,7 @@ export const useSaveJobSeekerProfile = () => {
     mutationFn: (profileData: JobSeekerProfileDB) => saveProfile(profileData),
     onSuccess: () => {
       toast.success("Profile saved successfully");
-      invalidateQuery(queryClient, ["jobSeekerProfile"]);
+      invalidateQuery(queryClient, ["seeker-profile"]);
       invalidateQuery(queryClient, ["notifications"]);
     },
     onError: (error: Error) => {
@@ -24,51 +27,22 @@ export const useSaveJobSeekerProfile = () => {
 };
 
 // get job seeker table
-export const useGetJobSeekerProfile = () => {
+export const useSeekerProfile = ({ enabled = true } = {}) => {
   return useQuery({
-    queryKey: ["jobSeekerProfile"],
-    queryFn: async () => {
-      const supabase = createClient();
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-      if (authError || !user) throw new Error("Not authenticated");
-
-      const { data, error } = await supabase
-        .from("job_seekers")
-        .select("*")
-        .eq("auth_id", user?.id)
-        .maybeSingle();
-      if (error) throw error;
-
-      return data;
-    },
+    queryKey: ["seeker-profile"],
+    queryFn: seekerProfile,
+    enabled,
+    staleTime: 1000 * 60 * 5,
   });
 };
 
 // get job seeker profile by slug
 export const useGetJobSeekerProfileBySlug = (slug: string) => {
   return useQuery({
-    queryKey: ["jobSeekerProfile", slug],
-    queryFn: async () => {
-      const supabase = createClient();
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-      if (authError || !user) throw new Error("Not authenticated");
-
-      const { data, error } = await supabase
-        .from("job_seekers")
-        .select("*")
-        .eq("slug", slug)
-        .maybeSingle();
-      if (error) throw error;
-
-      return data;
-    },
+    queryKey: ["seeker-profile", slug],
+    queryFn: () => seekerProfileBySlug(slug),
     enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
   });
 };
 
@@ -86,7 +60,7 @@ export const useUploadProfileAndResume = () => {
       currentFilePath?: string;
     }) => uploadJobSeekerImage(bucketName, file, currentFilePath),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["jobSeekerProfile"] });
+      queryClient.invalidateQueries({ queryKey: ["seeker-profile"] });
     },
     onError: (error) =>
       toast.error(
@@ -97,25 +71,10 @@ export const useUploadProfileAndResume = () => {
 };
 
 // profiles
-export const useSeekerProfiles = () => {
+export const useSeekerProfiles = (search?: string) => {
   return useQuery({
-    queryKey: ["seekerProfiles"],
-    queryFn: async () => {
-      const supabase = createClient();
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-      if (authError || !user) redirect("/auth/signin");
-
-      const { data, error } = await supabase
-        .from("job_seekers")
-        .select("*")
-        .neq("auth_id", user.id);
-
-      if (error) throw error;
-
-      return data;
-    },
+    queryKey: ["seeker-profiles", search ?? ""],
+    queryFn: () => seekerProfiles(search),
+    staleTime: 1000 * 60 * 5,
   });
 };

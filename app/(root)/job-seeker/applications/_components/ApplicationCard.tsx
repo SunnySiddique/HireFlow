@@ -22,7 +22,6 @@ import {
   XCircle,
 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
 
 export const getAppStatusConfig = (status: string) => {
   switch (status.toLowerCase()) {
@@ -77,16 +76,21 @@ export const getAppStatusConfig = (status: string) => {
   }
 };
 
+interface ApplicationCardProps {
+  app: MappedAppliedJobType;
+  index: number;
+  isExpanded: boolean; // ✅ controlled by parent
+  onToggleExpand: () => void; // ✅ parent decides which card is open
+}
+
 const ApplicationCard = ({
   app,
   index,
-}: {
-  app: MappedAppliedJobType;
-  index: number;
-}) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  isExpanded,
+  onToggleExpand,
+}: ApplicationCardProps) => {
   const statusConfig = getAppStatusConfig(app.application_status ?? "pending");
-  console.log(app);
+
   const PIPELINE = [
     { id: "pending", label: "Applied", color: "bg-amber-500" },
     { id: "reviewing", label: "Reviewing", color: "bg-blue-500" },
@@ -107,13 +111,12 @@ const ApplicationCard = ({
   return (
     <div
       className={cn(
-        "bg-card/80 backdrop-blur-xl rounded-3xl border p-5 sm:p-6 shadow-sm hover:shadow-xl transition-all duration-500 group relative flex flex-col h-full",
+        "bg-card/80 backdrop-blur-xl rounded-3xl border p-5 sm:p-6 shadow-sm hover:shadow-xl transition-all duration-500 group relative flex flex-col",
         app.application_status === "shortlisted"
           ? "border-purple-500/30 hover:border-purple-500/50"
           : "border-border/50 hover:border-primary/30",
       )}
     >
-      {/* Decorative background glow */}
       {app.application_status === "shortlisted" && (
         <div className="absolute -right-20 -top-20 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl group-hover:bg-purple-500/10 transition-colors duration-500" />
       )}
@@ -121,8 +124,8 @@ const ApplicationCard = ({
         <div className="absolute -right-20 -top-20 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-500" />
       )}
 
-      <div className="relative z-10 flex flex-col flex-1">
-        {/* Header: Company & Job Status */}
+      <div className="relative z-10 flex flex-col">
+        {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-5">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl border-2 border-background bg-card shadow-md overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-500">
@@ -253,11 +256,11 @@ const ApplicationCard = ({
           </div>
         )}
 
-        {/* Expandable Notes / Cover Letter Snippet */}
+        {/* Expandable Details — controlled by parent via isExpanded/onToggleExpand */}
         {hasExtraContent && (
           <div className="mb-6">
             <button
-              onClick={() => setIsExpanded(!isExpanded)}
+              onClick={onToggleExpand} // ✅ delegate to parent, no local state
               className="flex items-center gap-2 text-sm font-bold text-primary hover:text-primary/80 transition-colors mb-3"
             >
               {isExpanded ? (
@@ -312,7 +315,7 @@ const ApplicationCard = ({
 
         {/* Skills */}
         {app.skills_required && app.skills_required.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6 mt-auto">
+          <div className="flex flex-wrap gap-2 mb-6">
             {app.skills_required.map((skill: string) => (
               <span
                 key={skill}
@@ -325,7 +328,7 @@ const ApplicationCard = ({
         )}
 
         {/* Action Area */}
-        <div className="pt-5 border-t border-border/50 flex justify-between items-center mt-auto">
+        <div className="pt-5 border-t border-border/50 flex justify-between items-center">
           <div
             className={cn(
               "text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border",

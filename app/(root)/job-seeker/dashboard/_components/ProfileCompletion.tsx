@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { useGetJobSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
+import { useSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
 import { JobSeekerProfile } from "@/types/job-seeker";
 import {
   Briefcase,
@@ -61,7 +61,7 @@ const profileTabs: {
 ];
 
 const ProfileCompletion = () => {
-  const { data: jobSeekerProfile } = useGetJobSeekerProfile();
+  const { data: jobSeekerProfile } = useSeekerProfile();
 
   const isSectionCompleted = (fields: (keyof JobSeekerProfile)[]) => {
     return fields.some((field) => {

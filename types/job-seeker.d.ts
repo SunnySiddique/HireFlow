@@ -37,8 +37,6 @@ export interface JobSeekerProfile {
   expected_salary_min: number | null;
   expected_salary_max: number | null;
 
-  open_to_work: boolean;
-
   preferred_locations: string | null;
   preferred_job_type: string | null;
 
@@ -56,7 +54,7 @@ export interface JobSeekerProfile {
 
   slug: string;
   profile_completion: number;
-
+  open_to_work: boolean | null;
   is_featured: boolean | null;
 }
 

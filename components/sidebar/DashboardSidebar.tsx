@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { employerLinks, FREE_LINKS, jobSeekerLinks } from "@/constants";
 import { useEmployerProfile } from "@/hooks/employer-profile/useEmployer";
-import { useGetJobSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
+import { useSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
 import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { createClient } from "@/lib/supabase/client";
 import { getInitials, hasAccess } from "@/lib/utils";
@@ -43,8 +43,12 @@ const DashboardSidebar = ({
   role,
 }: DashboardSidebarProps) => {
   // hook
-  const { data: jobSeekerProfile } = useGetJobSeekerProfile();
-  const { data: employerProfile } = useEmployerProfile();
+  const { data: jobSeekerProfile } = useSeekerProfile({
+    enabled: role === "job-seeker",
+  });
+  const { data: employerProfile } = useEmployerProfile({
+    enabled: role === "employer",
+  });
   const { data: subscription } = useGetCurrentUserSubscription();
   const isSubscribed = hasAccess(
     subscription?.subscription_status as string,
@@ -81,7 +85,7 @@ const DashboardSidebar = ({
 
   const mainLinks = filteredLinks.filter((l) => l.section === "main");
   const manageLinks = filteredLinks.filter((l) => l.section === "manage");
-  console.log("emp:", employerProfile);
+
   const renderLink = (link: any) => {
     const href =
       typeof link.href === "function"
