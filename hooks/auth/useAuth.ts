@@ -8,10 +8,11 @@ export const useCreateUser = () => {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: (payload: {
-      role: "job_seeker" | "employer";
-      data: JobSeekerAuth;
-    }) => createUser(payload.role, payload.data),
+    mutationFn: (
+      payload:
+        | { role: "job_seeker"; data: JobSeekerAuth }
+        | { role: "employer"; data: EmployerAuth },
+    ) => createUser(payload.role, payload.data),
 
     onSuccess: (_, variables) => {
       toast.success("Account created");
@@ -32,10 +33,11 @@ export const useLoginUser = () => {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: (payload: {
-      role: "job_seeker" | "employer";
-      data: EmployerAuth;
-    }) => loginUser(payload.role, payload.data),
+    mutationFn: (
+      payload:
+        | { role: "job_seeker"; data: JobSeekerAuth }
+        | { role: "employer"; data: EmployerAuth },
+    ) => loginUser(payload.role, payload.data),
 
     onSuccess: (_, variables) => {
       const path =

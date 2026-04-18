@@ -4,7 +4,7 @@ import JobNavbar from "@/components/jobs/JobNavbar";
 import Loader from "@/components/Loader";
 import DashboardNavbar from "@/components/navbar/DashboardNavbar";
 import DashboardSidebar from "@/components/sidebar/DashboardSidebar";
-import { useGetJobSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
+import { useSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
@@ -13,7 +13,7 @@ export default function JobSeekerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isLoading } = useGetJobSeekerProfile();
+  const { isLoading } = useSeekerProfile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
 

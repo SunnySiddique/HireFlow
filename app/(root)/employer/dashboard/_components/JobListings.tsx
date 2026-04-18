@@ -1,3 +1,4 @@
+import Loader from "@/components/Loader";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import {
@@ -14,9 +15,10 @@ import { Edit, Eye, Loader2, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 const JobListings = () => {
-  const { data: jobListings } = useActiveJobs();
+  const { data: jobListings, isLoading } = useActiveJobs();
   const { mutateAsync: deleteJob, isPending } = useDeleteJob();
 
+  if (isLoading) return <Loader mode="inline" />;
   return (
     <div className="lg:col-span-2">
       <div className="flex items-center justify-between mb-4 lg:mb-6">

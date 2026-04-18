@@ -9,7 +9,12 @@ import {
 } from "@/lib/action/interview/interview.actions";
 import { invalidateQuery } from "@/lib/react-query/invalidateQueries";
 import { InterviewFilters, InterviewInvite } from "@/types/interview";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 // employer
@@ -44,6 +49,7 @@ export const useInterviews = (
     ],
     queryFn: () => interviews(filters, role),
     staleTime: 1000 * 60 * 5,
+    placeholderData: keepPreviousData,
   });
 };
 

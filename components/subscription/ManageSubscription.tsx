@@ -1,15 +1,14 @@
 import { employerPlans, seekerPlans } from "@/constants/BillingData";
-import { createPortalSession } from "@/lib/action/stripe.actions";
+import { createPortalSession } from "@/lib/action/stripe/stripe.actions";
+import { UserSubscription } from "@/types";
 import { AlertCircle, Calendar, CreditCard, Zap } from "lucide-react";
 import { useTransition } from "react";
 
 const ManageSubscription = ({
   subscription,
-  isSubscribed,
   userRole,
 }: {
-  subscription: any;
-  isSubscribed: boolean;
+  subscription: UserSubscription;
   userRole: "employer" | "job-seeker";
 }) => {
   console.log(subscription);
@@ -18,8 +17,6 @@ const ManageSubscription = ({
   const subCost = palns.find(
     (plan) => plan.name.toLowerCase() === subscription?.plan,
   );
-  const isCanceling =
-    isSubscribed && subscription?.cancel_at_end_period === true;
 
   const handleCancelSubscription = async () => {
     startTransition(async () => {

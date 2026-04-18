@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useUpdateInterviewStatus } from "@/hooks/interview/useInterview";
-import { useInterviewTimer } from "@/hooks/useInterviewTimer";
+import { useInterviewTimer } from "@/hooks/interview/useInterviewTimer";
 import { cn } from "@/lib/utils";
 import { Interview } from "@/types/interview";
 import {

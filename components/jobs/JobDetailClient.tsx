@@ -24,7 +24,6 @@ const JobDetailClient = ({ job }: { job: Job }) => {
     subscription?.plan_expires_at as string,
   );
 
-  console.log("isSub:", isSubscribed);
   useEffect(() => {
     if (!job?.id) return;
     if (!currentUser) return;
@@ -34,7 +33,7 @@ const JobDetailClient = ({ job }: { job: Job }) => {
 
   if (isLoading) return <Loader mode="inline" />;
   return (
-    <div className="space-y-6 py-5">
+    <div className="px-4 md:px-14 space-y-6 py-5">
       {/* ── Header Card ───── */}
       <HeaderCard job={job} isSubscribed={isSubscribed} />
       {/* ── Main Grid ─────── */}

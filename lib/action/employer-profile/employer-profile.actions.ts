@@ -23,6 +23,6 @@ export async function employerProfileBySlug(slug: string) {
   return employerProfileBySlugService(slug);
 }
 
-export async function employerProfiles() {
-  return employerProfilesService();
+export async function employerProfiles(search?: string) {
+  return employerProfilesService(search);
 }

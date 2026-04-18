@@ -9,7 +9,7 @@ import {
 } from "@/hooks/employer-profile/useEmployer";
 import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { hasAccess, MAX_PROFILE_SIZE } from "@/lib/utils";
-import { EmployerFormData } from "@/types/employer";
+import { EmployerDB, EmployerFormData } from "@/types/employer";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -117,7 +117,7 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
         comLogoPath = result.path;
       }
     }
-    const payload: EmployerType = {
+    const payload: EmployerDB = {
       company_name: data.companyName,
       website: data.website,
       company_logo_url: logoUrl,
@@ -201,7 +201,7 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
               editMode={editMode}
               form={form}
               setEditMode={setEditMode}
-              employer={employerProfile}
+              employer={employerProfile ?? undefined}
               setLogoFile={setLogoFile}
               isLoading={isSaving}
             />
@@ -211,7 +211,7 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
                 editMode={editMode}
                 form={form}
                 setEditMode={setEditMode}
-                employer={employerProfile}
+                employer={employerProfile ?? undefined}
               />
             )}
             {/* Open Positions Section */}
@@ -219,7 +219,7 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
               <OpenPositions
                 editMode={editMode}
                 form={form}
-                employer={employerProfile}
+                employer={employerProfile ?? undefined}
               />
             )}
             {/* Culture Section */}
@@ -231,7 +231,7 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
               <EmployerLocations
                 editMode={editMode}
                 form={form}
-                employer={employerProfile}
+                employer={employerProfile ?? undefined}
               />
             )}
             {/* Social Links Section */}
@@ -239,7 +239,7 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
               <EmployerSocialLinks
                 editMode={editMode}
                 form={form}
-                employer={employerProfile}
+                employer={employerProfile ?? undefined}
               />
             )}
             {isSubscribed && activeSection === "billing" && (

@@ -8,8 +8,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const MAX_PROFILE_SIZE = 2 * 1024 * 1024; // 2 MB
-export const MAX_RESUME_SIZE = 5 * 1024 * 1024; // 5MB
+export const MAX_PROFILE_SIZE = 5 * 1024 * 1024; // 5 MB
+export const MAX_RESUME_SIZE = 2 * 1024 * 1024; // 5MB
 
 // avatar for the proifle
 export const getInitials = (name: string) => {

@@ -222,7 +222,7 @@ export async function seekerAppliedJobsService(filters?: InterviewFilters) {
 
   if (error) throw error;
 
-  const mapped = data.map((appliedJob: any) => ({
+  const mapped = data.map((appliedJob) => ({
     id: appliedJob.id,
     job_id: appliedJob.job_id,
     application_status: appliedJob.status,
@@ -253,19 +253,19 @@ export async function seekerAppliedJobsService(filters?: InterviewFilters) {
 }
 
 // seeker  saved jobs
-export async function seekerSavedJobsService() {
+export async function seekerSavedJobsService(filters?: InterviewFilters) {
   const { supabase, user } = await getServerUser();
-
+  console.log("fff:", filters);
   if (!user) throw new Error("Unauthorized: Please login to continue");
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("save_jobs")
     .select(
       `
     id,
     job_id,
     saved_at,
-    job:job_id (
+    job:job_id!inner (
       job_title,
       location,
       salary_min,
@@ -275,7 +275,7 @@ export async function seekerSavedJobsService() {
       job_slug,
       application_deadline,
       employment_type,
-      employer:employer_id (
+      employer:employer_id!inner  (
         id,
         company_name,
         company_logo_url,
@@ -285,10 +285,31 @@ export async function seekerSavedJobsService() {
   `,
     )
     .eq("user_id", user.id);
+  const search = filters?.search && filters.search.toLowerCase().trim();
+  if (search) {
+    query = query.or(
+      `job.job_title.ilike.%${search}%,job.employer.company_name.ilike.%${search}%`,
+      { referencedTable: "job" },
+    );
+  }
 
-  if (error) throw error;
+  if (filters?.status && filters.status !== "all") {
+    query = query.eq("job.status", filters.status);
+  }
 
-  return data.map((saveJob: any) => ({
+  // pagnination
+  const { from, to, limit, page } = applyPagination(
+    filters?.page,
+    filters?.limit ?? 5,
+  );
+  const { data, error, count } = await query.range(from, to);
+
+  if (error) throw new Error(error.message);
+
+  const totalCount = count ?? 0;
+  const totalPages = Math.ceil(totalCount / limit);
+
+  const mapped = data.map((saveJob) => ({
     id: saveJob.id,
     job_id: saveJob.job_id,
     saved_at: saveJob.saved_at,
@@ -303,6 +324,13 @@ export async function seekerSavedJobsService() {
     employment_type: saveJob.job?.employment_type ?? null,
     employer: saveJob.job?.employer ?? null,
   }));
+
+  return {
+    saved_jobs: mapped,
+    totalPages,
+    currentPage: page,
+    totalCount,
+  };
 }
 
 // seeker recent jobs

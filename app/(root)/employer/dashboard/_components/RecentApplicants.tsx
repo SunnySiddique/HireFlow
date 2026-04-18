@@ -1,3 +1,4 @@
+import Loader from "@/components/Loader";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { useRecentApplicants } from "@/hooks/jobs/useEmployerJobs";
@@ -5,7 +6,9 @@ import { getInitials, timeAgo } from "@/lib/utils";
 import Image from "next/image";
 
 const RecentApplicants = () => {
-  const { data: recentApplicants } = useRecentApplicants();
+  const { data: recentApplicants, isLoading } = useRecentApplicants();
+
+  if (isLoading) return <Loader mode="inline" />;
 
   return (
     <>
@@ -22,7 +25,7 @@ const RecentApplicants = () => {
             View all →
           </a>
         </div>
-        <Card className="bg-background border border-border p-3 lg:p-4 space-y-3 lg:space-y-4 mb-4 lg:mb-6">
+        <Card className="bg-background border border-border p-3 lg:p-4 mb-4 lg:mb-6">
           {(recentApplicants ?? []).map((applicant, idx) => (
             <div
               key={idx}

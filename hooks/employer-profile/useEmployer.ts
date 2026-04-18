@@ -4,18 +4,19 @@ import {
   employerProfiles,
   updateEmployerProfile,
 } from "@/lib/action/employer-profile/employer-profile.actions";
-import { uploadEmployerCompanyLogo } from "@/lib/media/media.actions";
+import { uploadEmployerCompanyLogo } from "@/lib/action/media/media.actions";
 import { invalidateQuery } from "@/lib/react-query/invalidateQueries";
 import { EmployerDB } from "@/types/employer";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 // get employer table from db
-export const useEmployerProfile = () => {
+export const useEmployerProfile = ({ enabled = true } = {}) => {
   return useQuery({
     queryKey: ["employer-profile"],
     queryFn: employerProfile,
     staleTime: 1000 * 60 * 5,
+    enabled,
   });
 };
 
@@ -24,6 +25,7 @@ export const useEmployerProfileBySlug = (slug: string) => {
   return useQuery({
     queryKey: ["employer-profile-by-slug"],
     queryFn: () => employerProfileBySlug(slug),
+    staleTime: 1000 * 60 * 5,
     enabled: !!slug,
   });
 };
@@ -62,10 +64,10 @@ export const useUploadCompanyLogo = () => {
 };
 
 // profiles
-export const useEmployerProfiles = () => {
+export const useEmployerProfiles = (search?: string) => {
   return useQuery({
-    queryKey: ["employer-profiles"],
-    queryFn: employerProfiles,
-    staleTime: 1000 * 60 * 6,
+    queryKey: ["employer-profiles", search ?? ""],
+    queryFn: () => employerProfiles(search),
+    staleTime: 1000 * 60 * 5,
   });
 };

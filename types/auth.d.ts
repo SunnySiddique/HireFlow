@@ -1,11 +1,11 @@
 export type JobSeekerAuth = {
-  fullName: string;
+  fullName?: string;
   email: string;
   password: string;
 };
 
 export type EmployerAuth = {
-  companyName: string;
+  companyName?: string;
   workEmail: string;
   password: string;
 };

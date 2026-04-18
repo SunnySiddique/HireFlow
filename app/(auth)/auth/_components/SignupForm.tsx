@@ -71,7 +71,7 @@ export function SignupForm() {
     }
 
     createUser({
-      role: activeTab,
+      role: "job_seeker",
       data,
     });
   };
@@ -83,7 +83,7 @@ export function SignupForm() {
     }
 
     createUser({
-      role: activeTab,
+      role: "employer",
       data,
     });
   };

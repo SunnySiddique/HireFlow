@@ -57,17 +57,23 @@ export async function employerProfileBySlugService(slug: string) {
 }
 
 // employer profiles
-export async function employerProfilesService() {
+export async function employerProfilesService(search?: string) {
   const { supabase, user } = await getServerUser();
 
   if (!user) throw new Error("Unauthorized: Please login to continue");
 
-  const { data, error } = await supabase
-    .from("employers")
-    .select("*")
-    .neq("auth_id", user.id);
+  let query = supabase.from("employers").select("*");
+
+  if (search?.trim()) {
+    query = query.ilike("company_name", `%${search.trim()}%`);
+  }
+
+  const { data, error } = await query;
 
   if (error) throw error;
 
-  return data;
+  return {
+    featured: data.filter((p) => p.is_featured),
+    regular: data.filter((p) => !p.is_featured),
+  };
 }
