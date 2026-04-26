@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Zap } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 
@@ -16,16 +16,15 @@ const HomeNavbar = () => {
     <>
       <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center transform hover:scale-105 transition-transform">
-              <span className="text-primary-foreground font-black text-lg">
-                TH
-              </span>
+          <Link href={"/"} className={`flex items-center justify-between`}>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-sidebar-primary text-sidebar-primary-foreground rounded flex items-center justify-center flex-shrink-0">
+                <Zap className="w-5 h-5" />
+              </div>
+              <span className="font-bold text-lg font-sans">HireFlow</span>
             </div>
-            <span className="text-2xl font-black text-primary hidden sm:inline">
-              TalentHub
-            </span>
-          </div>
+          </Link>
+
           <div className="hidden md:flex items-center gap-10">
             <a
               href="#jobs"

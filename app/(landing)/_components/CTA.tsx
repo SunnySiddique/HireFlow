@@ -8,7 +8,7 @@ const CTA = () => {
           </h2>
           <p className="text-xl text-muted-foreground mb-12 font-semibold opacity-95">
             Join 500K+ professionals who found their perfect fit through
-            TalentHub
+            HireFlow
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="px-10 py-4 bg-primary text-black font-semibold rounded-lg  transition-all text-base shadow-lg hover:shadow-2xl">

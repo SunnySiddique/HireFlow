@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Moon, Sun } from "lucide-react";
+import { ArrowLeft, Moon, Sun, Zap } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 
@@ -26,15 +26,13 @@ const AuthNavbar = () => {
           </Link>
 
           {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center transform hover:scale-105 transition-transform">
-              <span className="text-primary-foreground font-black text-lg">
-                TH
-              </span>
+          <div className={`flex items-center justify-between`}>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-sidebar-primary text-sidebar-primary-foreground rounded flex items-center justify-center flex-shrink-0">
+                <Zap className="w-5 h-5" />
+              </div>
+              <span className="font-bold text-lg font-sans">HireFlow</span>
             </div>
-            <span className="text-2xl font-black text-primary hidden sm:inline">
-              TalentHub
-            </span>
           </div>
         </div>
 

@@ -25,9 +25,7 @@ const JobSeekerDashboardPage = () => {
   const { data: recommendedJobs = [], isLoading: recommendedLoading } =
     useRecommandedJobs();
 
-  const isLoading =
-    subLoading || interviewsLoading || recentJobsLoading || recommendedLoading;
-  if (isLoading) return <Loader mode="full" />;
+  if (subLoading) return <Loader mode="full" />;
 
   const isSubscribed = hasAccess(
     subscription?.subscription_status as string,
@@ -36,44 +34,50 @@ const JobSeekerDashboardPage = () => {
   const isAcceleratorPlan =
     subscription?.plan?.toLowerCase() === "acccelerator" ||
     subscription?.plan?.toLowerCase() === "champion";
+
   return (
     <main className="p-8">
-      {/* Stats Cards */}
-      <section className="mb-6 lg:mb-8 ">
+      <section className="mb-6 lg:mb-8">
         <DashboardStats
           isSubscribed={isSubscribed}
           isAcceleratorPlan={isAcceleratorPlan}
         />
       </section>
+
       {isSubscribed ? (
         <>
-          {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mb-6 lg:mb-8">
-            {/* Left Column - Applications & Interviews */}
             <div className="lg:col-span-2 space-y-6 lg:space-y-8">
-              {/* Upcoming Interviews */}
               <section>
-                <UpcomingInterviews interviews={upcomingInterviews} />
+                {interviewsLoading ? (
+                  <div className="animate-pulse h-48 bg-muted rounded-xl" />
+                ) : (
+                  <UpcomingInterviews interviews={upcomingInterviews} />
+                )}
               </section>
 
-              {/* Recent Applications */}
               <section>
-                <RecentApplications jobs={recentJobs} />
+                {recentJobsLoading ? (
+                  <div className="animate-pulse h-48 bg-muted rounded-xl" />
+                ) : (
+                  <RecentApplications jobs={recentJobs} />
+                )}
               </section>
             </div>
 
-            {/* Right Column - Sidebar */}
             <div className="space-y-6 lg:space-y-8">
-              {/* Profile Completion */}
               <section>
                 <ProfileCompletion />
               </section>
             </div>
           </div>
 
-          {/* Recommended Jobs - Full Width */}
           <section>
-            <RecommendedJobs jobs={recommendedJobs} />
+            {recommendedLoading ? (
+              <div className="animate-pulse h-64 bg-muted rounded-xl" />
+            ) : (
+              <RecommendedJobs jobs={recommendedJobs} />
+            )}
           </section>
         </>
       ) : (

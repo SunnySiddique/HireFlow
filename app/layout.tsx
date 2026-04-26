@@ -16,10 +16,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TalentHub - Find Your Perfect Job",
+  title: "HireFlow - Find Your Perfect Job",
   description:
     "Discover 50K+ jobs from leading companies with AI-powered matching. Search by role and location, connect with recruiters, and land your dream job on TalentHub.",
   generator: "v0.app",
+  icons: { icon: "/favicon.svg" },
 };
 
 export default function RootLayout({

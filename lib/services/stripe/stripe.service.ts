@@ -4,15 +4,29 @@ import {
   PRICE_IDS,
 } from "@/constants/BillingData";
 import { getServerUser } from "@/lib/action/auth/serverAuth";
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SK!);
 
-// fetch subscription
-export async function getSubscription(userId: string) {
-  const supabase = await createClient();
+// current user
+export async function getMySubscriptionService() {
+  const { supabase, user } = await getServerUser();
+  if (!user) throw new Error("UNAUTHORIZED");
+
+  const { data, error } = await supabase
+    .from("subscriptions")
+    .select("subscription_status, plan_expires_at, plan")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (error) throw error;
+
+  return data;
+}
+
+// any user
+export async function getUserSubscription(userId: string) {
+  const { supabase } = await getServerUser();
 
   const { data } = await supabase
     .from("subscriptions")
