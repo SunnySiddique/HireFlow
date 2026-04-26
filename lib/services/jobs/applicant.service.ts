@@ -22,7 +22,12 @@ export async function updateApplicantStatusService(
   if (error) throw new Error(error.message);
   if (!applicant) throw new Error("Failed to update applicant status");
 
-  await sendApplicantsNotification(supabase, applicant.user_id, status);
+  await sendApplicantsNotification(
+    supabase,
+    applicant.user_id,
+    status,
+    applicantId,
+  );
 
   return applicant;
 }

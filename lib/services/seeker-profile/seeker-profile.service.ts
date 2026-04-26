@@ -1,6 +1,6 @@
 import { getServerUser } from "@/lib/action/auth/serverAuth";
 import { JobSeekerProfileDB } from "@/types/job-seeker";
-import { sendProfileCompletionNotifications } from "../notification/notifications.helper";
+import { sendProfileCompletionNotification } from "../notification/notifications.helper";
 
 export async function saveSeekerProfileService(
   profileData: JobSeekerProfileDB,
@@ -22,7 +22,7 @@ export async function saveSeekerProfileService(
 
   if (!updatedProfile) throw new Error("Faild to Save profile");
 
-  await sendProfileCompletionNotifications(
+  await sendProfileCompletionNotification(
     supabase,
     updatedProfile.auth_id,
     updatedProfile.profile_completion as number,
