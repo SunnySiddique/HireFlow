@@ -1,23 +1,4 @@
 import { getServerUser } from "@/lib/action/auth/serverAuth";
-import { SupabaseClient } from "@supabase/supabase-js";
-import { insertNotification } from "./notifications.helper";
-
-// send notificaition
-export async function sendNotification(
-  supabase: SupabaseClient,
-  userId: string,
-  type: string,
-  title: string,
-  message: string,
-  referenceId: string,
-) {
-  await insertNotification(
-    supabase,
-    userId,
-    { type, title, message },
-    referenceId,
-  );
-}
 
 // notifications
 export async function notificationsService() {

@@ -6,7 +6,7 @@ import {
   InterviewFilters,
   InterviewInvite,
 } from "@/types/interview";
-import { sendNotification } from "../notification/notification.service";
+import { sendNotification } from "../notification/notifications.helper";
 
 // send interview link to the seeker
 export async function sendInterviewInviteService(interview: InterviewInvite) {

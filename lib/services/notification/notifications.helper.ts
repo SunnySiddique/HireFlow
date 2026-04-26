@@ -2,13 +2,28 @@ import {
   APPLICANT_TEMPLATES,
   SUBSCRIPTION_TEMPLATES,
 } from "@/constants/notificationData";
-import { hasAccess } from "@/lib/utils";
 import { NotificationPayload } from "@/types";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { getUserSubscription } from "../stripe/stripe.service";
 
 const MATCH_THRESHOLD = 0.4;
 const RELEVANCE_THRESHOLD = 0.3;
+
+// send notificaition
+export async function sendNotification(
+  supabase: SupabaseClient,
+  userId: string,
+  type: string,
+  title: string,
+  message: string,
+  referenceId: string,
+) {
+  await insertNotification(
+    supabase,
+    userId,
+    { type, title, message },
+    referenceId,
+  );
+}
 
 export async function insertNotification(
   supabase: SupabaseClient,
@@ -16,17 +31,6 @@ export async function insertNotification(
   payload: NotificationPayload,
   referenceId: string,
 ) {
-  const sub = await getUserSubscription(userId);
-
-  const hasValidPlan =
-    hasAccess(
-      sub?.subscription_status as string,
-      sub?.plan_expires_at as string,
-    ) &&
-    (sub?.plan === "growth" || sub?.plan === "accelerator");
-
-  if (!hasValidPlan) return;
-
   const { error } = await supabase.from("notifications").insert({
     user_id: userId,
     type: payload.type,

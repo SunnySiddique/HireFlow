@@ -1,10 +1,12 @@
 import { PLAN_LIMITS } from "@/constants/BillingData";
 import { getServerUser } from "@/lib/action/auth/serverAuth";
-import { sendJobMatchNotifications } from "@/lib/services/notification/notifications.helper";
+import {
+  sendJobMatchNotifications,
+  sendNotification,
+} from "@/lib/services/notification/notifications.helper";
 import { createClient } from "@/lib/supabase/server";
 import { createSlug } from "@/lib/utils";
 import { jobFormData, JobFormValues, jobUpdateFormData } from "@/types/jobs";
-import { sendNotification } from "../notification/notification.service";
 
 export async function employerJobsService() {
   const { supabase, user } = await getServerUser();
