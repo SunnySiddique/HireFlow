@@ -140,6 +140,9 @@ const ProfilePage = () => {
         if (profileFile.size > MAX_PROFILE_SIZE) {
           return toast.error("Profile image too large. Max size: 1MB.");
         }
+        if (profileFile.size > 5 * 1024 * 1024) {
+          return toast.error("Profile image must be under 5MB to upload.");
+        }
 
         const result = await uploadImage({
           bucketName: "job_seeker_profile",

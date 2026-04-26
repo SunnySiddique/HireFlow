@@ -62,11 +62,16 @@ export const useUploadProfileAndResume = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["seeker-profile"] });
     },
-    onError: (error) =>
-      toast.error(
-        error.message ||
-          `Something went wrong. uploading proifleImage or Resume try again`,
-      ),
+    onError: (error) => {
+      if (
+        error.message.includes("Body exceeded") ||
+        error.message.includes("body size limit")
+      ) {
+        toast.error("File is too large to upload. Please use a smaller file.");
+        return;
+      }
+      toast.error(error.message || "Upload failed. Please try again.");
+    },
   });
 };
 

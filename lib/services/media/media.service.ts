@@ -8,10 +8,6 @@ export async function uploadSeekerImageService(
 ) {
   const supabase = await createClient();
 
-  if (!file.type.startsWith("image/")) {
-    throw new Error("Invalid file type");
-  }
-
   if (file.size > 5 * 1024 * 1024) {
     throw new Error("File too large (max 5MB)");
   }
@@ -46,10 +42,6 @@ export async function uploadEmployerCompanyLogoService(
   logoPath?: string,
 ) {
   const supabase = await createClient();
-
-  if (!file.type.startsWith("image/")) {
-    throw new Error("Only image files allowed");
-  }
 
   if (file.size > 2 * 1024 * 1024) {
     throw new Error("Logo must be under 2MB");
