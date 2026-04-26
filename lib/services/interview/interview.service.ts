@@ -1,4 +1,4 @@
-import { getServerUser } from "@/lib/auth/serverAuth";
+import { getServerUser } from "@/lib/action/auth/serverAuth";
 import { applyPagination } from "@/lib/pagination/pagination";
 import { sendNotification } from "@/lib/services/notification/notifications.helper";
 import { createClient } from "@/lib/supabase/server";
@@ -180,6 +180,7 @@ export async function interviewsService(
 
   const totalCount = count ?? 0;
   const totalPages = Math.ceil(totalCount / limit);
+
   return {
     data: data as unknown as Interview[],
     totalPages,

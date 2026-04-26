@@ -19,6 +19,7 @@ import {
 } from "@/hooks/seeker-profile/useSeeker";
 import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { hasAccess, MAX_PROFILE_SIZE, MAX_RESUME_SIZE } from "@/lib/utils";
+import { UserSubscription } from "@/types";
 import {
   EducationItem,
   ExperienceItem,
@@ -231,20 +232,6 @@ const ProfilePage = () => {
     );
 
     setSkills(jobSeekerProfile.skills ?? []);
-
-    form.reset({
-      fullName: jobSeekerProfile.full_name ?? "",
-      headline: jobSeekerProfile.headline ?? "",
-      about: jobSeekerProfile.about ?? "",
-      bio: jobSeekerProfile.bio ?? "",
-      desiredRole: jobSeekerProfile.desired_role ?? "",
-      expectedSalaryMin: jobSeekerProfile.expected_salary_min ?? "",
-      expectedSalaryMax: jobSeekerProfile.expected_salary_max ?? "",
-      preferredLocations: jobSeekerProfile.preferred_locations ?? "",
-      portfolioUrl: jobSeekerProfile.portfolio_url ?? "",
-      openToWork: jobSeekerProfile.open_to_work ?? true,
-      preferred_job_type: jobSeekerProfile.preferred_job_type ?? "",
-    });
   }, [jobSeekerProfile, editMode, form]);
 
   const onInvalid = (errors: any) => {
@@ -341,8 +328,9 @@ const ProfilePage = () => {
 
             {isSubscribed && activeSection === "billing" && (
               <ManageSubscription
-                subscription={subscription}
-                isSubscribed={isSubscribed}
+                subscription={
+                  subscription as UserSubscription | null | undefined
+                }
                 userRole="job-seeker"
               />
             )}

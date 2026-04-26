@@ -109,6 +109,10 @@ export async function sendNotification(
   });
 
   if (error) {
+    if (error.code === "23505") {
+      return;
+    }
+
     console.error("[sendNotification]", error);
   }
 }

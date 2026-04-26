@@ -4,6 +4,7 @@ import Checkout from "@/components/subscription/Checkout";
 import { seekerPlans } from "@/constants/BillingData";
 import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { cn } from "@/lib/utils";
+import { UserSubscription } from "@/types";
 import { Check, Info, Star } from "lucide-react";
 
 const JobSeekerBillingPage = () => {
@@ -78,7 +79,9 @@ const JobSeekerBillingPage = () => {
                 isPopular={plan.popular}
                 planName={plan.name.toLowerCase()}
                 userRole="jobseeker"
-                subscription={subscription}
+                subscription={
+                  subscription as UserSubscription | null | undefined
+                }
               />
 
               <div className="space-y-4 flex-grow">

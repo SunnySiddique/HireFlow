@@ -1,7 +1,9 @@
-import { EmployerAuth, JobSeekerAuth } from "@/types/auth";
-import { createClient } from "../supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
-// Create user
+import { EmployerAuth, JobSeekerAuth } from "@/types/auth";
+import { redirect } from "next/navigation";
+
+// create user
 export async function createUserService(
   role: "job_seeker" | "employer",
   input: JobSeekerAuth | EmployerAuth,
@@ -55,7 +57,6 @@ export async function createUserService(
 }
 
 // login user
-
 export async function loginUserService(
   role: "job_seeker" | "employer",
   input: JobSeekerAuth | EmployerAuth,
@@ -100,4 +101,36 @@ export async function loginUserService(
   }
 
   return data;
+}
+
+// forgot password
+export async function forgotPasswordService(email: string) {
+  const supabase = await createClient();
+  const domain = process.env.NEXT_PUBLIC_DOMAIN;
+  if (!domain) throw new Error("Missing NEXT_PUBLIC_DOMAIN");
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${domain}/auth/callback?next=/auth/update-password`,
+  });
+
+  if (error) throw error;
+}
+
+export async function updatePasswordService(password: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.updateUser({
+    password,
+  });
+
+  if (error) throw error;
+
+  await supabase.auth.signOut();
+}
+
+// signout
+export async function siginOutService() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect("/auth/signin");
 }

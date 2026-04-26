@@ -21,7 +21,7 @@ const EmployerInterviewsPage = () => {
 
   if (isLoading) return <Loader mode="inline" />;
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-4">
+    <div className="py-4">
       <InterviewHeader
         resetFilters={resetFilters}
         updateFilter={updateFilter}

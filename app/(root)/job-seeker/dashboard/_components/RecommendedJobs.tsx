@@ -1,27 +1,32 @@
+import EmptyState from "@/components/EmptyState";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useRecommandedJobs } from "@/hooks/jobs/useSeekerJob";
 import {
   formatDate,
   formatLabel,
   formatSalary,
   getInitials,
 } from "@/lib/utils";
-import { Bookmark, Building2, Clock, MapPin, Wifi } from "lucide-react";
+import { JobWithEmployer } from "@/types/jobs";
+import {
+  Bookmark,
+  Briefcase,
+  Building2,
+  Clock,
+  MapPin,
+  Wifi,
+} from "lucide-react";
 import Link from "next/link";
-import EmptyState from "./EmptyState";
 
-const RecommendedJobs = () => {
-  const { data: recommendedJobs = [] } = useRecommandedJobs();
-
+const RecommendedJobs = ({ jobs }: { jobs: JobWithEmployer[] }) => {
   return (
     <>
-      {recommendedJobs.length > 0 ? (
+      {jobs.length > 0 ? (
         <>
           <div className="flex items-center justify-between mb-4 lg:mb-6">
             <h2 className="text-base lg:text-lg font-bold text-foreground">
-              Recommended Jobs {recommendedJobs.length}
+              Recommended Jobs {jobs.length}
             </h2>
             <Link
               href="/job-seeker/jobs"
@@ -31,7 +36,7 @@ const RecommendedJobs = () => {
             </Link>
           </div>
           <div className="space-y-3 lg:space-y-4">
-            {recommendedJobs.map((job) => {
+            {jobs.map((job) => {
               const {
                 id,
                 job_title,
@@ -144,7 +149,11 @@ const RecommendedJobs = () => {
           </div>
         </>
       ) : (
-        <EmptyState msg={"Recommended"} />
+        <EmptyState
+          icon={Briefcase}
+          msg1="No Recommended Jobs"
+          msg2="We don't have any job recommendations for you yet. Complete your profile to get personalized suggestions!"
+        />
       )}
     </>
   );

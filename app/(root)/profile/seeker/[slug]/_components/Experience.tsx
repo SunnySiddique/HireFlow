@@ -29,7 +29,7 @@ const Experience = ({ experiences }: ExperienceProps) => {
                   </h3>
                   <p className="text-muted-foreground text-sm">{exp.company}</p>
                   <p className="text-muted-foreground text-xs mt-1">
-                    {exp.duration}
+                    {exp.duration.toUpperCase()}
                   </p>
                 </div>
                 {exp.description && (

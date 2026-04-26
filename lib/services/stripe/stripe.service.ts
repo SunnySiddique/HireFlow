@@ -3,7 +3,7 @@ import {
   JobSeekerPlanKey,
   PRICE_IDS,
 } from "@/constants/BillingData";
-import { getServerUser } from "@/lib/auth/serverAuth";
+import { getServerUser } from "@/lib/action/auth/serverAuth";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Stripe from "stripe";
@@ -70,8 +70,8 @@ export async function createCheckoutSessionService(
       userRole,
       planName,
     },
-    success_url: `${process.env.NEXT_PUBLIC_DOMAIN}/${userRole === "employer" ? "employer" : "job-seeker"}/dashboard?success=true`,
-    cancel_url: `${process.env.NEXT_PUBLIC_DOMAIN}/${userRole === "employer" ? "employer" : "job-seeker"}/billing`,
+    success_url: `${process.env.NEXT_PUBLIC_DOMAIN!}/subscription/success`,
+    cancel_url: `${process.env.NEXT_PUBLIC_DOMAIN}/subscription/cancel`,
   });
 
   redirect(session.url!);

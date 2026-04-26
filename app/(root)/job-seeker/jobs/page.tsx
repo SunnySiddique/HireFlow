@@ -45,6 +45,10 @@ const BrowseJobs = () => {
   const featuredJobs = jobs.filter((job) => job.is_featured);
   const regularJobs = jobs.filter((job) => !job.is_featured);
 
+  const activeJobs = filters.featured
+    ? featuredJobs
+    : [...featuredJobs, ...regularJobs];
+
   const updateFilters = (updated: Partial<typeof filters>) => {
     setFilters((prev) => ({ ...prev, ...updated, page: 1 }));
   };
@@ -104,9 +108,9 @@ const BrowseJobs = () => {
       />
 
       {isLoading ? (
-        <Loader mode="full" />
+        <Loader mode="inline" />
       ) : isFetching ? (
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <JobCardSkeleton key={i} />
           ))}
@@ -135,14 +139,13 @@ const BrowseJobs = () => {
             </div>
           )}
 
-          {/* ✅ Regular jobs — hidden when featured filter is on */}
-          {!filters.featured && regularJobs.length > 0 && (
+          {!filters.featured && activeJobs.length > 0 && (
             <div className="space-y-3">
               <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
                 All Jobs
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-                {regularJobs.map((job) => (
+                {activeJobs.map((job) => (
                   <JobCard
                     key={job.id}
                     job={job}

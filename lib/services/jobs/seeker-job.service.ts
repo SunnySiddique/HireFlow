@@ -1,4 +1,4 @@
-import { getServerUser } from "@/lib/auth/serverAuth";
+import { getServerUser } from "@/lib/action/auth/serverAuth";
 import { applyPagination } from "@/lib/pagination/pagination";
 import { createClient } from "@/lib/supabase/server";
 import { InterviewFilters } from "@/types/interview";

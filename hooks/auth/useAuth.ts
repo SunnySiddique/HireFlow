@@ -1,9 +1,16 @@
-import { createUser, loginUser } from "@/lib/auth/auth.actions";
+import {
+  createUser,
+  forgotPassword,
+  loginUser,
+  signinOut,
+  updatePassword,
+} from "@/lib/action/auth/auth.actions";
 import { EmployerAuth, JobSeekerAuth } from "@/types/auth";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
+// create account
 export const useCreateUser = () => {
   const router = useRouter();
 
@@ -29,6 +36,7 @@ export const useCreateUser = () => {
   });
 };
 
+// singin user
 export const useLoginUser = () => {
   const router = useRouter();
 
@@ -61,6 +69,41 @@ export const useLoginUser = () => {
       }
 
       toast.error(error.message || "Login failed");
+    },
+  });
+};
+
+// forgot passwowrd
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: (email: string) => forgotPassword(email),
+
+    onError: (error) => {
+      toast.error(error.message || "Something went wrong. Sending email");
+    },
+  });
+};
+
+// update pass
+export const useUpdatePassword = () => {
+  return useMutation({
+    mutationFn: (password: string) => updatePassword(password),
+
+    onError: (error) => {
+      toast.error(error.message || "Something went wrong. Sending email");
+    },
+  });
+};
+
+// signin out
+export const useSignOut = () => {
+  return useMutation({
+    mutationFn: signinOut,
+    onSuccess: () => {
+      toast.success("Signed out successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Something went wrong");
     },
   });
 };

@@ -6,7 +6,7 @@ import { AUTH_TABS } from "@/constants";
 import { useCreateUser } from "@/hooks/auth/useAuth";
 import { createClient } from "@/lib/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Chrome, Github } from "lucide-react";
+import { Chrome, Github, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -33,7 +33,7 @@ type JobSeekerFormData = z.infer<typeof jobSeekerSchema>;
 type EmployerFormData = z.infer<typeof employerSchema>;
 
 export function SignupForm() {
-  const { mutate: createUser, isPending } = useCreateUser();
+  const { mutate: createUser, isPending: isSubmitting } = useCreateUser();
 
   const [activeTab, setActiveTab] = useState<"job_seeker" | "employer">(
     "job_seeker",
@@ -95,7 +95,7 @@ export function SignupForm() {
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${path}&role=${activeTab}`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${path}&role=${activeTab}&type=signup`,
       },
     });
   };
@@ -112,26 +112,25 @@ export function SignupForm() {
       </div>
 
       {/* Social Login Buttons */}
-      {activeTab === "job_seeker" && (
-        <div className="flex gap-3 mb-8">
-          <Button
-            variant="outline"
-            className="flex-1 h-12 border border-border hover:bg-muted bg-transparent"
-            disabled={isPending}
-            onClick={() => handleSignInWithGoogleAndGithub("github")}
-          >
-            <Github className="w-5 h-5" />
-          </Button>
-          <Button
-            variant="outline"
-            className="flex-1 h-12 border border-border hover:bg-muted bg-transparent"
-            disabled={isPending}
-            onClick={() => handleSignInWithGoogleAndGithub("google")}
-          >
-            <Chrome className="w-5 h-5" />
-          </Button>
-        </div>
-      )}
+      <div className="flex gap-3 mb-8">
+        <Button
+          variant="outline"
+          className="flex-1 h-12 border border-border hover:bg-muted bg-transparent"
+          disabled={isSubmitting}
+          onClick={() => handleSignInWithGoogleAndGithub("github")}
+        >
+          <Github className="w-5 h-5" />
+        </Button>
+        <Button
+          variant="outline"
+          className="flex-1 h-12 border border-border hover:bg-muted bg-transparent"
+          disabled={isSubmitting}
+          onClick={() => handleSignInWithGoogleAndGithub("google")}
+        >
+          <Chrome className="w-5 h-5" />
+        </Button>
+      </div>
+
       <div className="relative mb-8">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-border" />
@@ -200,9 +199,9 @@ export function SignupForm() {
               <Button
                 type="submit"
                 className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-base rounded-lg"
-                disabled={isPending}
+                disabled={isSubmitting}
               >
-                {isPending ? "Creating Account..." : "Sign Up"}
+                {isSubmitting ? "Creating Account..." : "Sign Up"}
               </Button>
             </form>
           </Form>
@@ -258,10 +257,17 @@ export function SignupForm() {
 
               <Button
                 type="submit"
-                className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-base rounded-lg"
-                disabled={isPending}
+                disabled={isSubmitting}
+                className="w-full h-12 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 transition-all duration-300"
               >
-                {isPending ? "Creating Account..." : "Sign Up"}
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Creating Account...
+                  </>
+                ) : (
+                  "Sign Up"
+                )}
               </Button>
             </form>
           </Form>

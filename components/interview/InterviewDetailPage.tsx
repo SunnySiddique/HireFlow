@@ -1,11 +1,11 @@
 "use client";
 
-import Loader from "@/components/Loader";
 import { getStatusConfig } from "@/constants/InterviewsData";
 import { useInterview } from "@/hooks/interview/useInterview";
 import { cn } from "@/lib/utils";
 import { Calendar, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Loader from "../Loader";
 import { Button } from "../ui/button";
 import Hero from "./Hero";
 import LeftColumn from "./LeftColumn";

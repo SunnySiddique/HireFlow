@@ -50,6 +50,8 @@ export const NotificationIcon = ({ type }: { type: string }) => {
       return <CheckCircle className="w-4 h-4 text-green-500" />;
     case "interview_declined":
       return <XCircle className="w-4 h-4 text-red-500" />;
+    case "interview_reminder":
+      return <Clock className="w-4 h-4 text-yellow-500" />;
 
     default:
       return <Bell className="w-4 h-4 text-muted-foreground" />;
@@ -86,7 +88,8 @@ export function getNotificationLink(
     case "new_interview_invite":
     case "interview_accepted":
     case "interview_declined":
-      return role === "job-seeker" && `/job-seeker/interviews/${referenceId}`;
+    case "interview_reminder":
+      return `/${role}/interviews/${referenceId}`;
 
     default:
       return "";

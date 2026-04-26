@@ -1,7 +1,15 @@
 "use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LogOut, MoreVertical, X, Zap } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  LogOut,
+  MoreVertical,
+  X,
+  Zap,
+} from "lucide-react";
 
 import { AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -19,17 +27,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { employerLinks, FREE_LINKS, jobSeekerLinks } from "@/constants";
+import { useSignOut } from "@/hooks/auth/useAuth";
 import { useEmployerProfile } from "@/hooks/employer-profile/useEmployer";
 import { useSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
 import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
-import { createClient } from "@/lib/supabase/client";
 import { getInitials, hasAccess } from "@/lib/utils";
+import { randomImage } from "@/lib/utils/randomImage";
 import { Check, MonitorIcon, Moon, PaletteIcon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import toast from "react-hot-toast";
+import Loader from "../Loader";
 
 interface DashboardSidebarProps {
   sidebarOpen: boolean;
@@ -43,29 +52,36 @@ const DashboardSidebar = ({
   role,
 }: DashboardSidebarProps) => {
   // hook
-  const { data: jobSeekerProfile } = useSeekerProfile({
-    enabled: role === "job-seeker",
-  });
-  const { data: employerProfile } = useEmployerProfile({
-    enabled: role === "employer",
-  });
-  const { data: subscription } = useGetCurrentUserSubscription();
+  const { data: jobSeekerProfile, isLoading: seekerLoading } = useSeekerProfile(
+    {
+      enabled: role === "job-seeker",
+    },
+  );
+  const { data: employerProfile, isLoading: employerLoading } =
+    useEmployerProfile({
+      enabled: role === "employer",
+    });
+
+  const { data: subscription, isLoading: subLoading } =
+    useGetCurrentUserSubscription();
+  const { mutateAsync: signOut, isPending } = useSignOut();
+
+  const router = useRouter();
+
+  // state
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const pathname = usePathname();
+
   const isSubscribed = hasAccess(
     subscription?.subscription_status as string,
     subscription?.plan_expires_at as string,
   );
 
-  const [isOpen, setIsOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
-  const router = useRouter();
-  const pathname = usePathname();
-
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-
-    toast.success("Signout successfully");
-    router.push("/auth/signin");
+    await signOut();
   };
 
   const isActive = (href: string) => {
@@ -80,7 +96,11 @@ const DashboardSidebar = ({
     }
     if (!link.plan) return true;
 
-    return subscription?.plan === link.plan;
+    return (
+      subscription?.plan === link.plan ||
+      link?.plan === "growth" ||
+      link?.plan === "accelerator"
+    );
   });
 
   const mainLinks = filteredLinks.filter((l) => l.section === "main");
@@ -104,14 +124,23 @@ const DashboardSidebar = ({
           isActive(href)
             ? "bg-sidebar border-l-4 border-sidebar-primary text-sidebar-primary"
             : "hover:bg-muted-foreground/10"
-        } flex items-center gap-3 px-4 py-3 rounded-md cursor-pointer`}
+        } flex items-center gap-3 px-4 py-3 rounded-md cursor-pointer ${
+          isCollapsed ? "justify-center p-5" : ""
+        }`}
         onClick={() => setSidebarOpen(false)}
       >
         {link.icon && <link.icon className="w-4 h-4" />}
-        <span className="text-sm font-medium">{link.label}</span>
+        {!isCollapsed && (
+          <span className="text-sm font-medium">{link.label}</span>
+        )}{" "}
       </Link>
     );
   };
+
+  const isLoading =
+    subLoading || (role === "job-seeker" ? seekerLoading : employerLoading);
+
+  if (isLoading) return <Loader mode="full" />;
   return (
     <>
       {sidebarOpen && (
@@ -121,66 +150,95 @@ const DashboardSidebar = ({
         />
       )}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 w-70 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col z-40 transition-transform duration-300 transform ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className={`fixed lg:static inset-y-0 left-0 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col z-40 transition-all duration-300
+${isCollapsed ? "w-24" : "w-60"}
+${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
+        <button
+          onClick={() => setIsCollapsed((prev) => !prev)}
+          className="hidden lg:flex absolute -right-4 top-6 w-8 h-8 rounded-full bg-sidebar border border-sidebar-border items-center justify-center text-sidebar-foreground z-50 hover:bg-sidebar-accent transition-colors shadow-sm"
+        >
+          {isCollapsed ? (
+            <ChevronRight className="w-4 h-4" />
+          ) : (
+            <ChevronLeft className="w-4 h-4" />
+          )}
+        </button>
         {/* Logo */}
-        <div className="p-4 lg:p-6 flex items-center justify-between border-b border-sidebar-border">
+        <div
+          className={`p-4 lg:p-6 flex items-center border-b border-sidebar-border transition-all duration-300 ${
+            isCollapsed ? "justify-center" : "justify-between"
+          }`}
+        >
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-sidebar-primary text-sidebar-primary-foreground rounded flex items-center justify-center">
+            <div className="w-8 h-8 bg-sidebar-primary text-sidebar-primary-foreground rounded flex items-center justify-center flex-shrink-0">
               <Zap className="w-5 h-5" />
             </div>
-            <span className="font-bold text-lg font-sans">HireFlow</span>
+            {!isCollapsed && (
+              <span className="font-bold text-lg font-sans">HireFlow</span>
+            )}
           </div>
-          <button
-            className="lg:hidden text-sidebar-foreground"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <X className="w-5 h-5" />
-          </button>
+          {!isCollapsed && (
+            <button
+              className="lg:hidden text-sidebar-foreground"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-4 space-y-6">
+
+        <nav
+          className={`flex-1 overflow-y-auto p-4 ${isCollapsed ? "space-y-0" : "space-y-6"} `}
+        >
           {/* Main Section */}
           <div>
-            <p className="text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-3 px-2">
-              Main
-            </p>
-
-            <div className="space-y-2">{mainLinks.map(renderLink)}</div>
+            {!isCollapsed && (
+              <p
+                className={`text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-3 px-2`}
+              >
+                Main
+              </p>
+            )}
+            <div className="space-y-1">{mainLinks.map(renderLink)}</div>
           </div>
 
           {/* Manage Section */}
           <div>
-            <p className="text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-3 px-2">
-              Manage
-            </p>
-
-            <div className="space-y-2">{manageLinks.map(renderLink)}</div>
+            {!isCollapsed && (
+              <p className="text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-3 px-2">
+                Manage
+              </p>
+            )}
+            <div className="space-y-1">{manageLinks.map(renderLink)}</div>
           </div>
         </nav>
+
         {/* Bottom User Profile */}
         <div className="p-4 border-t border-sidebar-border">
           <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="w-full h-auto px-3 py-2 rounded-lg justify-start hover:bg-sidebar-accent transition-colors"
+                className={`w-full h-auto py-2 rounded-lg transition-colors hover:bg-sidebar-accent ${
+                  isCollapsed ? "px-0 justify-center" : "px-3 justify-start"
+                }`}
               >
                 {role === "job-seeker" ? (
                   <Avatar className="h-10 w-10 flex-shrink-0">
                     {jobSeekerProfile?.profile_url ? (
                       <AvatarImage
                         src={
-                          jobSeekerProfile?.profile_url || "/placeholder.svg"
+                          jobSeekerProfile?.profile_url ||
+                          randomImage(jobSeekerProfile?.full_name)
                         }
                         alt={jobSeekerProfile?.full_name || "User Profile"}
                       />
                     ) : (
                       <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                        {getInitials(jobSeekerProfile?.full_name ?? "User")}
+                        {getInitials(jobSeekerProfile?.full_name ?? "Jhon")}
                       </AvatarFallback>
                     )}
                   </Avatar>
@@ -190,40 +248,53 @@ const DashboardSidebar = ({
                       <AvatarImage
                         src={
                           employerProfile?.company_logo_url ||
-                          "/placeholder.svg"
+                          randomImage(employerProfile?.company_name)
                         }
-                        alt={employerProfile?.company_name || "User Profile"}
+                        alt={employerProfile?.company_name || "Company Profile"}
                       />
                     ) : (
                       <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                        {getInitials(employerProfile?.company_name ?? "User")}
+                        {getInitials(employerProfile?.company_name ?? "CO")}
                       </AvatarFallback>
                     )}
                   </Avatar>
                 )}
-                <div className="flex-1 text-left ml-3 min-w-0">
-                  <p className="text-sm font-semibold text-foreground truncate">
-                    {role === "job-seeker"
-                      ? (jobSeekerProfile?.full_name ?? "John Doe")
-                      : (employerProfile?.company_name ?? "John Doe")}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {role === "job-seeker" ? "Job Seeker" : "Employer"}
-                  </p>
-                </div>
-                <MoreVertical className="w-4 h-4 flex-shrink-0 ml-2" />
+
+                {!isCollapsed && (
+                  <>
+                    <div className="flex-1 text-left ml-3 min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">
+                        {role === "job-seeker"
+                          ? (jobSeekerProfile?.full_name ?? "User")
+                          : (employerProfile?.company_name ?? "Company")}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {role === "job-seeker" ? "Job Seeker" : "Employer"}
+                      </p>
+                    </div>
+                    <MoreVertical className="w-4 h-4 flex-shrink-0 ml-2 text-muted-foreground" />
+                  </>
+                )}
               </Button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-56">
               {/* User Info */}
-              <div className="flex items-center gap-3 px-2 py-3">
+              <div
+                className="flex items-center gap-3 px-2 py-3 cursor-pointer"
+                onClick={() =>
+                  router.push(
+                    `/${role}/profile/${role === "job-seeker" ? jobSeekerProfile?.slug : employerProfile?.slug}`,
+                  )
+                }
+              >
                 {role === "job-seeker" ? (
-                  <Avatar className="h-10 w-10 flex-shrink-0">
+                  <Avatar className="h-10 w-10 flex-shrink-0 cursor-pointer ">
                     {jobSeekerProfile?.profile_url ? (
                       <AvatarImage
                         src={
-                          jobSeekerProfile?.profile_url || "/placeholder.svg"
+                          jobSeekerProfile?.profile_url ||
+                          randomImage(jobSeekerProfile?.full_name)
                         }
                         alt={jobSeekerProfile?.full_name || "User Profile"}
                       />
@@ -234,12 +305,12 @@ const DashboardSidebar = ({
                     )}
                   </Avatar>
                 ) : (
-                  <Avatar className="h-10 w-10 flex-shrink-0">
+                  <Avatar className="h-10 w-10 flex-shrink-0 cursor-pointer">
                     {employerProfile?.company_logo_url ? (
                       <AvatarImage
                         src={
                           employerProfile?.company_logo_url ||
-                          "/placeholder.svg"
+                          randomImage(employerProfile?.company_name)
                         }
                         alt={employerProfile?.company_name || "User Profile"}
                       />
@@ -261,7 +332,6 @@ const DashboardSidebar = ({
               </div>
 
               <DropdownMenuSeparator />
-
               <DropdownMenuGroup>
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
@@ -317,9 +387,19 @@ const DashboardSidebar = ({
               <DropdownMenuItem
                 className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
                 onClick={handleLogout}
+                disabled={isPending}
               >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
+                {isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Logging Out...</span>
+                  </>
+                ) : (
+                  <>
+                    <LogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </>
+                )}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

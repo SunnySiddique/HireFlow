@@ -21,13 +21,17 @@ const UpcomingInterviewsPage = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 space-y-6">
-        {upcomingInterviews.map((interview) => (
-          <InterviewCard
-            key={interview.id}
-            interview={interview}
-            role="seeker"
-          />
-        ))}
+        {upcomingInterviews.length > 0 ? (
+          upcomingInterviews.map((interview) => (
+            <InterviewCard
+              key={interview.id}
+              interview={interview}
+              role="seeker"
+            />
+          ))
+        ) : (
+          <p className="">No Interviews</p>
+        )}
       </div>
     </div>
   );

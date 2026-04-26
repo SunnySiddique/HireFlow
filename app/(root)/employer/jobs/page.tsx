@@ -37,13 +37,13 @@ import { useEffect, useState } from "react";
 const getStatusColor = (status: string) => {
   switch (status) {
     case "open":
-      return "bg-emerald-50 text-emerald-700 border-emerald-200 ring-1 ring-emerald-600/20";
+      return "bg-green-500/10 text-green-600 border-green-500/20 ring-1 ring-green-500/10";
     case "closed":
-      return "bg-rose-50 text-rose-700 border-rose-200 ring-1 ring-rose-600/20";
+      return "bg-red-500/10 text-red-600 border-red-500/20 ring-1 ring-red-500/10";
     case "pending":
-      return "bg-amber-50 text-amber-700 border-amber-200 ring-1 ring-amber-600/20";
+      return "bg-yellow-500/10 text-yellow-600 border-yellow-500/20 ring-1 ring-yellow-500/10";
     default:
-      return "bg-muted text-muted-foreground border-border";
+      return "bg-muted/50 text-muted-foreground border-border ring-1 ring-border/20";
   }
 };
 
@@ -90,16 +90,32 @@ const ManageJobsPage = () => {
     <main>
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
-          <div>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          >
             <h1 className="text-4xl font-bold text-foreground">Manage Jobs</h1>
             <p className="text-muted-foreground mt-2">
               Create, edit and manage your job postings
             </p>
-          </div>
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+          </motion.div>
+          <motion.div
+            whileHover={{
+              scale: 1.05,
+              boxShadow: "0 10px 25px -5px rgba(var(--primary), 0.3)",
+            }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
             <Link href="/employer/jobs/create">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 h-11">
-                <Plus className="w-5 h-5" />
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25 flex items-center gap-2 h-11 px-6 rounded-lg font-medium transition-all duration-300">
+                <motion.div
+                  whileHover={{ rotate: 90 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Plus className="w-5 h-5" />
+                </motion.div>
                 Create New Job
               </Button>
             </Link>
@@ -107,38 +123,74 @@ const ManageJobsPage = () => {
         </div>
 
         {jobs.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1,
+                },
+              },
+            }}
+          >
             {jobs.map((job) => (
-              <div key={job.id}>
-                <Card className="border-border bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200 flex flex-col rounded-xl overflow-hidden h-full">
+              <motion.div
+                key={job.id}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                whileHover={{ y: -4 }}
+                className="group"
+              >
+                <Card className="p-0 border-border bg-card hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 flex flex-col rounded-xl overflow-hidden h-full group-hover:bg-card/95">
                   <div className="p-5 flex-1 flex flex-col">
                     {/* Status row */}
                     <div className="flex items-start justify-between gap-3 mb-4">
-                      <h3 className="text-base font-semibold text-foreground line-clamp-2 flex-1">
+                      <motion.h3
+                        className="text-base font-semibold text-foreground line-clamp-2 flex-1 group-hover:text-primary transition-colors duration-200"
+                        initial={{ opacity: 0.9 }}
+                        whileHover={{ opacity: 1 }}
+                      >
                         {job.job_title}
-                      </h3>
+                      </motion.h3>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <Badge
-                          className={`${getStatusColor(job.status as string)} border text-[11px] rounded-sm`}
+                        <motion.div
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                         >
-                          {job.status}
-                        </Badge>
-                        <Select
-                          value={job.status || ""}
-                          onValueChange={(newStatus) =>
-                            handleChangeJobStatus(job.id, newStatus)
-                          }
-                          disabled={updatingStatusJobId === job.id}
+                          <Badge
+                            className={`${getStatusColor(job.status as string)} border text-[11px] rounded-sm transition-all duration-200 hover:shadow-sm`}
+                          >
+                            {job.status}
+                          </Badge>
+                        </motion.div>
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                         >
-                          <SelectTrigger className="h-7 w-[90px] text-xs">
-                            <SelectValue placeholder="Change" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="open">Open</SelectItem>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="closed">Closed</SelectItem>
-                          </SelectContent>
-                        </Select>
+                          <Select
+                            value={job.status || ""}
+                            onValueChange={(newStatus) =>
+                              handleChangeJobStatus(job.id, newStatus)
+                            }
+                            disabled={updatingStatusJobId === job.id}
+                          >
+                            <SelectTrigger className="h-7 w-[90px] text-xs hover:border-primary/40 transition-colors">
+                              <SelectValue placeholder="Change" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="open">Open</SelectItem>
+                              <SelectItem value="pending">Pending</SelectItem>
+                              <SelectItem value="closed">Closed</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </motion.div>
                       </div>
                     </div>
 
@@ -148,14 +200,18 @@ const ManageJobsPage = () => {
                         formatLabel(job.category ?? "N/A"),
                         formatLabel(job.employment_type ?? "N/A"),
                         formatLabel(job.experience_level ?? "N/A"),
-                        formatLabel(job.status ?? "N/A"),
-                      ].map((label) => (
-                        <Badge
+                      ].map((label, idx) => (
+                        <motion.div
                           key={label}
-                          className="text-[11px] px-2 py-0.5 rounded-sm bg-muted text-muted-foreground border border-border"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: idx * 0.1, duration: 0.3 }}
+                          whileHover={{ scale: 1.05 }}
                         >
-                          {label}
-                        </Badge>
+                          <Badge className="text-[11px] px-2 py-0.5 rounded-sm bg-muted/60 text-muted-foreground border border-border/50 hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all duration-200 cursor-default">
+                            {label}
+                          </Badge>
+                        </motion.div>
                       ))}
                     </div>
 
@@ -213,53 +269,71 @@ const ManageJobsPage = () => {
 
                     {/* Actions */}
                     <div className="flex gap-2 mt-auto">
-                      <Link
-                        href={`/employer/jobs/${job.job_slug}/edit`}
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="flex-1"
+                      >
+                        <Link
+                          href={`/employer/jobs/${job.job_slug}/edit`}
+                          className="block"
+                        >
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full border-border hover:bg-primary/5 hover:border-primary/40 hover:text-primary text-xs transition-all duration-200"
+                          >
+                            <Edit2 className="w-3.5 h-3.5 mr-1" />
+                            Edit
+                          </Button>
+                        </Link>
+                      </motion.div>
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="flex-1"
+                      >
+                        <Link
+                          href={`/employer/jobs/${job.job_slug}`}
+                          className="block"
+                        >
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full border-border hover:bg-primary/5 hover:border-primary/40 hover:text-primary text-xs transition-all duration-200"
+                          >
+                            <Eye className="w-3.5 h-3.5 mr-1" />
+                            View
+                          </Button>
+                        </Link>
+                      </motion.div>
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         className="flex-1"
                       >
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full border-border hover:bg-muted text-xs"
+                          className="w-full border-destructive/40 text-destructive hover:bg-destructive/10 hover:border-destructive hover:text-destructive text-xs transition-all duration-200"
+                          onClick={() => handleDeleteJob(job.id)}
                         >
-                          <Edit2 className="w-3.5 h-3.5 mr-1" />
-                          Edit
+                          {isDeletingJob && jobToDelete === job.id ? (
+                            <LoaderCircle className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <>
+                              <Trash2 className="w-3.5 h-3.5 mr-1" />
+                              Delete
+                            </>
+                          )}
                         </Button>
-                      </Link>
-                      <Link
-                        href={`/employer/jobs/${job.job_slug}`}
-                        className="flex-1"
-                      >
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full border-border hover:bg-muted text-xs"
-                        >
-                          <Eye className="w-3.5 h-3.5 mr-1" />
-                          View
-                        </Button>
-                      </Link>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 border-destructive/40 text-destructive hover:bg-destructive/10 hover:border-destructive text-xs transition-colors"
-                        onClick={() => handleDeleteJob(job.id)}
-                      >
-                        {isDeletingJob && jobToDelete === job.id ? (
-                          <LoaderCircle className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <>
-                            <Trash2 className="w-3.5 h-3.5 mr-1" />
-                            Delete
-                          </>
-                        )}
-                      </Button>
+                      </motion.div>
                     </div>
                   </div>
                 </Card>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         ) : (
           <NoJobsFound isEmployer={true} />
         )}

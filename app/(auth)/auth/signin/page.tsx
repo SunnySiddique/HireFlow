@@ -1,5 +1,6 @@
-import { LoginForm } from "@/app/(auth)/auth/_components/LoginForm";
+import { Suspense } from "react";
 import AuthNavbar from "../_components/authNavbar";
+import LoginForm from "../_components/LoginForm";
 
 export default function LoginPage() {
   return (
@@ -8,7 +9,9 @@ export default function LoginPage() {
 
       <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted px-4 py-12">
         <div className="w-full max-w-lg border shadow-lg p-5 rounded-sm">
-          <LoginForm />
+          <Suspense fallback={<div>Loading...</div>}>
+            <LoginForm />
+          </Suspense>
         </div>
       </main>
     </>

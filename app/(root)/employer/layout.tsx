@@ -1,10 +1,7 @@
 "use client";
 
-import Loader from "@/components/Loader";
 import DashboardNavbar from "@/components/navbar/DashboardNavbar";
 import DashboardSidebar from "@/components/sidebar/DashboardSidebar";
-import { useEmployerProfile } from "@/hooks/employer-profile/useEmployer";
-import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
@@ -15,9 +12,6 @@ export default function EmployerLayout({
 }) {
   const pathname = usePathname();
 
-  const { isLoading } = useEmployerProfile();
-  const { isLoading: isGetSub } = useGetCurrentUserSubscription();
-
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const isInterviewDetail = /^\/employer\/interviews\/[^/]+$/.test(pathname);
@@ -26,7 +20,6 @@ export default function EmployerLayout({
     return <>{children}</>;
   }
 
-  if (isLoading || isGetSub) return <Loader mode="full" />;
   return (
     <div className="flex h-screen bg-background">
       <DashboardSidebar

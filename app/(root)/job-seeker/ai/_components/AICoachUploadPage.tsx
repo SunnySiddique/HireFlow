@@ -159,11 +159,12 @@ const AICoachUploadPage = () => {
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1]">
                 Let AI Find Your{" "}
-                <span className="text-primary">Perfect Job</span> in Bangladesh
+                <span className="text-primary">Perfect Job</span> Worldwide
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Upload your resume and get hyper-personalized job matches with
-                fit scores, strengths, skill gaps & learning paths.
+                fit scores, strengths, skill gaps & learning paths from anywhere
+                in the world.
               </p>
             </motion.div>
 

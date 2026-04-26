@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { buildPagination } from "@/hooks/usePagination";
 
 interface PaginationProps {
   page: number;
@@ -8,26 +9,14 @@ interface PaginationProps {
 
 const Pagination = ({ page, onPageChange, totalPages }: PaginationProps) => {
   if (totalPages <= 1) return null;
+  const safePage = Math.max(1, Math.min(page, totalPages));
+  const items = buildPagination(safePage, totalPages);
 
-  const siblingCount = 1;
-  const leftSibling = Math.max(page - siblingCount, 1);
-  const rightSibling = Math.min(page + siblingCount, totalPages);
-
-  const pages: (number | string)[] = [];
-
-  if (leftSibling > 2) {
-    pages.push(1);
-    pages.push("...");
-  }
-
-  for (let i = leftSibling; i <= rightSibling; i++) {
-    pages.push(i);
-  }
-
-  if (rightSibling < totalPages - 1) {
-    pages.push("...");
-    pages.push(totalPages);
-  }
+  const handleChange = (newPage: number) => {
+    if (newPage !== safePage) {
+      onPageChange(newPage);
+    }
+  };
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mt-6">
@@ -41,7 +30,7 @@ const Pagination = ({ page, onPageChange, totalPages }: PaginationProps) => {
         variant="outline"
         size="sm"
         disabled={page === 1}
-        onClick={() => onPageChange(page - 1)}
+        onClick={() => handleChange(page - 1)}
         className="flex items-center gap-1 px-3 h-9"
       >
         Prev
@@ -49,32 +38,37 @@ const Pagination = ({ page, onPageChange, totalPages }: PaginationProps) => {
 
       {/* Pages - Hidden on very small screens */}
       <div className="hidden sm:flex items-center gap-1">
-        {pages.map((p, index) =>
-          typeof p === "string" ? (
-            <span key={index} className="px-2 text-muted-foreground">
-              {p}
-            </span>
-          ) : (
+        {items.map((item) => {
+          if (item.type === "dots") {
+            return (
+              <span key={item.id} className="px-2 text-muted-foreground">
+                ...
+              </span>
+            );
+          }
+
+          const isActive = item.value === safePage;
+
+          return (
             <Button
-              key={p}
+              key={item.value}
               size="sm"
-              variant={p === page ? "default" : "outline"}
-              onClick={() => onPageChange(p)}
+              variant={isActive ? "default" : "outline"}
+              aria-current={isActive ? "page" : undefined}
+              onClick={() => handleChange(item.value)}
               className="h-9 w-9 p-0 rounded-lg"
             >
-              {p}
+              {item.value}
             </Button>
-          ),
-        )}
+          );
+        })}
       </div>
 
-      {/* Next Button */}
       <Button
         variant="outline"
         size="sm"
-        disabled={page === totalPages}
-        onClick={() => onPageChange(page + 1)}
-        className="flex items-center gap-1 px-3 h-9"
+        disabled={safePage === totalPages}
+        onClick={() => handleChange(safePage + 1)}
       >
         Next
       </Button>

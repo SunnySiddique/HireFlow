@@ -44,7 +44,6 @@ const SavedJobsPage = () => {
           /* Empty state */
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="relative mb-6">
-              <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl" />
               <div className="relative w-24 h-24 rounded-full bg-muted border-2 border-primary/20 flex items-center justify-center">
                 <Bookmark className="w-12 h-12 text-primary" />
               </div>

@@ -8,7 +8,8 @@ import { useCreateJob, useUpdateJob } from "@/hooks/jobs/useEmployerJobs";
 import { createSlug } from "@/lib/utils";
 import { JobFormValues } from "@/types/jobs";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Check } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowLeft, Check, Loader2, SkipForward } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, Resolver, useForm } from "react-hook-form";
@@ -144,7 +145,6 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
         { job_slug: initialData.job_slug, jobData: data },
         {
           onSuccess: () => {
-            toast.success("Job updated successfully");
             form.reset();
           },
           onSettled: () => {
@@ -312,38 +312,88 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
                 {/* Navigation Buttons */}
                 <div className="flex justify-between gap-3 pt-6 border-t border-border mt-8">
                   {currentStep > 1 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="border-border hover:bg-muted"
-                      onClick={handleDecreaseCurrentStep}
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
                     >
-                      <ArrowLeft className="w-4 h-4 mr-2" />
-                      Back
-                    </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="border-border hover:bg-muted hover:border-primary/40 transition-all duration-200"
+                        onClick={handleDecreaseCurrentStep}
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Back
+                      </Button>
+                    </motion.div>
                   )}
-                  <Button
-                    type="button"
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 ml-auto"
-                    onClick={
-                      currentStep < 4
-                        ? handleIncreaseCurrentStep
-                        : () => form.handleSubmit(onSubmit, onInvalid)()
-                    }
-                    disabled={!isValid() || isJobCreating || isJobUpdating}
-                  >
-                    {currentStep < 4 && "Next: "}
-                    {currentStep === 4
-                      ? fromType === "create"
-                        ? isJobCreating
-                          ? "Creating..."
-                          : "Publish Job"
-                        : isJobUpdating
-                          ? "Updating..."
-                          : "Update Job"
-                      : (buttonText.find((txt) => txt.stepNum === currentStep)
-                          ?.btnTxt ?? "")}
-                  </Button>
+                  <div className="flex gap-2 ml-auto">
+                    {fromType === "edit" && currentStep < 4 && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="border-primary/40 text-primary hover:bg-primary/10 hover:border-primary transition-all duration-200"
+                          onClick={() => setCurrentStep(4)}
+                          disabled={
+                            !isValid() || isJobCreating || isJobUpdating
+                          }
+                        >
+                          <SkipForward className="w-4 h-4 mr-2" />
+                          Skip to Review
+                        </Button>
+                      </motion.div>
+                    )}
+                    <motion.div
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 10 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Button
+                        type="button"
+                        className="w-full h-12 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 transition-all duration-300"
+                        onClick={
+                          currentStep < 4
+                            ? handleIncreaseCurrentStep
+                            : () => form.handleSubmit(onSubmit, onInvalid)()
+                        }
+                        disabled={!isValid() || isJobCreating || isJobUpdating}
+                      >
+                        {currentStep < 4 && "Next: "}
+                        {currentStep === 4 ? (
+                          fromType === "create" ? (
+                            isJobCreating ? (
+                              <>
+                                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                Creating...
+                              </>
+                            ) : (
+                              "Publish Job"
+                            )
+                          ) : isJobUpdating ? (
+                            <>
+                              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                              Updating...
+                            </>
+                          ) : (
+                            "Save Changes"
+                          )
+                        ) : (
+                          (buttonText.find((txt) => txt.stepNum === currentStep)
+                            ?.btnTxt ?? "")
+                        )}
+                      </Button>
+                    </motion.div>
+                  </div>
                 </div>
               </Card>
             </form>

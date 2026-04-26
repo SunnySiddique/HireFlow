@@ -7,7 +7,6 @@ import {
   Briefcase,
   CheckCircle2,
   MapPin,
-  RefreshCw,
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
@@ -115,10 +114,6 @@ const RightContent = ({ result }: { result: AICareerAnalysisResult }) => {
               Sorted by Fit Score based on your profile
             </p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-all text-sm font-bold w-fit">
-            <RefreshCw className="w-4 h-4" />
-            Regenerate
-          </button>
         </div>
 
         <div className="flex flex-wrap gap-2 mt-2">
@@ -330,9 +325,6 @@ const RightContent = ({ result }: { result: AICareerAnalysisResult }) => {
 
             {/* Actions */}
             <div className="flex items-center justify-end gap-3 pt-4 border-t border-border/50 mt-2">
-              <button className="px-5 py-2.5 rounded-xl text-sm font-bold text-foreground hover:bg-muted transition-colors">
-                View Full Analysis
-              </button>
               <Link
                 href={`/job-seeker/jobs/${job.job_slug}`}
                 className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 shadow-md shadow-primary/20 transition-all flex items-center gap-2 group"

@@ -1,4 +1,5 @@
 import {
+  Bell,
   Briefcase,
   Building2,
   CheckCircle,
@@ -172,6 +173,13 @@ export const jobSeekerLinks = [
     plan: "champion",
   },
   {
+    label: "Notifications",
+    href: "/job-seeker/notifications",
+    icon: Bell,
+    section: "main",
+    plan: "accelerator",
+  },
+  {
     label: "Saved Jobs",
     href: "/job-seeker/saved-jobs",
     icon: Heart,
@@ -246,6 +254,13 @@ export const employerLinks = [
     plan: "elite",
   },
   {
+    label: "Notifications",
+    href: "/employer/notifications",
+    icon: Bell,
+    section: "main",
+    plan: "growth",
+  },
+  {
     label: "Post a Job",
     href: "/employer/jobs/create",
     icon: PlusCircle,
@@ -281,41 +296,35 @@ export const employerHiringStatus = [
 ];
 // <--- EMPLOYER PROFILE ---> //
 
-export const notifications = [
-  {
-    id: 1,
-    type: "message",
-    title: "New Message",
-    description: "You received a message from TechCorp Inc",
-    timestamp: "2 min ago",
-    icon: MessageSquare,
-    unread: true,
-  },
-  {
-    id: 2,
-    type: "job",
-    title: "Job Application Update",
-    description: "Your application for Senior Dev has been reviewed",
-    timestamp: "1 hour ago",
-    icon: Briefcase,
-    unread: true,
-  },
-  {
-    id: 3,
-    type: "system",
-    title: "Profile Updated",
-    description: "Your profile information was successfully updated",
-    timestamp: "3 hours ago",
-    icon: CheckCircle,
-    unread: false,
-  },
-  {
-    id: 4,
-    type: "job",
-    title: "New Job Recommendation",
-    description: "We found a job that matches your skills",
-    timestamp: "1 day ago",
-    icon: Briefcase,
-    unread: false,
-  },
+// protected route links
+export const PUBLIC_ROUTES = [
+  "/",
+  "/auth/signin",
+  "/auth/signup",
+  "/auth/forgot-password",
+  "/auth/update-password",
+  "/auth/callback",
+  "/auth/auth-code-error",
+];
+
+export const AUTH_REDIRECT_ROUTES = ["/", "/auth/signin", "/auth/signup"];
+
+export const RESTRICTED_EMP_ROUTES = [
+  "/employer/jobs",
+  "/employer/applicants",
+  "/employer/jobs/create",
+  "/employer/talents",
+];
+
+export const RESTRICTED_SEEKER_ROUTES = [
+  "/job-seeker/applications",
+  "/job-seeker/companies",
+  "/job-seeker/saved-jobs",
+];
+
+export const BYPASS_ROUTES = [
+  "/auth/forgot-password",
+  "/auth/update-password",
+  "/auth/callback",
+  "/auth/auth-code-error",
 ];
