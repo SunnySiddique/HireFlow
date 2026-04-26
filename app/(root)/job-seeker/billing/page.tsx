@@ -51,7 +51,6 @@ const JobSeekerBillingPage = () => {
                   Most Popular
                 </div>
               )}
-
               <div className="flex items-center justify-between mb-6">
                 <div className="p-3 rounded-xl bg-muted">
                   <plan.icon className="w-6 h-6 text-primary" />
@@ -60,7 +59,6 @@ const JobSeekerBillingPage = () => {
                   {plan.name}
                 </h3>
               </div>
-
               <div className="mb-6">
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-bold tracking-tighter">
@@ -72,16 +70,13 @@ const JobSeekerBillingPage = () => {
                   {plan.description}
                 </p>
               </div>
-
               <Checkout
                 key={plan.name}
                 cta={plan.cta}
                 isPopular={plan.popular}
                 planName={plan.name.toLowerCase()}
                 userRole="jobseeker"
-                subscription={
-                  subscription as UserSubscription | null | undefined
-                }
+                subscription={subscription as UserSubscription}
               />
 
               <div className="space-y-4 flex-grow">

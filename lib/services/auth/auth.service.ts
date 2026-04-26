@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 
 import { EmployerAuth, JobSeekerAuth } from "@/types/auth";
-import { redirect } from "next/navigation";
 
 // create user
 export async function createUserService(
@@ -132,5 +131,4 @@ export async function updatePasswordService(password: string) {
 export async function siginOutService() {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect("/auth/signin");
 }

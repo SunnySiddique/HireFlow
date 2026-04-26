@@ -245,9 +245,7 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
             )}
             {isSubscribed && activeSection === "billing" && (
               <ManageSubscription
-                subscription={
-                  subscription as UserSubscription | null | undefined
-                }
+                subscription={subscription as UserSubscription}
                 userRole="employer"
               />
             )}

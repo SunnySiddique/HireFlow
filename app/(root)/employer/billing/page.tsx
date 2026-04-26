@@ -80,9 +80,7 @@ const EmployerBillingPage = () => {
                 isPopular={plan.popular}
                 planName={plan.name.toLowerCase()}
                 userRole="employer"
-                subscription={
-                  subscription as UserSubscription | null | undefined
-                }
+                subscription={subscription as UserSubscription}
               />
 
               <div className="space-y-4 flex-grow">

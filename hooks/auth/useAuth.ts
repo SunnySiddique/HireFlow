@@ -6,7 +6,7 @@ import {
   updatePassword,
 } from "@/lib/action/auth/auth.actions";
 import { EmployerAuth, JobSeekerAuth } from "@/types/auth";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -97,13 +97,18 @@ export const useUpdatePassword = () => {
 
 // signin out
 export const useSignOut = () => {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: signinOut,
     onSuccess: () => {
+      queryClient.clear();
       toast.success("Signed out successfully");
+      router.push("/auth/signin");
     },
     onError: (error) => {
-      toast.error(error.message || "Something went wrong");
+      toast.error(error.message || "Something went wrong signing out");
     },
   });
 };

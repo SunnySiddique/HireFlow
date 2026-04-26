@@ -16,10 +16,9 @@ const Checkout = ({
   isPopular: boolean;
   planName: string;
   userRole: "employer" | "jobseeker";
-  subscription: UserSubscription | null | undefined;
+  subscription: UserSubscription;
 }) => {
   const [isPending, startTransition] = useTransition();
-  if (!subscription) return null;
 
   const isSubscribed = hasAccess(
     subscription?.subscription_status as string,

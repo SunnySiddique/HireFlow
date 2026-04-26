@@ -328,9 +328,7 @@ const ProfilePage = () => {
 
             {isSubscribed && activeSection === "billing" && (
               <ManageSubscription
-                subscription={
-                  subscription as UserSubscription | null | undefined
-                }
+                subscription={subscription as UserSubscription}
                 userRole="job-seeker"
               />
             )}

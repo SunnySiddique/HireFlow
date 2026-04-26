@@ -8,11 +8,10 @@ const ManageSubscription = ({
   subscription,
   userRole,
 }: {
-  subscription: UserSubscription | null | undefined;
+  subscription: UserSubscription;
   userRole: "employer" | "job-seeker";
 }) => {
   const [isPending, startTransition] = useTransition();
-  if (!subscription) return null;
 
   const palns = userRole === "employer" ? employerPlans : seekerPlans;
   const subCost = palns.find(
