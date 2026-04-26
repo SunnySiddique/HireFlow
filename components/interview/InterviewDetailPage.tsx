@@ -43,7 +43,13 @@ const InterviewDetailPage = ({
         <Button
           variant="outline"
           className="mt-2 border-primary/20 text-primary hover:bg-primary/10"
-          onClick={() => router.back()}
+          onClick={() =>
+            router.push(
+              role === "seeker"
+                ? "/job-seeker/interviews"
+                : "/employer/interviews",
+            )
+          }
         >
           <ChevronLeft className="w-4 h-4 mr-1" />
           Go Back

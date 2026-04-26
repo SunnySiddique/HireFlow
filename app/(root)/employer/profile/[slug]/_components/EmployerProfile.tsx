@@ -1,5 +1,6 @@
 "use client";
 
+import Loader from "@/components/Loader";
 import NavigationSidebar from "@/components/NavigationSidebar";
 import ManageSubscription from "@/components/subscription/ManageSubscription";
 import {
@@ -67,7 +68,7 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
   const { mutateAsync: uploadCompanyLogo, isPending: isLogoUploading } =
     useUploadCompanyLogo();
 
-  const { data: employerProfile } = useEmployerProfileBySlug(slug);
+  const { data: employerProfile, isLoading } = useEmployerProfileBySlug(slug);
   const { data: subscription } = useGetCurrentUserSubscription();
   const isSubscribed = hasAccess(
     subscription?.subscription_status as string,
@@ -172,6 +173,8 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
       });
     }
   }, [employerProfile, editMode, form]);
+
+  if (isLoading) return <Loader mode="inline" />;
 
   return (
     <FormProvider {...form}>
