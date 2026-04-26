@@ -33,3 +33,10 @@ interface UserSubscription {
   updated_at: string;
   cancel_at_period_end: boolean;
 }
+
+// notificaition
+export interface NotificationPayload {
+  title: string;
+  message: string;
+  type: string;
+}

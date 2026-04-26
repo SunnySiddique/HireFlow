@@ -1,12 +1,12 @@
 import { getServerUser } from "@/lib/action/auth/serverAuth";
 import { applyPagination } from "@/lib/pagination/pagination";
-import { sendNotification } from "@/lib/services/notification/notifications.helper";
 import { createClient } from "@/lib/supabase/server";
 import {
   Interview,
   InterviewFilters,
   InterviewInvite,
 } from "@/types/interview";
+import { sendNotification } from "../notification/notification.service";
 
 // send interview link to the seeker
 export async function sendInterviewInviteService(interview: InterviewInvite) {

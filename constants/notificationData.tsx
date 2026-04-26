@@ -1,3 +1,4 @@
+import { NotificationPayload } from "@/types";
 import {
   AlertCircle,
   BarChart3,
@@ -125,3 +126,83 @@ export const categories = [
     icon: <CreditCard className="w-4 h-4" />,
   },
 ];
+
+// notification service functions
+export const SUBSCRIPTION_TEMPLATES: Record<string, NotificationPayload> = {
+  new: {
+    type: "new",
+    title: "Subscription Activated! 🎉",
+    message: "Your {plan} plan is now active. Enjoy your benefits!",
+  },
+  update: {
+    type: "update",
+    title: "Plan Updated! 🔄",
+    message: "Your plan has been updated to {plan} successfully.",
+  },
+  renewed: {
+    type: "renewed",
+    title: "Subscription Renewed! ✅",
+    message: "Your {plan} plan has been renewed successfully.",
+  },
+  cancelling: {
+    type: "cancelling",
+    title: "Subscription Cancellation Scheduled 🔔",
+    message:
+      "Your {plan} plan will be cancelled at the end of your billing period.",
+  },
+  canceled: {
+    type: "canceled",
+    title: "Subscription Cancelled ❌",
+    message:
+      "Your {plan} plan has been cancelled. You can resubscribe anytime.",
+  },
+  payment_failed: {
+    type: "payment_failed",
+    title: "Payment Failed ⚠️",
+    message:
+      "Your payment for {plan} plan failed. Please update your card details.",
+  },
+  trial_end: {
+    type: "trial_end",
+    title: "Trial Ending Soon ⏳",
+    message: "Your trial for {plan} ends on {date}. Don't forget to subscribe!",
+  },
+  payment_upcoming: {
+    type: "payment_upcoming",
+    title: "Upcoming Payment 💳",
+    message: "Your next payment of ${amount} for {plan} is due on {date}.",
+  },
+};
+
+export const APPLICANT_TEMPLATES: Record<string, NotificationPayload> = {
+  pending: {
+    type: "pending",
+    title: "Application Received",
+    message:
+      "Your application has been received and is pending review. We'll get back to you soon.",
+  },
+  reviewing: {
+    type: "reviewing",
+    title: "Application Under Review",
+    message:
+      "Good news! Your application is currently being reviewed by our hiring team.",
+  },
+  shortlisted: {
+    type: "shortlisted",
+    title: "You've Been Shortlisted! 🎉",
+    message:
+      "Congratulations! You have been shortlisted for the position. We will contact you shortly.",
+  },
+  rejected: {
+    type: "rejected",
+    title: "Application Update",
+    message:
+      "Thank you for your interest. After careful consideration, we have decided to move forward with other candidates.",
+  },
+  accepted: {
+    type: "accepted",
+    title: "Application Accepted! 🎊",
+    message:
+      "Congratulations! Your application has been accepted. Please check your email for further instructions.",
+  },
+};
