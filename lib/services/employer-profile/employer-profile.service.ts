@@ -1,4 +1,4 @@
-import { getServerUser } from "@/lib/auth/serverAuth";
+import { getServerUser } from "@/lib/action/auth/serverAuth";
 import { EmployerDB } from "@/types/employer";
 
 // update employer profile
@@ -34,7 +34,6 @@ export async function employerProfileService() {
     .maybeSingle();
 
   if (error) throw error;
-  if (!data) throw new Error("FAiled to fetch profile. Try again!");
 
   return data;
 }

@@ -4,7 +4,6 @@ import Loader from "@/components/Loader";
 import NavigationSidebar from "@/components/NavigationSidebar";
 import { useTrackSeekerProfileView } from "@/hooks/profile-view/useViews";
 import { useGetJobSeekerProfileBySlug } from "@/hooks/seeker-profile/useSeeker";
-import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
 import {
   EducationItem,
   ExperienceItem,
@@ -25,7 +24,6 @@ import Skills from "./_components/Skills";
 const PublicProfilePage = () => {
   const { slug } = useParams();
 
-  const { data: currentUser } = useGetCurrentUser();
   const { mutate: trackView } = useTrackSeekerProfileView();
 
   const { data: jobSeekerProfile, isLoading: isJobSeekerProfileLoading } =
@@ -35,8 +33,6 @@ const PublicProfilePage = () => {
 
   useEffect(() => {
     if (!jobSeekerProfile?.id) return;
-    if (!currentUser) return;
-
     trackView(jobSeekerProfile.auth_id);
   }, [jobSeekerProfile?.id]);
 

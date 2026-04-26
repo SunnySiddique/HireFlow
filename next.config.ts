@@ -6,17 +6,17 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "ovkokjixdwygetaqvxug.supabase.co",
-        pathname: "/**", // allow any file path
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
-        pathname: "/**", // allow all Google profile images
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "avatars.githubusercontent.com",
-        pathname: "/**", // allow all Github avatars
+        pathname: "/**",
       },
     ],
   },

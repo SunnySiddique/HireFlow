@@ -1,10 +1,8 @@
 "use client";
 
 import JobNavbar from "@/components/jobs/JobNavbar";
-import Loader from "@/components/Loader";
 import DashboardNavbar from "@/components/navbar/DashboardNavbar";
 import DashboardSidebar from "@/components/sidebar/DashboardSidebar";
-import { useSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
@@ -13,7 +11,6 @@ export default function JobSeekerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isLoading } = useSeekerProfile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
 
@@ -26,7 +23,6 @@ export default function JobSeekerLayout({
     return <>{children}</>;
   }
 
-  if (isLoading) return <Loader mode="full" />;
   return (
     <div className="flex h-screen bg-background">
       {!isJobs && (

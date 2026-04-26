@@ -154,7 +154,7 @@ const Hero = ({
                 className="object-cover w-full h-full"
               />
             </div>
-            <div className="flex flex-col justify-center">
+            <div className="flex flex-col ">
               <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight mb-2">
                 {interview?.applicant?.job.job_title ?? "N/A"}
               </h1>

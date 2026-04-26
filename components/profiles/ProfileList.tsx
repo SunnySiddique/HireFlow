@@ -7,6 +7,7 @@ import { Employer } from "@/types/employer";
 import { JobSeekerProfile } from "@/types/job-seeker";
 import { Search, Star } from "lucide-react";
 import { useState } from "react";
+import Loader from "../Loader";
 import { Input } from "../ui/input";
 import EmployerCard from "./EmployerCard";
 import { FeaturedEmployerCard } from "./FeaturedEmployerCard";
@@ -23,13 +24,12 @@ const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
   const [search, setSearch] = useState("");
   const debounceSearch = useDebounce(search, 500);
 
-  const { data: seekerData } = useSeekerProfiles(
+  const { data: seekerData, isLoading: seekerLoading } = useSeekerProfiles(
     isJobSeeker ? undefined : debounceSearch,
   );
 
-  const { data: employerData } = useEmployerProfiles(
-    isJobSeeker ? debounceSearch : undefined,
-  );
+  const { data: employerData, isLoading: employerLoading } =
+    useEmployerProfiles(isJobSeeker ? debounceSearch : undefined);
 
   const isEmployer = (p: Profile): p is Employer => "company_name" in p;
 
@@ -58,6 +58,8 @@ const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
       <TalentCard key={profile.id} talent={profile} />
     );
   };
+
+  if (seekerLoading || employerLoading) return <Loader mode="inline" />;
 
   return (
     <main className="p-8">

@@ -9,6 +9,7 @@ import {
 } from "@/hooks/employer-profile/useEmployer";
 import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { hasAccess, MAX_PROFILE_SIZE } from "@/lib/utils";
+import { UserSubscription } from "@/types";
 import { EmployerDB, EmployerFormData } from "@/types/employer";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
@@ -244,8 +245,9 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
             )}
             {isSubscribed && activeSection === "billing" && (
               <ManageSubscription
-                subscription={subscription}
-                isSubscribed={isSubscribed}
+                subscription={
+                  subscription as UserSubscription | null | undefined
+                }
                 userRole="employer"
               />
             )}

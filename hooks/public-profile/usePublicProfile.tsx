@@ -1,4 +1,4 @@
-import { companyProfile } from "@/lib/public-profile/public.actions";
+import { companyProfile } from "@/lib/action/public-profile/public.actions";
 import { useQuery } from "@tanstack/react-query";
 
 export const useCompanyProfile = (slug: string) => {

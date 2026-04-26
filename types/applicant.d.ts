@@ -27,3 +27,15 @@ export interface JobApplication {
 
   employer: Employer;
 }
+
+export interface RecentApplicant {
+  id: string;
+  applied_at: string | null;
+  seeker: {
+    full_name: string;
+    profile_url: string | null;
+  };
+  job: {
+    job_title: string;
+  };
+}

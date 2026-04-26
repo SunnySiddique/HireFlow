@@ -46,8 +46,8 @@ const Loader = ({ mode = "inline", variant = "spinner" }: LoaderProps) => {
       <div
         className={
           isFull
-            ? "absolute inset-0 bg-black/30 backdrop-blur-md"
-            : "absolute inset-0 bg-black/10 backdrop-blur-sm"
+            ? "absolute inset-0 bg-muted/50 backdrop-blur-md"
+            : "absolute inset-0 bg-muted/30 backdrop-blur-sm"
         }
       />
 

@@ -5,8 +5,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 import { JobFiltersType } from "@/types/jobs";
+import { Star } from "lucide-react";
 
 interface JobTopBarProps {
   totalCount: number;
@@ -36,7 +36,7 @@ const JobTopBar = ({
           </span>
         )}
       </p>
-      {featuredCount > 0 && (
+      {/* {featuredCount > 0 && (
         <button
           onClick={() => onFeaturedChange(!featured)}
           className={cn(
@@ -48,9 +48,9 @@ const JobTopBar = ({
         >
           {featured ? "⭐ Featured Only" : "⭐ Show Featured"}
         </button>
-      )}
+      )} */}
 
-      <div className="w-full sm:w-auto">
+      <div className="flex items-center rounded-lg border border-border bg-muted p-1 shrink-0">
         <Select
           value={sort ?? "all"}
           onValueChange={(val) => onSortChange(val as JobFiltersType["sort"])}
@@ -66,6 +66,19 @@ const JobTopBar = ({
             <SelectItem value="salary-low">Lowest Salary</SelectItem>
           </SelectContent>
         </Select>
+        <button
+          onClick={() => onFeaturedChange(!featured)}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
+            featured
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Star
+            className={`h-3 w-3 ${featured ? "fill-primary-foreground" : ""}`}
+          />
+          Featured
+        </button>
       </div>
     </div>
   );

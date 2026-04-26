@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { useEmployerProfile } from "@/hooks/employer-profile/useEmployer";
 import {
   useApplyJob,
   useSavedJob,
@@ -36,12 +37,15 @@ const HeaderCard = ({
   job: Job;
   isSubscribed: boolean;
 }) => {
-  const [open, setOpen] = useState(false);
-  const [coverLetter, setCoverLetter] = useState("");
+  // hook
   const { mutate: applyJob, isPending: isApplying } = useApplyJob();
   const { mutate: saveJob } = useSavedJob();
   const { data } = useSeekerAppliedJobs();
   const { data: saveJobs } = useSeekerSavedJobs();
+  const { data: employerProfile } = useEmployerProfile();
+
+  const [open, setOpen] = useState(false);
+  const [coverLetter, setCoverLetter] = useState("");
   const appliedJobs = data?.jobs;
   const router = useRouter();
 
@@ -50,7 +54,9 @@ const HeaderCard = ({
   const isApplied = appliedJobs?.some(
     (applicant) => applicant.job_id === job.id,
   );
+
   const isSaved = savedJobs?.some((save) => save.job_id === job.id);
+  const isEmployer = employerProfile?.auth_id === job?.employer_id;
 
   const handleApplyJob = () => {
     applyJob(
@@ -69,7 +75,7 @@ const HeaderCard = ({
   };
 
   return (
-    <>
+    <div className="px-12 py-5">
       <Card className="p-6 lg:p-8 bg-background border border-border overflow-hidden relative">
         <motion.div
           className="absolute top-0 left-0 h-[3px] bg-primary"
@@ -98,7 +104,15 @@ const HeaderCard = ({
               ))}
               <div>
                 <Badge
-                  className={`rounded-sm ${job.status === "open" ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-muted border border-border text-muted-foreground"}`}
+                  className={`rounded-sm ${
+                    job.status === "open"
+                      ? "bg-green-500/10 text-green-500 border-green-500/20"
+                      : job.status === "pending"
+                        ? "bg-yellow-500/10 text-yellow-600 border-yellow-500/20"
+                        : job.status === "closed"
+                          ? "bg-red-500/10 text-red-500 border-red-500/20"
+                          : "bg-muted border border-border text-muted-foreground"
+                  }`}
                 >
                   {formatLabel(job.status as string)}
                 </Badge>
@@ -131,42 +145,44 @@ const HeaderCard = ({
           </div>
 
           {/* Action Buttons */}
-          <motion.div
-            initial={{ opacity: 0, x: 12 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.25 }}
-            className="flex gap-2 flex-shrink-0 h-fit"
-          >
-            {isApplied ? (
-              <Button disabled variant={"outline"}>
-                Applied
-              </Button>
-            ) : (
-              <Button
-                className="bg-primary text-primary-foreground"
-                onClick={() => setOpen(true)}
-                disabled={isApplying}
-              >
-                Apply Now
-              </Button>
-            )}
-
-            {isSubscribed && (
-              <motion.div whileTap={{ scale: 0.95 }}>
-                <Button
-                  variant="outline"
-                  className={`border-border transition-all duration-200 ${isSaved ? "border-primary/50 text-primary bg-primary/5" : "text-foreground hover:bg-muted"}`}
-                  onClick={handleSaveJob}
-                >
-                  {isSaved ? (
-                    <BookmarkCheck className="w-4 h-4" />
-                  ) : (
-                    <Bookmark className="w-4 h-4" />
-                  )}
+          {!isEmployer && (
+            <motion.div
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.25 }}
+              className="flex gap-2 flex-shrink-0 h-fit"
+            >
+              {isApplied ? (
+                <Button disabled variant={"outline"}>
+                  Applied
                 </Button>
-              </motion.div>
-            )}
-          </motion.div>
+              ) : (
+                <Button
+                  className="bg-primary text-primary-foreground"
+                  onClick={() => setOpen(true)}
+                  disabled={isApplying}
+                >
+                  Apply Now
+                </Button>
+              )}
+
+              {isSubscribed && (
+                <motion.div whileTap={{ scale: 0.95 }}>
+                  <Button
+                    variant="outline"
+                    className={`border-border transition-all duration-200 ${isSaved ? "border-primary/50 text-primary bg-primary/5" : "text-foreground hover:bg-muted"}`}
+                    onClick={handleSaveJob}
+                  >
+                    {isSaved ? (
+                      <BookmarkCheck className="w-4 h-4" />
+                    ) : (
+                      <Bookmark className="w-4 h-4" />
+                    )}
+                  </Button>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
         </div>
       </Card>
 
@@ -236,7 +252,7 @@ const HeaderCard = ({
           </DialogContent>
         </Dialog>
       )}
-    </>
+    </div>
   );
 };
 

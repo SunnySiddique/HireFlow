@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { Control, FieldValues, Path } from "react-hook-form";
 
@@ -47,12 +48,12 @@ const AuthField = <T extends FieldValues>({
               {label}
             </FormLabel>
             {isLogin && (
-              <a
-                href="#"
+              <Link
+                href="/auth/forgot-password"
                 className="text-primary font-semibold text-sm hover:underline"
               >
                 Forgot?
-              </a>
+              </Link>
             )}
           </div>
           <FormControl>

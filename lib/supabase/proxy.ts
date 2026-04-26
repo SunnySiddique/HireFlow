@@ -1,10 +1,23 @@
+import {
+  AUTH_REDIRECT_ROUTES,
+  BYPASS_ROUTES,
+  RESTRICTED_EMP_ROUTES,
+  RESTRICTED_SEEKER_ROUTES,
+} from "@/constants";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { employerProfileService } from "../services/employer-profile/employer-profile.service";
+import { seekerProfileService } from "../services/seeker-profile/seeker-profile.service";
+import { getSubscription } from "../services/stripe/stripe.service";
 import { Database } from "../types/supabase";
 import { hasAccess } from "../utils";
 
 export async function updateSession(request: NextRequest) {
   const response = NextResponse.next();
+  const { pathname } = request.nextUrl;
+
+  if (BYPASS_ROUTES.some((route) => pathname.startsWith(route)))
+    return response;
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,75 +40,39 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: subscription } = await supabase
-    .from("subscriptions")
-    .select("subscription_status, plan_expires_at, plan")
-    .eq("user_id", user?.id as string)
-    .maybeSingle();
-
-  const isSubscribed = hasAccess(
-    subscription?.subscription_status as string,
-    subscription?.plan_expires_at as string,
-  );
-
-  const { pathname } = request.nextUrl;
-
-  const isAuthRoute = ["/", "/auth/signin", "/auth/signup"].includes(pathname);
   const isJobSeekerRoute = pathname.startsWith("/job-seeker");
   const isEmployerRoute = pathname.startsWith("/employer");
   const isProtectedRoute = isJobSeekerRoute || isEmployerRoute;
-  const isSubEmp = [
-    "/employer/jobs",
-    "/employer/applicants",
-    "/employer/jobs/create",
-    "/employer/talents",
-  ];
-  const isSubSeeker = [
-    "/job-seeker/applications",
-    "/job-seeker/companies",
-    "/job-seeker/saved-jobs",
-  ];
+  const isAuthRedirectRoute = AUTH_REDIRECT_ROUTES.includes(pathname);
 
-  const isRestrictedEmpRoute = isSubEmp.some((path) =>
-    pathname.startsWith(path),
-  );
-
-  const isRestrictedSeekerRoute = isSubSeeker.some((path) =>
-    pathname.startsWith(path),
-  );
-
-  // 1️⃣ Unauthenticated users cannot access protected routes
+  // redirect logout users acessing to the dashboard
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/signin";
     return NextResponse.redirect(url);
   }
 
-  // 2️⃣ Fetch role only if user is logged in
-  let userRole: "job-seeker" | "employer" | undefined;
+  if (!user) return response;
 
-  if (user) {
-    const { data: jobSeekerData } = await supabase
-      .from("job_seekers")
-      .select("id")
-      .eq("auth_id", user.id)
-      .single();
+  const [jobSeekerData, employerData, subscription] = await Promise.all([
+    seekerProfileService(),
+    employerProfileService(),
+    getSubscription(user.id),
+  ]);
 
-    if (jobSeekerData) {
-      userRole = "job-seeker";
-    } else {
-      const { data: employerData } = await supabase
-        .from("employers")
-        .select("id")
-        .eq("auth_id", user.id)
-        .single();
+  const userRole: "job-seeker" | "employer" | undefined = jobSeekerData
+    ? "job-seeker"
+    : employerData
+      ? "employer"
+      : undefined;
 
-      if (employerData) userRole = "employer";
-    }
-  }
+  const isSubscribed = hasAccess(
+    subscription?.subscription_status as string,
+    subscription?.plan_expires_at as string,
+  );
 
-  // 3️⃣ Logged-in users with a role should not access auth pages
-  if (user && userRole && isAuthRoute) {
+  // if logged in user tries to access the auth page they redirect to the dashboard based on the role
+  if (userRole && isAuthRedirectRoute) {
     const url = request.nextUrl.clone();
     url.pathname =
       userRole === "job-seeker"
@@ -104,8 +81,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // 4️⃣ Role-based route protection
-  if (user && userRole) {
+  // 5️⃣ Role-based route protection
+  if (userRole) {
     if (isEmployerRoute && userRole !== "employer") {
       const url = request.nextUrl.clone();
       url.pathname = "/job-seeker/dashboard";
@@ -119,30 +96,34 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // sub
+  // 6️⃣ Subscription-gated routes
+  const isRestrictedEmpRoute = RESTRICTED_EMP_ROUTES.some((p) =>
+    pathname.startsWith(p),
+  );
+  const isRestrictedSeekerRoute = RESTRICTED_SEEKER_ROUTES.some((p) =>
+    pathname.startsWith(p),
+  );
 
-  if (
-    user &&
-    !isSubscribed &&
-    (isRestrictedEmpRoute || isRestrictedSeekerRoute)
-  ) {
+  if (!isSubscribed && (isRestrictedEmpRoute || isRestrictedSeekerRoute)) {
     const url = request.nextUrl.clone();
     url.pathname = `/${userRole}/dashboard`;
     return NextResponse.redirect(url);
   }
-  const isPremiumPlan = userRole === "job-seeker" ? "Champion" : "Elite";
+
+  // 7️⃣ Premium plan routes
+  const isPremiumPlan = userRole === "job-seeker" ? "champion" : "elite";
   const premiumPath =
     userRole === "job-seeker" ? "/job-seeker/companies" : "/employer/talents";
-  const isPremiumRoute = pathname.startsWith(premiumPath);
+
   if (
-    user &&
     isSubscribed &&
-    isPremiumRoute &&
-    subscription?.plan?.toLowerCase() !== isPremiumPlan.toLowerCase()
+    pathname.startsWith(premiumPath) &&
+    subscription?.plan?.toLowerCase() !== isPremiumPlan
   ) {
     const url = request.nextUrl.clone();
     url.pathname = `/${userRole}/dashboard`;
     return NextResponse.redirect(url);
   }
+
   return response;
 }

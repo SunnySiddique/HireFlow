@@ -24,7 +24,8 @@ export async function companyProfileService(slug: string) {
         twitter_url,
         operating_locations,
         logo_path,
-        auth_id
+        auth_id,
+        is_featured
         `,
     )
     .eq("slug", slug)

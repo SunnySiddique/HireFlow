@@ -5,10 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { statusLabel } from "@/constants/employerData";
 import { useTrackEmployerProfileView } from "@/hooks/profile-view/useViews";
 import { useCompanyProfile } from "@/hooks/public-profile/usePublicProfile";
-import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
 import { formatDate } from "@/lib/utils";
+import { motion } from "framer-motion";
 import {
   ArrowLeft,
   Briefcase,
@@ -24,6 +25,7 @@ import {
   Twitter,
   Users,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import CompanyPositionsModal from "./CompanyPositionsModal";
@@ -35,12 +37,10 @@ interface CompanyViewProps {
 const CompanyView = ({ slug }: CompanyViewProps) => {
   const { data, isLoading } = useCompanyProfile(slug);
   const [isPositionsModalOpen, setIsPositionsModalOpen] = useState(false);
-  const { data: currentUser } = useGetCurrentUser();
   const { mutate: trackView } = useTrackEmployerProfileView();
 
   useEffect(() => {
     if (!data?.company?.id) return;
-    if (!currentUser) return;
 
     trackView(data.company.auth_id);
   }, [data?.company?.id]);
@@ -55,6 +55,7 @@ const CompanyView = ({ slug }: CompanyViewProps) => {
 
   const company = data?.company;
   const jobs = data?.jobs || [];
+  const hiringStatus = company?.hiring_status?.toLowerCase() ?? "";
 
   if (!company) {
     return (
@@ -66,14 +67,6 @@ const CompanyView = ({ slug }: CompanyViewProps) => {
       </div>
     );
   }
-
-  const hiringStatusColors: Record<string, string> = {
-    "actively hiring":
-      "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-    selective:
-      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-    "not hiring": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-  };
 
   const coreValues = company.core_values || [];
   const openPositionsCount = company.open_positions_count ?? 0;
@@ -103,15 +96,50 @@ const CompanyView = ({ slug }: CompanyViewProps) => {
           <div className="relative -mt-20 pb-6">
             <div className="flex flex-col md:flex-row items-start md:items-end gap-6">
               {/* Company Logo */}
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl border-4 border-background bg-background shadow-xl flex items-center justify-center overflow-hidden">
-                {company.company_logo_url ? (
-                  <img
-                    src={company.company_logo_url}
-                    alt={company.company_name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <Building2 className="w-16 h-16 text-primary" />
+              <div className="relative shrink-0">
+                <div
+                  className={`relative w-24 h-24 rounded-lg bg-muted flex items-center justify-center overflow-hidden z-10 transition-all ${
+                    company?.is_featured
+                      ? "border-4 border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.2)]"
+                      : "border-2 border-border"
+                  }`}
+                >
+                  {company?.company_logo_url ? (
+                    <Image
+                      src={company?.company_logo_url || ""}
+                      alt="Profile image"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 112px, 128px"
+                      priority
+                    />
+                  ) : (
+                    <Building2 className="w-12 h-12 text-muted-foreground" />
+                  )}
+                </div>
+
+                {/* Glowing Featured Badge (like Job Seeker profile) */}
+                {company?.is_featured && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ delay: 0.3, type: "spring" }}
+                    className="absolute -bottom-3 left-1/2 -translate-x-1/2 z-20 whitespace-nowrap"
+                  >
+                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-lg shadow-amber-500/40 border border-white/20">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 8,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                      >
+                        <Star className="w-3 h-3 fill-white text-white" />
+                      </motion.div>
+                      Featured
+                    </div>
+                  </motion.div>
                 )}
               </div>
 
@@ -122,18 +150,30 @@ const CompanyView = ({ slug }: CompanyViewProps) => {
                     {company.company_name}
                   </h1>
                   {company.hiring_status && (
-                    <Badge
-                      className={`${
-                        hiringStatusColors[company.hiring_status]
-                      } border-0 w-fit`}
+                    <div
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border font-semibold text-sm whitespace-nowrap ${
+                        hiringStatus === "actively_hiring"
+                          ? "bg-green-500/15 text-green-700 border-green-500/30"
+                          : hiringStatus === "selective"
+                            ? "bg-amber-500/15 text-amber-700 border-amber-500/30"
+                            : "bg-red-500/15 text-red-700 border-red-500/30"
+                      }`}
                     >
-                      {company.hiring_status === "actively hiring" && (
-                        <span className="flex items-center gap-1">
-                          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                        </span>
-                      )}
-                      {company.hiring_status}
-                    </Badge>
+                      <span
+                        className="w-2 h-2 rounded-full animate-pulse"
+                        style={{
+                          backgroundColor:
+                            hiringStatus === "actively_hiring"
+                              ? "#22c55e"
+                              : hiringStatus === "selective"
+                                ? "#f59e0b"
+                                : "#ef4444",
+                        }}
+                      />
+                      <span className="capitalize">
+                        {statusLabel[hiringStatus] || "Status not set"}
+                      </span>
+                    </div>
                   )}
                 </div>
                 <p className="text-muted-foreground text-sm md:text-base">

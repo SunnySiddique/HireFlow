@@ -1,32 +1,31 @@
+import EmptyState from "@/components/EmptyState";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useGetRecentJobs } from "@/hooks/jobs/useSeekerJob";
 import {
   formatDate,
   formatLabel,
   formatSalary,
   getInitials,
 } from "@/lib/utils";
+import { JobWithEmployer } from "@/types/jobs";
 import {
   Building2,
   CalendarDays,
   ChevronRight,
   DollarSign,
+  FileText,
   MapPin,
 } from "lucide-react";
 import Link from "next/link";
-import EmptyState from "./EmptyState";
 
 const jobStatusConfig: Record<string, string> = {
   open: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800",
   closed: "bg-muted text-muted-foreground border-border",
 };
 
-const RecentApplications = () => {
-  const { data: jobs = [] } = useGetRecentJobs();
-
+const RecentApplications = ({ jobs }: { jobs: JobWithEmployer[] }) => {
   return (
     <>
       {jobs.length > 0 ? (
@@ -35,12 +34,14 @@ const RecentApplications = () => {
             <h2 className="text-base lg:text-lg font-bold text-foreground">
               Recent Applications {jobs.length}
             </h2>
-            <Link
-              href="/job-seeker/jobs"
-              className="text-primary hover:underline text-xs lg:text-sm font-medium"
-            >
-              View all →
-            </Link>
+            {jobs.length > 0 && (
+              <Link
+                href="/job-seeker/jobs"
+                className="text-primary hover:underline text-xs lg:text-sm font-medium"
+              >
+                View all →
+              </Link>
+            )}
           </div>
           <Card className="bg-background border border-border divide-y divide-border">
             {jobs.map((job) => {
@@ -140,7 +141,11 @@ const RecentApplications = () => {
           </Card>
         </>
       ) : (
-        <EmptyState msg={"Recent"} />
+        <EmptyState
+          icon={FileText}
+          msg1="No Recent Applications"
+          msg2="You haven't applied to any jobs yet. Start exploring opportunities!"
+        />
       )}
     </>
   );

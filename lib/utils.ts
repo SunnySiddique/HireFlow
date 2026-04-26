@@ -13,7 +13,6 @@ export const MAX_RESUME_SIZE = 2 * 1024 * 1024; // 5MB
 
 // avatar for the proifle
 export const getInitials = (name: string) => {
-  console.log("name:", name);
   return name
     .split(" ")
     .map((w) => w[0])

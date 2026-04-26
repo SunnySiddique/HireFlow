@@ -52,7 +52,6 @@ export async function POST(req: Request) {
       break;
     }
 
-    // ✅ Monthly renewal — reset usage counters
     case "invoice.payment_succeeded": {
       const invoice = event.data.object as Stripe.Invoice & {
         subscription: string | null;

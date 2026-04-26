@@ -8,7 +8,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ArrowRight, BarChart3, Eye, Users, Zap } from "lucide-react";
-const UnSubscribeEmptyState = () => {
+import { useRouter } from "next/router";
+const UnSubscribeEmptyState = ({
+  role,
+}: {
+  role: "job-seeker" | "employer";
+}) => {
+  const router = useRouter();
   return (
     <Card className="border-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5 shadow-lg overflow-hidden">
       <CardHeader className="pb-4">
@@ -86,7 +92,11 @@ const UnSubscribeEmptyState = () => {
                 Billed monthly, cancel anytime
               </p>
             </div>
-            <Button size="lg" className="w-full gap-2">
+            <Button
+              onClick={() => router.push(`/${role}/billing`)}
+              size="lg"
+              className="w-full gap-2"
+            >
               Subscribe Now
               <ArrowRight className="w-4 h-4" />
             </Button>

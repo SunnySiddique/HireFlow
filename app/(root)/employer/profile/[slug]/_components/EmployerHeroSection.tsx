@@ -4,6 +4,7 @@ import CustomField from "@/components/CustomField";
 import EmptyState from "@/components/EmptyState";
 import { statusLabel } from "@/constants/employerData";
 import { Employer, EmployerFormData } from "@/types/employer";
+import { motion } from "framer-motion";
 import { Building2, Star, Upload } from "lucide-react";
 import Image from "next/image";
 import { UseFormReturn } from "react-hook-form";
@@ -22,7 +23,6 @@ const EmployerHeroSection = ({
   form,
   employer,
   setLogoFile,
-  isLoading,
 }: EmployerHeroSectionProps) => {
   const logoRef = useRef<HTMLInputElement>(null);
   const [viewLogo, setViewLogo] = useState<string | null>(null);
@@ -38,17 +38,17 @@ const EmployerHeroSection = ({
 
   return (
     <>
-      <div className="border rounded-sm p-8 shadow-lg">
-        {employer?.is_featured && (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-xs mb-2 font-bold uppercase tracking-widest border border-amber-500/20">
-            <Star className="w-3.5 h-3.5 fill-amber-500" />
-            Featured
-          </div>
-        )}
+      <div className="border rounded-sm p-8 shadow-lg relative overflow-hidden bg-card">
         <div className="flex items-start gap-6">
-          {/* Logo */}
-          <div className="relative">
-            <div className="w-24 h-24 rounded-lg bg-muted border-2 border-border flex items-center justify-center overflow-hidden">
+          {/* Logo Wrapper */}
+          <div className="relative shrink-0">
+            <div
+              className={`relative w-24 h-24 rounded-lg bg-muted flex items-center justify-center overflow-hidden z-10 transition-all ${
+                employer?.is_featured
+                  ? "border-4 border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.2)]"
+                  : "border-2 border-border"
+              }`}
+            >
               {viewLogo || employer?.company_logo_url ? (
                 <Image
                   src={viewLogo || employer?.company_logo_url || ""}
@@ -61,29 +61,54 @@ const EmployerHeroSection = ({
               ) : (
                 <Building2 className="w-12 h-12 text-muted-foreground" />
               )}
-            </div>
-            {editMode && (
-              <>
-                <button
+
+              {editMode && (
+                <div
+                  className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer transition-opacity opacity-0 hover:opacity-100"
                   onClick={() => logoRef.current?.click()}
-                  className="absolute bottom-0 right-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all"
-                  disabled={isLoading}
                 >
-                  <Upload className="w-4 h-4" />
-                </button>
-                <input
-                  ref={logoRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogoChange}
-                  className="hidden"
-                />
-              </>
+                  <Upload className="w-6 h-6 text-white" />
+                </div>
+              )}
+            </div>
+
+            {/* Glowing Featured Badge (like Job Seeker profile) */}
+            {!editMode && employer?.is_featured && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: 0.3, type: "spring" }}
+                className="absolute -bottom-3 left-1/2 -translate-x-1/2 z-20 whitespace-nowrap"
+              >
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-lg shadow-amber-500/40 border border-white/20">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 8,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  >
+                    <Star className="w-3 h-3 fill-white text-white" />
+                  </motion.div>
+                  Featured
+                </div>
+              </motion.div>
+            )}
+
+            {editMode && (
+              <input
+                ref={logoRef}
+                type="file"
+                accept="image/*"
+                onChange={handleLogoChange}
+                className="hidden"
+              />
             )}
           </div>
 
           {/* Company Info */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             {editMode ? (
               <div className="space-y-4">
                 <CustomField
@@ -100,30 +125,51 @@ const EmployerHeroSection = ({
                 />
               </div>
             ) : employer?.industry || employer?.founded_year ? (
-              <>
-                <h1 className="text-3xl sm:text-4xl font-black mb-2">
-                  {employer?.company_name}
-                </h1>
+              <div className="pt-1">
+                <div className="flex flex-wrap items-center gap-3 mb-2">
+                  <h1 className="text-3xl sm:text-4xl font-black truncate">
+                    {employer?.company_name}
+                  </h1>
+
+                  {employer?.is_featured && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        delay: 0.5,
+                      }}
+                      className="flex shrink-0 items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md shadow-amber-500/20"
+                      title="Featured Company"
+                    >
+                      <Star className="w-4 h-4 sm:w-4 sm:h-4 fill-white" />
+                    </motion.div>
+                  )}
+                </div>
                 <p className="text-lg sm:text-xl text-muted-foreground font-semibold mb-2">
                   {employer?.industry}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {employer?.founded_year}
+                  {employer?.founded_year &&
+                    `Founded: ${employer.founded_year}`}
                 </p>
-              </>
+              </div>
             ) : (
-              <EmptyState
-                icon={Building2}
-                msg1="No Company Profile Yet"
-                msg2={`Click the "Edit Profile" button to add your company information.`}
-              />
+              <div className="py-4">
+                <EmptyState
+                  icon={Building2}
+                  msg1="No Company Profile Yet"
+                  msg2="Click the Edit Profile button to add your company information."
+                />
+              </div>
             )}
           </div>
 
           {/* Hiring Status Badge */}
           {!editMode && employer?.industry && (
             <div
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border font-semibold text-sm whitespace-nowrap ${
+              className={`shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border font-semibold text-sm whitespace-nowrap ${
                 hiringStatus === "actively_hiring"
                   ? "bg-green-500/15 text-green-700 border-green-500/30"
                   : hiringStatus === "selective"
@@ -150,7 +196,7 @@ const EmployerHeroSection = ({
         </div>
 
         {/* Description */}
-        <div className="mt-6 pt-6 border-t border-primary/20">
+        <div className="mt-8 pt-6 border-t border-primary/20">
           {editMode ? (
             <CustomField
               control={form.control}
@@ -158,11 +204,10 @@ const EmployerHeroSection = ({
               label="Company Description"
               placeholder="Tell us about your company..."
               type="textarea"
-              isAbout={true}
             />
           ) : (
             <p className="text-muted-foreground leading-relaxed">
-              {form.watch("description")}
+              {form?.watch ? form.watch("description") : ""}
             </p>
           )}
         </div>

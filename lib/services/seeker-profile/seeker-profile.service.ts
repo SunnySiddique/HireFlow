@@ -1,4 +1,4 @@
-import { getServerUser } from "@/lib/auth/serverAuth";
+import { getServerUser } from "@/lib/action/auth/serverAuth";
 import { JobSeekerProfileDB } from "@/types/job-seeker";
 import { sendProfileCompletionNotifications } from "../notification/notifications.helper";
 

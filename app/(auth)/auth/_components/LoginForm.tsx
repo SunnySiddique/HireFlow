@@ -1,19 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldContent,
-  FieldError,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AUTH_TABS } from "@/constants";
 import { useLoginUser } from "@/hooks/auth/useAuth";
 import { createClient } from "@/lib/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Chrome, Github } from "lucide-react";
+import { Chrome, Github, Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -36,8 +29,8 @@ const employerSchema = z.object({
 type JobSeekerFormData = z.infer<typeof jobSeekerSchema>;
 type EmployerFormData = z.infer<typeof employerSchema>;
 
-export function LoginForm() {
-  const { mutate: loginUser, isPending } = useLoginUser();
+const LoginForm = () => {
+  const { mutate: loginUser, isPending: isSubmitting } = useLoginUser();
 
   const [activeTab, setActiveTab] = useState<"job_seeker" | "employer">(
     "job_seeker",
@@ -78,24 +71,32 @@ export function LoginForm() {
     });
   };
 
-  const handleSignup = async (provider: "google" | "github") => {
+  const handleSignIn = async (provider: "google" | "github") => {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.origin}/auth/callback?role=${activeTab}&next=${path}`,
+        redirectTo: `${window.origin}/auth/callback?role=${activeTab}&next=${path}&type=signin`,
       },
     });
   };
 
   useEffect(() => {
     const error = searchParams.get("error");
-    if (error === "role_mismatch") {
-      // Show toast
-      toast.error(
-        "This email is registered with a different account type. Please login with the correct tab.",
-      );
 
+    if (error === "role_mismatch") {
+      toast.error("This email is registered with a different account type.");
+    }
+
+    if (error === "no_account") {
+      toast.error("No account found. Please sign up first.");
+    }
+
+    if (error === "profile_creation_failed") {
+      toast.error("Failed to create your account. Please try again.");
+    }
+
+    if (error) {
       const cleanUrl = window.location.origin + window.location.pathname;
       window.history.replaceState({}, "", cleanUrl);
     }
@@ -113,26 +114,25 @@ export function LoginForm() {
       </div>
 
       {/* Social Login Buttons */}
-      {activeTab === "job_seeker" && (
-        <div className="flex gap-3 mb-8">
-          <Button
-            variant="outline"
-            className="flex-1 h-12 border border-border hover:bg-muted bg-transparent"
-            disabled={isPending}
-            onClick={() => handleSignup("github")}
-          >
-            <Github className="w-5 h-5" />
-          </Button>
-          <Button
-            variant="outline"
-            className="flex-1 h-12 border border-border hover:bg-muted bg-transparent"
-            disabled={isPending}
-            onClick={() => handleSignup("google")}
-          >
-            <Chrome className="w-5 h-5" />
-          </Button>
-        </div>
-      )}
+      <div className="flex gap-3 mb-8">
+        <Button
+          variant="outline"
+          className="flex-1 h-12 border border-border hover:bg-muted bg-transparent"
+          disabled={isSubmitting}
+          onClick={() => handleSignIn("github")}
+        >
+          <Github className="w-5 h-5" />
+        </Button>
+        <Button
+          variant="outline"
+          className="flex-1 h-12 border border-border hover:bg-muted bg-transparent"
+          disabled={isSubmitting}
+          onClick={() => handleSignIn("google")}
+        >
+          <Chrome className="w-5 h-5" />
+        </Button>
+      </div>
+
       <div className="relative mb-8">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-border" />
@@ -174,92 +174,68 @@ export function LoginForm() {
                 name="password"
                 placeholder="••••••••"
                 isLogin={true}
+                type="password"
               />
 
               <Button
                 type="submit"
-                className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-base rounded-lg"
-                disabled={isPending}
+                disabled={isSubmitting}
+                className="w-full h-12 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 transition-all duration-300"
               >
-                {isPending ? "Signing In..." : "Sign In"}
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Signing In...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
               </Button>
             </form>
           </Form>
         </TabsContent>
 
         <TabsContent value="employer">
-          <form
-            onSubmit={employerForm.handleSubmit(onEmployerSubmit)}
-            className="space-y-5"
-          >
-            <Field>
-              <FieldLabel
-                htmlFor="workEmail"
-                className="text-foreground font-semibold"
-              >
-                Work Email
-              </FieldLabel>
-              <FieldContent>
-                <Input
-                  id="workEmail"
-                  type="email"
-                  placeholder="company@example.com"
-                  {...employerForm.register("workEmail")}
-                  className="h-11 bg-accent border-border text-foreground placeholder:text-muted-foreground"
-                  disabled={isPending}
-                />
-                <FieldError
-                  errors={
-                    employerForm.formState.errors.workEmail
-                      ? [employerForm.formState.errors.workEmail]
-                      : undefined
-                  }
-                />
-              </FieldContent>
-            </Field>
-
-            <Field>
-              <div className="flex items-center justify-between">
-                <FieldLabel
-                  htmlFor="empPassword"
-                  className="text-foreground font-semibold"
-                >
-                  Password
-                </FieldLabel>
-                <a
-                  href="#"
-                  className="text-primary font-semibold text-sm hover:underline"
-                >
-                  Forgot?
-                </a>
-              </div>
-              <FieldContent>
-                <Input
-                  id="empPassword"
-                  type="password"
-                  placeholder="••••••••"
-                  {...employerForm.register("password")}
-                  className="h-11 bg-accent border-border text-foreground placeholder:text-muted-foreground"
-                  disabled={isPending}
-                />
-                <FieldError
-                  errors={
-                    employerForm.formState.errors.password
-                      ? [employerForm.formState.errors.password]
-                      : undefined
-                  }
-                />
-              </FieldContent>
-            </Field>
-
-            <Button
-              type="submit"
-              className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-base rounded-lg"
-              disabled={isPending}
+          <Form {...employerForm}>
+            <form
+              onSubmit={employerForm.handleSubmit(onEmployerSubmit)}
+              className="space-y-5"
             >
-              {isPending ? "Signing In..." : "Sign In"}
-            </Button>
-          </form>
+              <AuthField
+                id="workEmail"
+                control={employerForm.control}
+                label="Work Email"
+                name="workEmail"
+                placeholder="john@example.com"
+              />
+
+              {/* password */}
+              <AuthField
+                id="empPassword"
+                control={employerForm.control}
+                label="Password"
+                name="password"
+                placeholder="••••••••"
+                isLogin={true}
+                type="password"
+              />
+
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-12 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 transition-all duration-300"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Signing In...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
+              </Button>
+            </form>
+          </Form>
         </TabsContent>
 
         <AuthTabs tabs={AUTH_TABS} />
@@ -276,4 +252,6 @@ export function LoginForm() {
       </p>
     </div>
   );
-}
+};
+
+export default LoginForm;

@@ -3,7 +3,6 @@
 import { useSeekerSimilerJobs } from "@/hooks/jobs/useSeekerJob";
 import { useTrackJobView } from "@/hooks/profile-view/useViews";
 import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
-import { useGetCurrentUser } from "@/hooks/useGetCurrentUser";
 import { hasAccess } from "@/lib/utils";
 import { Job } from "@/types/jobs";
 import { useEffect } from "react";
@@ -15,7 +14,6 @@ import JobCard from "./JobCard";
 
 const JobDetailClient = ({ job }: { job: Job }) => {
   const { data: similarJobs = [], isLoading } = useSeekerSimilerJobs(job.id);
-  const { data: currentUser } = useGetCurrentUser();
   const { mutate: trackView } = useTrackJobView();
   const { data: subscription } = useGetCurrentUserSubscription();
 
@@ -26,18 +24,18 @@ const JobDetailClient = ({ job }: { job: Job }) => {
 
   useEffect(() => {
     if (!job?.id) return;
-    if (!currentUser) return;
 
     trackView(job.id);
   }, [job?.id]);
 
   if (isLoading) return <Loader mode="inline" />;
   return (
-    <div className="px-4 md:px-14 space-y-6 py-5">
+    <div className="space-y-6">
       {/* ── Header Card ───── */}
+
       <HeaderCard job={job} isSubscribed={isSubscribed} />
       {/* ── Main Grid ─────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-12">
         {/* Left Column */}
         <JobDetailContent job={job} />
         {/* Right Column */}

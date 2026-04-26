@@ -15,7 +15,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import Loader from "../Loader";
 
 interface JobCardProps {
   job: Job;
@@ -33,15 +32,15 @@ const JobCard = ({
   featured = false,
 }: JobCardProps) => {
   const { mutate: saveJob } = useSavedJob();
-  const { data, isLoading } = useSeekerSavedJobs();
+  const { data } = useSeekerSavedJobs();
   const savedJobs = data?.saved_jobs ?? [];
   const isSaved = savedJobs?.some((s) => s.job_id === job.id);
 
   const detailHref = href ?? `/job-seeker/jobs/${job.job_slug}`;
-  if (isLoading) return <Loader mode="inline" />;
+
   return (
     <Card
-      className={` p-0
+      className={`p-0
       relative w-full rounded-xl border text-card-foreground overflow-hidden
       transition-all duration-300 ease-out group
       hover:-translate-y-0.5 hover:shadow-md

@@ -2,6 +2,11 @@
 
 import Loader from "@/components/Loader";
 import UnSubscribeEmptyState from "@/components/UnSubscribeEmptyState";
+import { useUpcomingInterviews } from "@/hooks/interview/useInterview";
+import {
+  useGetRecentJobs,
+  useRecommandedJobs,
+} from "@/hooks/jobs/useSeekerJob";
 import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { hasAccess } from "@/lib/utils";
 import DashboardStats from "./_components/DashboardStats";
@@ -11,7 +16,19 @@ import RecommendedJobs from "./_components/RecommendedJobs";
 import UpcomingInterviews from "./_components/UpcomingInterviews";
 
 const JobSeekerDashboardPage = () => {
-  const { data: subscription, isLoading } = useGetCurrentUserSubscription();
+  const { data: subscription, isLoading: subLoading } =
+    useGetCurrentUserSubscription();
+  const { data: upcomingInterviews = [], isLoading: interviewsLoading } =
+    useUpcomingInterviews(true);
+  const { data: recentJobs = [], isLoading: recentJobsLoading } =
+    useGetRecentJobs();
+  const { data: recommendedJobs = [], isLoading: recommendedLoading } =
+    useRecommandedJobs();
+
+  const isLoading =
+    subLoading || interviewsLoading || recentJobsLoading || recommendedLoading;
+  if (isLoading) return <Loader mode="full" />;
+
   const isSubscribed = hasAccess(
     subscription?.subscription_status as string,
     subscription?.plan_expires_at as string,
@@ -19,8 +36,6 @@ const JobSeekerDashboardPage = () => {
   const isAcceleratorPlan =
     subscription?.plan?.toLowerCase() === "acccelerator" ||
     subscription?.plan?.toLowerCase() === "champion";
-
-  if (isLoading) return <Loader mode="full" />;
   return (
     <main className="p-8">
       {/* Stats Cards */}
@@ -38,12 +53,12 @@ const JobSeekerDashboardPage = () => {
             <div className="lg:col-span-2 space-y-6 lg:space-y-8">
               {/* Upcoming Interviews */}
               <section>
-                <UpcomingInterviews />
+                <UpcomingInterviews interviews={upcomingInterviews} />
               </section>
 
               {/* Recent Applications */}
               <section>
-                <RecentApplications />
+                <RecentApplications jobs={recentJobs} />
               </section>
             </div>
 
@@ -58,11 +73,11 @@ const JobSeekerDashboardPage = () => {
 
           {/* Recommended Jobs - Full Width */}
           <section>
-            <RecommendedJobs />
+            <RecommendedJobs jobs={recommendedJobs} />
           </section>
         </>
       ) : (
-        <UnSubscribeEmptyState />
+        <UnSubscribeEmptyState role="job-seeker" />
       )}
     </main>
   );

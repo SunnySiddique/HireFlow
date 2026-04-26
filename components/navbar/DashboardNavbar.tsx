@@ -15,7 +15,6 @@ import { createClient } from "@/lib/supabase/client";
 import { getInitials, timeAgo } from "@/lib/utils";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
-import { motion } from "framer-motion";
 import { Bell, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -91,11 +90,7 @@ const DashboardNavbar = ({
     <div className="px-4 lg:px-8 py-4 bg-background border-b border-border/40 sticky top-0 z-30 backdrop-blur-md">
       <div className="flex flex-row items-center justify-between gap-4">
         {/* Welcome Text */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <div>
           <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-1">
             Welcome back,{" "}
             <span className="text-primary">
@@ -110,7 +105,7 @@ const DashboardNavbar = ({
               ? `Here's what's happening with your job search today.`
               : `Here's what's happening with your job listings today.`}
           </p>
-        </motion.div>
+        </div>
 
         {/* Quick Search & Notifications */}
         <div className="flex justify-end items-center gap-3">
@@ -125,13 +120,9 @@ const DashboardNavbar = ({
                   <Card className="p-2 lg:p-3 bg-background border border-border relative hover:border-primary transition-all hover:shadow-md">
                     <Bell className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                     {unreadCount > 0 && (
-                      <motion.span
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-background"
-                      >
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-background">
                         {unreadCount}
-                      </motion.span>
+                      </span>
                     )}
                   </Card>
                 </div>
@@ -294,8 +285,7 @@ const DashboardNavbar = ({
 
           {/* Menu icon — mobile only */}
           <div className="block lg:hidden">
-            <motion.button
-              whileTap={{ scale: 0.9 }}
+            <button
               onClick={onMenuClick}
               className="p-2 rounded-lg border border-border bg-background hover:border-primary hover:shadow-md transition-all group"
               aria-label="Toggle sidebar"
@@ -305,7 +295,7 @@ const DashboardNavbar = ({
               ) : (
                 <Menu className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
               )}
-            </motion.button>
+            </button>
           </div>
         </div>
       </div>

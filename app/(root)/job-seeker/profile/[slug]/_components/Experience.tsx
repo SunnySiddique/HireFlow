@@ -156,7 +156,7 @@ const Experience = ({
                     <h3 className="text-lg font-bold">{exp.title}</h3>
                     <p className="text-primary font-semibold">{exp.company}</p>
                     <p className="text-sm text-muted-foreground">
-                      {exp.duration}
+                      {exp.duration.toUpperCase()}
                     </p>
                     <p className="mt-3 text-muted-foreground">
                       {exp.description}

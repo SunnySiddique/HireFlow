@@ -180,3 +180,16 @@ export type MappedAppliedJobType = {
     company_logo_url: string | null;
   } | null;
 };
+
+export interface JobListingsType {
+  id: string;
+  job_title: string;
+  status: string | null;
+  created_at: string | null;
+  job_slug: string;
+  employment_type: string | null;
+  remote_option: string | null;
+  applicants: {
+    count: number;
+  }[];
+}

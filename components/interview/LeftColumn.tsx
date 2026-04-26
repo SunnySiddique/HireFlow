@@ -1,7 +1,12 @@
+import { useJoinAvailable } from "@/hooks/interview/useJoinAvailable";
 import { Interview } from "@/types/interview";
 import { User, Video } from "lucide-react";
 
 const LeftColumn = ({ interview }: { interview: Interview }) => {
+  const { isJoinAvailable } = useJoinAvailable(
+    interview.id,
+    interview.scheduled_at ?? "",
+  );
   return (
     <>
       <div className="lg:col-span-1 space-y-6">
@@ -39,20 +44,24 @@ const LeftColumn = ({ interview }: { interview: Interview }) => {
               </div>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-medium mb-1">
-                Meeting Link
-              </p>
-              {interview.meeting_link ? (
-                <a
-                  href={interview.meeting_link}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-sm text-blue-500 hover:underline break-all"
-                >
-                  {interview.meeting_link}
-                </a>
-              ) : (
-                <p className="text-sm text-foreground">Not provided yet</p>
+              {isJoinAvailable && (
+                <>
+                  <p className="text-xs text-muted-foreground font-medium mb-1">
+                    Meeting Link
+                  </p>
+                  {interview.meeting_link ? (
+                    <a
+                      href={interview.meeting_link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm text-blue-500 hover:underline break-all"
+                    >
+                      {interview.meeting_link}
+                    </a>
+                  ) : (
+                    <p className="text-sm text-foreground">Not provided yet</p>
+                  )}
+                </>
               )}
             </div>
           </div>

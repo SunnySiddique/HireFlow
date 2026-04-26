@@ -1,4 +1,4 @@
-import { getServerUser } from "@/lib/auth/serverAuth";
+import { getServerUser } from "@/lib/action/auth/serverAuth";
 import { startOfMonth, startOfWeek } from "date-fns";
 
 export async function seekerApplicationStatsService() {

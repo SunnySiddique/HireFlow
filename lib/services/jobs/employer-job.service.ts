@@ -1,5 +1,5 @@
 import { PLAN_LIMITS } from "@/constants/BillingData";
-import { getServerUser } from "@/lib/auth/serverAuth";
+import { getServerUser } from "@/lib/action/auth/serverAuth";
 import {
   sendJobMatchNotifications,
   sendNotification,

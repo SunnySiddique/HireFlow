@@ -1,4 +1,4 @@
-import { getServerUser } from "@/lib/auth/serverAuth";
+import { getServerUser } from "@/lib/action/auth/serverAuth";
 import { hasAccess } from "@/lib/utils";
 import { getSubscription } from "../stripe/stripe.service";
 
@@ -42,7 +42,7 @@ export async function trackSeekerProfileViewService(seekerId: string) {
     type: "profile_view",
     title: "New Profile View!",
     message: `${employer.company_name} viewed your profile`,
-    reference_id: employer.slug,
+    reference_id: employer.slug ?? "",
     is_read: false,
   });
 }
@@ -87,7 +87,7 @@ export async function trackEmployerProfileViewService(employerId: string) {
     type: "profile_view",
     title: "New Profile View!",
     message: `${seeker.full_name} viewed your profile`,
-    reference_id: seeker.slug,
+    reference_id: seeker.slug ?? "",
     is_read: false,
   });
 }
