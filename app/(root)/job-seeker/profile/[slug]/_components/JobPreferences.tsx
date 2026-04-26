@@ -70,7 +70,7 @@ const JobPreferences = ({
               {editMode ? (
                 <CustomField
                   control={form.control}
-                  name="jobType"
+                  name="preferred_job_type"
                   label="Job Types"
                   type="checkbox-group"
                   options={jobType.map((type) => ({
