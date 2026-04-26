@@ -232,6 +232,19 @@ const ProfilePage = () => {
     );
 
     setSkills(jobSeekerProfile.skills ?? []);
+
+    form.reset({
+      fullName: jobSeekerProfile.full_name || "",
+      headline: jobSeekerProfile.headline || "",
+      bio: jobSeekerProfile.bio || "",
+      desiredRole: jobSeekerProfile.desired_role || "",
+      expectedSalaryMin: jobSeekerProfile.expected_salary_min || "",
+      expectedSalaryMax: jobSeekerProfile.expected_salary_max || "",
+      preferredLocations: jobSeekerProfile.preferred_locations || "",
+      portfolioUrl: jobSeekerProfile.portfolio_url || "",
+      openToWork: jobSeekerProfile.open_to_work ?? true,
+      preferred_job_type: jobSeekerProfile.preferred_job_type || "",
+    });
   }, [jobSeekerProfile, editMode, form]);
 
   const onInvalid = (errors: any) => {
