@@ -382,38 +382,34 @@ export async function seekerRecommendedJobsService() {
   }
 
   const userSkills = jobSeeker.skills ?? [];
+  if (userSkills.length === 0) return [];
 
-  let query = supabase
+  const { data: jobs, error } = await supabase
     .from("jobs")
     .select(
       `
+        id,
+        job_title,
+        location,
+        salary_min,
+        salary_max,
+        currency,
+        employment_type,
+        job_slug,
+        created_at,
+        skills_required,
+        employer:employer_id (
           id,
-          job_title,
-          location,
-          salary_min,
-          salary_max,
-          currency,
-          employment_type,
-          job_slug,
-          created_at,
-          skills_required,
-          employer:employer_id (
-            id,
-            company_name,
-            company_logo_url,
-            website
-          )
-        `,
+          company_name,
+          company_logo_url,
+          website
+        )
+      `,
     )
     .eq("status", "open")
-    .limit(20)
+    .overlaps("skills_required", userSkills)
+    .limit(100)
     .order("created_at", { ascending: false });
-
-  if (userSkills.length > 0) {
-    query = query.overlaps("skills_required", userSkills);
-  }
-
-  const { data: jobs, error } = await query;
 
   if (error || !jobs) throw new Error("Jobs not found");
 
@@ -424,11 +420,22 @@ export async function seekerRecommendedJobsService() {
       userSkills.includes(skill),
     ).length;
 
+    const matchPercentage =
+      jobSkills.length > 0
+        ? Math.round((matchScore / jobSkills.length) * 100)
+        : 0;
+
     return {
       ...job,
       matchScore,
+      matchPercentage,
     };
   });
 
-  return jobsWithScore.sort((a, b) => b.matchScore - a.matchScore);
+  return jobsWithScore
+    .sort((a, b) => {
+      if (b.matchScore !== a.matchScore) return b.matchScore - a.matchScore;
+      return b.matchPercentage - a.matchPercentage;
+    })
+    .slice(0, 20);
 }

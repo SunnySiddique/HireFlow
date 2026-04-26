@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ArrowRight, BarChart3, Eye, Users, Zap } from "lucide-react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 const UnSubscribeEmptyState = ({
   role,
 }: {

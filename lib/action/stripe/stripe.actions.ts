@@ -3,7 +3,12 @@
 import {
   createCheckoutSessionService,
   createPortalSessionService,
+  getMySubscriptionService,
 } from "@/lib/services/stripe/stripe.service";
+
+export async function getSubscription() {
+  return getMySubscriptionService();
+}
 
 export async function createCheckoutSession(
   planName: string,

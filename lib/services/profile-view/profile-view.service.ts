@@ -1,6 +1,6 @@
 import { getServerUser } from "@/lib/action/auth/serverAuth";
 import { hasAccess } from "@/lib/utils";
-import { getSubscription } from "../stripe/stripe.service";
+import { getUserSubscription } from "../stripe/stripe.service";
 
 // job-seeker view
 export async function trackSeekerProfileViewService(seekerId: string) {
@@ -17,7 +17,7 @@ export async function trackSeekerProfileViewService(seekerId: string) {
   if (!employer) return;
   if (user.id === seekerId) return;
 
-  const sub = await getSubscription(user.id);
+  const sub = await getUserSubscription(user.id);
 
   const isChampion =
     hasAccess(
@@ -62,7 +62,7 @@ export async function trackEmployerProfileViewService(employerId: string) {
   if (!seeker) return;
   if (user.id === employerId) return;
 
-  const sub = await getSubscription(employerId);
+  const sub = await getUserSubscription(employerId);
 
   const isElite =
     hasAccess(
@@ -115,7 +115,7 @@ export async function trackJobViewService(jobId: string) {
   if (!job) return;
   if (user.id === job.employer_id) return;
 
-  const sub = await getSubscription(job.employer_id);
+  const sub = await getUserSubscription(job.employer_id);
 
   const isElite =
     hasAccess(

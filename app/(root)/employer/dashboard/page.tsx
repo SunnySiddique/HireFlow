@@ -23,10 +23,7 @@ const EmployerDashboardPage = () => {
   const { data: recentApplicants = [], isLoading: applicantsLoading } =
     useRecentApplicants();
 
-  const isLoading =
-    subLoading || jobsLoading || chartLoading || applicantsLoading;
-
-  if (isLoading) return <Loader mode="full" />;
+  if (subLoading) return <Loader mode="full" />;
 
   const isSubscribed = hasAccess(
     subscription?.subscription_status as string,
@@ -39,10 +36,24 @@ const EmployerDashboardPage = () => {
 
       {isSubscribed ? (
         <>
-          <JobListings jobs={jobListings} />
+          {jobsLoading ? (
+            <div className="animate-pulse h-40 bg-muted rounded-xl mt-6" />
+          ) : (
+            <JobListings jobs={jobListings} />
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mt-10">
-            <WeeklyApplicationsChart chartData={chartData} />
-            <RecentApplicants applicants={recentApplicants} />
+            {chartLoading ? (
+              <div className="animate-pulse h-64 bg-muted rounded-xl" />
+            ) : (
+              <WeeklyApplicationsChart chartData={chartData} />
+            )}
+
+            {applicantsLoading ? (
+              <div className="animate-pulse h-64 bg-muted rounded-xl" />
+            ) : (
+              <RecentApplicants applicants={recentApplicants} />
+            )}
           </div>
         </>
       ) : (

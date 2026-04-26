@@ -8,7 +8,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { employerProfileService } from "../services/employer-profile/employer-profile.service";
 import { seekerProfileService } from "../services/seeker-profile/seeker-profile.service";
-import { getSubscription } from "../services/stripe/stripe.service";
+import { getUserSubscription } from "../services/stripe/stripe.service";
 import { Database } from "../types/supabase";
 import { hasAccess } from "../utils";
 
@@ -57,7 +57,7 @@ export async function updateSession(request: NextRequest) {
   const [jobSeekerData, employerData, subscription] = await Promise.all([
     seekerProfileService(),
     employerProfileService(),
-    getSubscription(user.id),
+    getUserSubscription(user.id),
   ]);
 
   const userRole: "job-seeker" | "employer" | undefined = jobSeekerData

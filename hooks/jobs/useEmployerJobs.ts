@@ -101,6 +101,7 @@ export const useActiveJobs = () => {
   return useQuery({
     queryKey: ["active-jobs"],
     queryFn: activeJobs,
+    staleTime: 1000 * 60 * 5,
   });
 };
 
@@ -109,6 +110,7 @@ export const useRecentApplicants = () => {
   return useQuery({
     queryKey: ["recent-applicants"],
     queryFn: recentJobs,
+    staleTime: 1000 * 60 * 2,
   });
 };
 
@@ -117,5 +119,6 @@ export const useChartApplicants = () => {
   return useQuery({
     queryKey: ["chart-applicants"],
     queryFn: chartApplicants,
+    staleTime: 1000 * 60 * 10,
   });
 };

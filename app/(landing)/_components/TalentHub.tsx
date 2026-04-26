@@ -1,7 +1,7 @@
 import { JOB_PLATFORM_FEATURES } from "@/constants";
 import { CheckCircle } from "lucide-react";
 
-const TalentHub = () => {
+const HireFlow = () => {
   return (
     <>
       <section
@@ -11,7 +11,7 @@ const TalentHub = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           <div>
             <h2 className="text-5xl sm:text-6xl font-black mb-4 text-foreground">
-              Why TalentHub?
+              Why HireFlow?
             </h2>
             <p className="text-lg text-muted-foreground font-semibold mb-12">
               Everything you need to land your next opportunity
@@ -53,4 +53,4 @@ const TalentHub = () => {
   );
 };
 
-export default TalentHub;
+export default HireFlow;
