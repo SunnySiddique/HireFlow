@@ -81,5 +81,6 @@ export const useSeekerProfiles = (search?: string) => {
     queryKey: ["seeker-profiles", search ?? ""],
     queryFn: () => seekerProfiles(search),
     staleTime: 1000 * 60 * 5,
+    enabled: search !== undefined,
   });
 };

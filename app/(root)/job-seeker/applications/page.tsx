@@ -14,7 +14,7 @@ const JobSeekerApplicationsPage = () => {
   const { filters, updateFilter, resetFilters } = useInterviewFilters();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const { data, isLoading } = useSeekerAppliedJobs();
+  const { data, isLoading } = useSeekerAppliedJobs(filters);
 
   const applications = data?.jobs ?? [];
   const totalPages = data?.totalPages ?? 0;
@@ -99,7 +99,6 @@ const JobSeekerApplicationsPage = () => {
         ) : (
           <div className="col-span-full py-16 sm:py-24 flex flex-col items-center justify-center text-center bg-card/50 rounded-2xl sm:rounded-3xl border border-dashed border-border px-4">
             <div className="relative mb-5 sm:mb-6">
-              <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse" />
               <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-muted border-2 border-primary/20 flex items-center justify-center">
                 <BriefcaseBusiness className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
               </div>

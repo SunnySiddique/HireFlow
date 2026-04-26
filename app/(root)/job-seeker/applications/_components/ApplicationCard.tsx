@@ -79,8 +79,8 @@ export const getAppStatusConfig = (status: string) => {
 interface ApplicationCardProps {
   app: MappedAppliedJobType;
   index: number;
-  isExpanded: boolean; // ✅ controlled by parent
-  onToggleExpand: () => void; // ✅ parent decides which card is open
+  isExpanded: boolean;
+  onToggleExpand: () => void;
 }
 
 const ApplicationCard = ({

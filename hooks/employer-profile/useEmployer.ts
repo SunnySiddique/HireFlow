@@ -69,5 +69,6 @@ export const useEmployerProfiles = (search?: string) => {
     queryKey: ["employer-profiles", search ?? ""],
     queryFn: () => employerProfiles(search),
     staleTime: 1000 * 60 * 5,
+    enabled: search !== undefined,
   });
 };

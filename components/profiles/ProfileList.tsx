@@ -25,7 +25,7 @@ const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
   const debounceSearch = useDebounce(search, 500);
 
   const { data: seekerData, isLoading: seekerLoading } = useSeekerProfiles(
-    isJobSeeker ? undefined : debounceSearch,
+    !isJobSeeker ? debounceSearch : undefined,
   );
 
   const { data: employerData, isLoading: employerLoading } =
