@@ -50,14 +50,6 @@ export const typeIcon = (type: string) => {
   }
 };
 
-export const typeLabel: Record<string, string> = {
-  zoom: "Zoom",
-  google_meet: "Google Meet",
-  ms_teams: "MS Teams",
-  phone: "Phone",
-  in_person: "In Person",
-};
-
 // interviews
 
 export const getStatusConfig = (status: string | null) => {

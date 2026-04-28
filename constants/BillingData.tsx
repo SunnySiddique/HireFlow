@@ -57,8 +57,6 @@ export const PLAN_LIMITS = {
   elite: Infinity,
 };
 
-// employer
-
 // seeker
 export const seekerPlans = [
   {
