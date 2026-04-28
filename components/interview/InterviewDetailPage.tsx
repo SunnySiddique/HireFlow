@@ -1,6 +1,6 @@
 "use client";
 
-import { getStatusConfig } from "@/constants/InterviewsData";
+import { getStatusConfig } from "@/constants/interviewsData";
 import { useInterview } from "@/hooks/interview/useInterview";
 import { cn } from "@/lib/utils";
 import { Calendar, ChevronLeft } from "lucide-react";
@@ -22,7 +22,7 @@ const InterviewDetailPage = ({
 
   const router = useRouter();
 
-  const statusConfig = getStatusConfig(interview?.status ?? "N/A");
+  const statusConfig = getStatusConfig(interview?.status ?? "");
 
   if (isLoading) return <Loader mode="inline" />;
   if (!interview)
@@ -83,12 +83,12 @@ const InterviewDetailPage = ({
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <div className="max-w-5xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 pt-4 lg:pt-8">
         {/* Hero Section */}
         <Hero interview={interview} role={role} />
 
         {/* Two Column Layout for Details */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
           {/* Left Column: Interviewer Info */}
           <LeftColumn interview={interview} />
 

@@ -42,7 +42,7 @@ const CompanyView = ({ slug }: CompanyViewProps) => {
   useEffect(() => {
     if (!data?.company?.id) return;
 
-    trackView(data.company.auth_id);
+    trackView(data?.company?.auth_id);
   }, [data?.company?.id]);
 
   if (isLoading) {

@@ -53,7 +53,7 @@ const NotificationLists = ({
           <div
             className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${notification.is_read ? "bg-primary/10" : "bg-muted"}`}
           >
-            <NotificationIcon type={notification.type ?? "N/A"} />
+            <NotificationIcon type={notification.type ?? ""} />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1">

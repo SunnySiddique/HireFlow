@@ -11,7 +11,8 @@ import Loader from "../Loader";
 import { Input } from "../ui/input";
 import EmployerCard from "./EmployerCard";
 import { FeaturedEmployerCard } from "./FeaturedEmployerCard";
-import { FeaturedTalentCard } from "./FeaturedTalentCard";
+
+import FeaturedTalentCard from "./FeaturedTalentCard";
 import { TalentCard } from "./TalentCard";
 
 type Profile = JobSeekerProfile | Employer;
@@ -62,7 +63,7 @@ const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
   if (seekerLoading || employerLoading) return <Loader mode="inline" />;
 
   return (
-    <main className="p-8">
+    <main>
       {/* Header */}
       <div className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-30 pb-4 mb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">

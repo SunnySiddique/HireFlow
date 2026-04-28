@@ -36,7 +36,7 @@ const JobSeekerDashboardPage = () => {
     subscription?.plan?.toLowerCase() === "champion";
 
   return (
-    <main className="p-8">
+    <main>
       <section className="mb-6 lg:mb-8">
         <DashboardStats
           isSubscribed={isSubscribed}

@@ -1,7 +1,6 @@
 import CustomField from "@/components/CustomField";
 import EmptyState from "@/components/EmptyState";
-import { employerHiringStatus } from "@/constants";
-import { statusLabel } from "@/constants/employerData";
+import { employerHiringStatus, statusLabel } from "@/constants/employerData";
 import { Employer, EmployerFormData } from "@/types/employer";
 import { Briefcase, TrendingUp } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
@@ -79,7 +78,7 @@ const OpenPositions = ({ editMode, form, employer }: OpenPositionsProps) => {
                 />
               ) : (
                 <p className="text-foreground font-semibold capitalize">
-                  {statusLabel[employer?.hiring_status ?? "N/A"] ||
+                  {statusLabel[employer?.hiring_status ?? ""] ||
                     "Not specified"}
                 </p>
               )}

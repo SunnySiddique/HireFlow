@@ -59,24 +59,30 @@ const CustomField = <T extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem
-          className={`${isCheckBox ? "flex justify-center items-center flex-row-reverse" : "flex-col"}`}
+          className={`w-full ${
+            isCheckBox
+              ? "flex items-center justify-between gap-3 flex-row-reverse"
+              : "flex flex-col gap-2"
+          }`}
         >
-          {!isLable ? (
-            <FormLabel className={"text-xs font-bold text-muted-foreground"}>
+          {!isLable && (
+            <FormLabel className="text-sm md:text-base font-medium text-muted-foreground">
               {label}
             </FormLabel>
-          ) : null}
+          )}
 
           <FormControl>
             {type === "textarea" ? (
               <Textarea
                 placeholder={placeholder}
-                className={`${isAbout ? "h-48" : "h-20"} ${isJob ? "resize-y" : "resize-none"} w-full  text-base bg-muted text-foreground rounded-lg border border-border focus:border-primary focus:outline-none p-3`}
+                className={`w-full text-sm md:text-base bg-muted text-foreground rounded-lg border border-border focus:border-primary focus:outline-none p-3 min-h-[80px] ${
+                  isAbout ? "min-h-[160px]" : ""
+                } ${isJob ? "resize-y" : "resize-none"}`}
                 {...field}
               />
             ) : type === "select" ? (
               <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full h-11 text-sm md:text-base">
                   <SelectValue placeholder={placeholder} />
                 </SelectTrigger>
                 <SelectContent>
@@ -88,12 +94,14 @@ const CustomField = <T extends FieldValues>({
                 </SelectContent>
               </Select>
             ) : type === "checkbox" ? (
-              <Checkbox
-                checked={field.value}
-                onCheckedChange={(checked) => field.onChange(checked)}
-              />
+              <div className="flex items-center justify-between w-full">
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) => field.onChange(checked)}
+                />
+              </div>
             ) : type === "checkbox-group" ? (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
                 {options?.map((option) => {
                   const id = `${name}-${option.value}`;
                   return (
@@ -105,7 +113,7 @@ const CustomField = <T extends FieldValues>({
                       />
                       <label
                         htmlFor={id}
-                        className="text-foreground cursor-pointer select-none"
+                        className="text-sm md:text-base text-foreground cursor-pointer"
                       >
                         {option.label}
                       </label>
@@ -115,7 +123,7 @@ const CustomField = <T extends FieldValues>({
               </div>
             ) : (
               <Input
-                className="w-full text-lg font-semibold bg-transparent text-foreground focus:outline-none focus:border-secondary/70"
+                className="w-full h-11 text-sm md:text-base bg-transparent text-foreground border border-border rounded-md px-3 focus:outline-none focus:border-primary"
                 type={type}
                 placeholder={placeholder}
                 {...field}

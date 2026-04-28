@@ -58,10 +58,15 @@ export const useSavedJob = () => {
 
   return useMutation({
     mutationFn: (jobId: string) => toggleSaveJob(jobId),
-    onSuccess: () => {
+    onSuccess: (data) => {
       invalidateQuery(queryClient, ["get-all-save-jobs"]);
       invalidateQuery(queryClient, ["seeker-application-stats"]);
-      toast.success("Job Saved Successfully");
+
+      if (data === "saved") {
+        toast.success("Job saved successfully");
+      } else if (data === "unsaved") {
+        toast.success("Job removed from saved");
+      }
     },
     onError: (error) => {
       toast.error(error.message || "Something went wrong Saving Job");

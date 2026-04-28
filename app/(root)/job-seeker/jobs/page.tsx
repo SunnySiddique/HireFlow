@@ -1,15 +1,15 @@
 "use client";
 
 import JobCard from "@/components/jobs/JobCard";
-import JobCardSkeleton from "@/components/jobs/JobCardSkeleton";
-import Loader from "@/components/Loader";
 import { SALARY_RANGES } from "@/constants/jobsData";
 import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { hasAccess } from "@/lib/utils";
 import { JobFiltersType } from "@/types/jobs";
 import { useState } from "react";
 
+import Loader from "@/components/Loader";
 import { useSeekerJobs } from "@/hooks/jobs/useSeekerJob";
+import { useDebounce } from "@/hooks/useDebounce";
 import JobTopBar from "./_components/JobTopBar";
 import NoJobsFound from "./_components/NoJobsFound";
 import Pagination from "./_components/Pagination";
@@ -21,9 +21,9 @@ const BrowseJobs = () => {
   const [filters, setFilters] = useState<JobFiltersType>({
     search: "",
     location: "",
-    category: "",
-    employmentType: "",
-    experienceLevel: "",
+    category: "all",
+    employmentType: "all",
+    experienceLevel: "all",
     salaryMin: undefined,
     salaryMax: undefined,
     page: 1,
@@ -32,13 +32,16 @@ const BrowseJobs = () => {
     featured: false,
   });
 
-  const [salaryLabel, setSalaryLabel] = useState("");
+  const [salaryLabel, setSalaryLabel] = useState("any");
 
-  const {
-    data = { jobs: [], totalCount: 0, totalPages: 0 },
-    isLoading,
-    isFetching,
-  } = useSeekerJobs(filters);
+  const debouncedSearch = useDebounce(filters.search, 500);
+  const debouncedLocation = useDebounce(filters.location, 500);
+  const { data = { jobs: [], totalCount: 0, totalPages: 0 }, isLoading } =
+    useSeekerJobs({
+      ...filters,
+      search: debouncedSearch,
+      location: debouncedLocation,
+    });
 
   const { jobs, totalCount, totalPages } = data;
 
@@ -55,23 +58,28 @@ const BrowseJobs = () => {
 
   const updateSalary = (label: string) => {
     setSalaryLabel(label);
+    if (label === "any") {
+      updateFilters({ salaryMin: undefined, salaryMax: undefined });
+      return;
+    }
     const selected = SALARY_RANGES.find((s) => s.label === label);
     updateFilters({ salaryMin: selected?.min, salaryMax: selected?.max });
   };
 
   const clearFilters = () => {
-    setSalaryLabel("");
+    setSalaryLabel("any");
     setFilters({
       search: "",
       location: "",
-      category: "",
-      employmentType: "",
-      experienceLevel: "",
+      category: "all",
+      employmentType: "all",
+      experienceLevel: "all",
       salaryMin: undefined,
       salaryMax: undefined,
       page: 1,
       limit: 10,
       sort: "all",
+      featured: false,
     });
   };
 
@@ -79,8 +87,10 @@ const BrowseJobs = () => {
     subscription?.subscription_status as string,
     subscription?.plan_expires_at as string,
   );
+
+  if (isLoading) return <Loader mode="inline" />;
   return (
-    <div className="px-4 md:px-14 py-4 space-y-4">
+    <div className="space-y-4">
       <div className="space-y-2">
         <h1 className="text-xl md:text-2xl font-bold">Find Your Dream Job</h1>
 
@@ -107,15 +117,7 @@ const BrowseJobs = () => {
         onFeaturedChange={(val) => updateFilters({ featured: val })}
       />
 
-      {isLoading ? (
-        <Loader mode="inline" />
-      ) : isFetching ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <JobCardSkeleton key={i} />
-          ))}
-        </div>
-      ) : jobs.length === 0 ? (
+      {jobs.length === 0 ? (
         <NoJobsFound />
       ) : (
         <div className="space-y-6">

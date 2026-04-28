@@ -1,5 +1,4 @@
 "use client";
-
 import Loader from "@/components/Loader";
 import { useSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
 import { useVapi } from "@/hooks/vapi/useVapi";
@@ -23,26 +22,26 @@ const AIMockInterviewPage = () => {
   const { data: seeker, isLoading } = useSeekerProfile();
 
   if (isLoading) return <Loader mode="inline" />;
+
   return (
-    <div className="flex flex-col">
-      {/* Main Content */}
-      <main className="flex-1 px-14 py-8 flex flex-col gap-8">
-        {/* Header Area */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1 flex flex-col gap-6 sm:gap-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between md:items-end gap-4">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">
               Technical Interview Practice
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm sm:text-base">
               Role: Dynamic Data Coordinator • Difficulty: Medium
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            {/* Call Action Button */}
+
+          <div className="flex flex-wrap gap-3 w-full md:w-auto">
             {!isConnected && !isConnecting ? (
               <button
                 onClick={startCall}
-                className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold flex items-center gap-2 hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all hover:scale-105"
+                className="flex-1 md:flex-none px-5 sm:px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-2 hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all hover:scale-105"
               >
                 <Phone className="w-5 h-5" />
                 Start Call
@@ -50,7 +49,7 @@ const AIMockInterviewPage = () => {
             ) : isConnecting ? (
               <button
                 disabled
-                className="px-6 py-2.5 rounded-xl bg-primary/50 text-primary-foreground font-bold flex items-center gap-2 cursor-not-allowed"
+                className="flex-1 md:flex-none px-5 sm:px-6 py-2.5 rounded-xl bg-primary/50 text-primary-foreground font-bold flex items-center justify-center gap-2 cursor-not-allowed"
               >
                 <Sparkles className="w-5 h-5 animate-spin" />
                 Connecting...
@@ -58,7 +57,7 @@ const AIMockInterviewPage = () => {
             ) : (
               <button
                 onClick={endCall}
-                className="px-6 py-2.5 rounded-xl bg-destructive text-destructive-foreground font-bold flex items-center gap-2 hover:bg-destructive/90 shadow-lg shadow-destructive/20 transition-all hover:scale-105"
+                className="flex-1 md:flex-none px-5 sm:px-6 py-2.5 rounded-xl bg-destructive text-destructive-foreground font-bold flex items-center justify-center gap-2 hover:bg-destructive/90 shadow-lg shadow-destructive/20 transition-all hover:scale-105"
               >
                 <PhoneOff className="w-5 h-5" />
                 End Call
@@ -68,10 +67,9 @@ const AIMockInterviewPage = () => {
         </div>
 
         {/* Video Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-[500px]">
-          {/* Card 1: AI Avatar (Nova) */}
-          <div className="relative rounded-3xl bg-card border border-border/50 shadow-lg overflow-hidden flex flex-col">
-            {/* Active Glow Effect */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 flex-1">
+          {/* AI CARD */}
+          <div className="relative rounded-2xl sm:rounded-3xl bg-card border border-border/50 shadow-lg overflow-hidden flex flex-col min-h-[380px] sm:min-h-[500px]">
             <AnimatePresence>
               {isConnected && isSpeaking && (
                 <motion.div
@@ -83,42 +81,25 @@ const AIMockInterviewPage = () => {
               )}
             </AnimatePresence>
 
-            {/* Header */}
-            <div className="absolute top-6 left-6 z-10 flex items-center gap-3 bg-background/80 backdrop-blur-md px-4 py-2 rounded-full border border-border/50 shadow-sm">
+            <div className="absolute top-4 sm:top-6 left-4 sm:left-6 z-10 flex items-center gap-2 sm:gap-3 bg-background/80 backdrop-blur-md px-3 sm:px-4 py-2 rounded-full border border-border/50">
               <div className="relative flex h-3 w-3">
                 {isConnected ? (
                   <>
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    <span className="animate-ping absolute h-full w-full rounded-full bg-green-400 opacity-75" />
+                    <span className="relative h-3 w-3 rounded-full bg-green-500" />
                   </>
                 ) : (
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-muted-foreground"></span>
+                  <span className="h-3 w-3 rounded-full bg-muted-foreground" />
                 )}
               </div>
-              <span className="text-sm font-bold">Nova (AI Interviewer)</span>
+              <span className="text-xs sm:text-sm font-bold">Nova</span>
             </div>
 
-            {/* Avatar Center */}
-            <div className="flex-1 flex flex-col items-center justify-center relative z-10 p-8">
+            <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
               <div className="relative">
-                {/* Glowing Ring when speaking */}
-                {isConnected && isSpeaking && (
-                  <motion.div
-                    layoutId="glow"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1.2 }}
-                    transition={{
-                      repeat: Infinity,
-                      duration: 2,
-                      repeatType: "reverse",
-                    }}
-                    className="absolute inset-0 rounded-full bg-primary/20 blur-xl"
-                  />
-                )}
-
                 <div
                   className={cn(
-                    "relative w-40 h-40 rounded-full overflow-hidden border-4 transition-colors duration-500 z-10",
+                    "relative w-28 h-28 sm:w-40 sm:h-40 rounded-full overflow-hidden border-4 transition-colors",
                     isConnected && isSpeaking
                       ? "border-primary"
                       : "border-border",
@@ -133,16 +114,15 @@ const AIMockInterviewPage = () => {
                 </div>
               </div>
 
-              {/* Status / Visualizer */}
-              <div className="mt-8 h-16 flex items-center justify-center">
+              <div className="mt-6 sm:mt-8 h-14 sm:h-16 flex items-center justify-center">
                 {!isConnected && !isConnecting && (
-                  <span className="text-muted-foreground font-mono text-sm bg-muted/50 px-4 py-2 rounded-full">
+                  <span className="text-muted-foreground text-xs sm:text-sm bg-muted/50 px-3 sm:px-4 py-2 rounded-full">
                     Ready to start
                   </span>
                 )}
                 {isConnecting && (
-                  <span className="text-primary font-mono text-sm animate-pulse">
-                    Connecting to Nova...
+                  <span className="text-primary text-xs sm:text-sm animate-pulse">
+                    Connecting...
                   </span>
                 )}
                 {isConnected && (
@@ -151,7 +131,7 @@ const AIMockInterviewPage = () => {
                       active={isSpeaking}
                       colorClass="bg-primary"
                     />
-                    <span className="text-xs text-primary font-mono uppercase tracking-widest">
+                    <span className="text-[10px] sm:text-xs text-primary uppercase tracking-widest">
                       {isSpeaking ? "Speaking" : "Listening"}
                     </span>
                   </div>
@@ -160,45 +140,41 @@ const AIMockInterviewPage = () => {
             </div>
           </div>
 
-          <div className="relative rounded-3xl bg-card border border-border/50 shadow-lg overflow-hidden flex flex-col">
-            {/* Header */}
-            <div className="absolute top-6 left-6 z-10 flex items-center gap-3 bg-background/80 backdrop-blur-md px-4 py-2 rounded-full border border-border/50 shadow-sm">
-              <span className="text-sm font-bold">
-                {seeker?.full_name.split(" ")[0] ?? "Seeker"} (You)
+          {/* USER CARD */}
+          <div className="relative rounded-2xl sm:rounded-3xl bg-card border border-border/50 shadow-lg overflow-hidden flex flex-col min-h-[380px] sm:min-h-[500px]">
+            <div className="absolute top-4 sm:top-6 left-4 sm:left-6 z-10 flex items-center bg-background/80 backdrop-blur-md px-3 sm:px-4 py-2 rounded-full border border-border/50">
+              <span className="text-xs sm:text-sm font-bold">
+                {seeker?.full_name?.split(" ")[0] ?? "Seeker"}
               </span>
             </div>
 
-            {/* Avatar Center */}
-            <div className="flex-1 flex flex-col items-center justify-center relative z-10 p-8">
-              <div className="relative">
-                <div
-                  className={cn(
-                    "relative w-40 h-40 rounded-full overflow-hidden border-4 transition-colors duration-500 z-10",
-                    isConnected && !isSpeaking
-                      ? "border-secondary"
-                      : "border-border",
-                  )}
-                >
-                  <Image
-                    src={seeker?.profile_url ?? "Seeker profile"}
-                    alt="Seeker profile"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+            <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
+              <div
+                className={cn(
+                  "relative w-28 h-28 sm:w-40 sm:h-40 rounded-full overflow-hidden border-4",
+                  isConnected && !isSpeaking
+                    ? "border-secondary"
+                    : "border-border",
+                )}
+              >
+                <Image
+                  src={seeker?.profile_url ?? "/placeholder.png"}
+                  alt="Seeker profile"
+                  fill
+                  className="object-cover"
+                />
               </div>
 
-              {/* Status / Visualizer */}
-              <div className="mt-8 h-16 flex items-center justify-center">
+              <div className="mt-6 sm:mt-8 h-14 sm:h-16 flex items-center justify-center">
                 {isConnected && !isSpeaking ? (
                   <div className="flex flex-col items-center gap-2">
                     <AudioVisualizer active={true} colorClass="bg-secondary" />
-                    <span className="text-xs text-secondary font-mono uppercase tracking-widest">
+                    <span className="text-[10px] sm:text-xs text-secondary uppercase tracking-widest">
                       Speaking
                     </span>
                   </div>
                 ) : (
-                  <span className="text-muted-foreground font-mono text-sm bg-muted/50 px-4 py-2 rounded-full">
+                  <span className="text-muted-foreground text-xs sm:text-sm bg-muted/50 px-3 sm:px-4 py-2 rounded-full">
                     {isConnected ? "Listening" : "Ready"}
                   </span>
                 )}
@@ -207,15 +183,17 @@ const AIMockInterviewPage = () => {
           </div>
         </div>
 
-        {/* Bottom Context / Transcript Panel */}
+        {/* TRANSCRIPT */}
         <div className="w-full">
-          {/* Live Transcript */}
-          <div className="w-full p-6 rounded-2xl bg-card border border-border/50 shadow-sm flex flex-col gap-4">
+          <div className="p-4 sm:p-6 rounded-2xl bg-card border border-border/50 shadow-sm flex flex-col gap-4">
             <div className="flex items-center gap-2 text-primary">
               <MessageSquare className="w-5 h-5" />
-              <h3 className="font-bold">Live Transcript</h3>
+              <h3 className="font-bold text-sm sm:text-base">
+                Live Transcript
+              </h3>
             </div>
-            <div className="flex-1 p-4 rounded-xl bg-muted/30 border border-border/50 h-[250px] overflow-y-scroll flex flex-col gap-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+
+            <div className="p-3 sm:p-4 rounded-xl bg-muted/30 border border-border/50 h-[200px] sm:h-[250px] lg:h-[300px] overflow-y-scroll flex flex-col gap-3 sm:gap-4">
               {transcript.map((msg, idx) => (
                 <div
                   key={idx}
@@ -226,25 +204,17 @@ const AIMockInterviewPage = () => {
                 >
                   <div
                     className={cn(
-                      "max-w-[80%] p-3 rounded-2xl",
+                      "max-w-[85%] p-3 rounded-2xl text-sm",
                       msg.role === "user"
-                        ? "bg-secondary text-secondary-foreground rounded-tr-sm"
-                        : "bg-primary/10 text-foreground border border-primary/20 rounded-tl-sm",
+                        ? "bg-secondary text-secondary-foreground"
+                        : "bg-primary/10 border border-primary/20",
                     )}
                   >
-                    <p className="text-sm font-medium">{msg.text}</p>
+                    {msg.text}
                   </div>
                 </div>
               ))}
-              {isConnected && !isSpeaking && (
-                <div className="flex w-full justify-end">
-                  <div className="max-w-[80%] p-3 rounded-2xl bg-secondary/10 text-secondary-foreground border border-secondary/20 rounded-tr-sm animate-pulse">
-                    <p className="text-sm font-medium italic">
-                      Listening to you...
-                    </p>
-                  </div>
-                </div>
-              )}
+
               <div ref={transcriptEndRef} />
             </div>
           </div>

@@ -4,7 +4,7 @@ import { cn, formatDate, formatLabel, formatSalary } from "@/lib/utils";
 import { SavedJob } from "@/types/jobs";
 import {
   AlertCircle,
-  BookmarkMinus,
+  BookmarkCheck,
   Briefcase,
   Building2,
   CalendarDays,
@@ -12,11 +12,11 @@ import {
   Clock,
   DollarSign,
   ExternalLink,
+  Loader,
   MapPin,
 } from "lucide-react";
 
 import { randomImage } from "@/lib/utils/randomImage";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import { Button } from "../ui/button";
 
@@ -53,10 +53,12 @@ const getStatusConfig = (status: string) => {
 export const SavedJobCard = ({
   job,
   onSave,
+  isSaving,
 }: {
   job: SavedJob;
   index?: number;
   onSave?: (id: string) => void;
+  isSaving: boolean;
 }) => {
   const statusConfig = getStatusConfig(job.status || "open");
   const isClosed = (job.status || "").toLowerCase() === "closed";
@@ -84,10 +86,13 @@ export const SavedJobCard = ({
           }}
           className="absolute top-4 right-4 p-2 rounded-full hover:bg-rose-500/10 hover:text-rose-500  transition-all duration-300 z-20 group/unsave"
           aria-label="Remove from saved jobs"
+          disabled={isSaving}
         >
-          <motion.div whileTap={{ scale: 0.9 }}>
-            <BookmarkMinus className="w-5 h-5 group-hover/unsave:fill-rose-500/20" />
-          </motion.div>
+          {isSaving ? (
+            <Loader className="h-3 w-3 animate-spin" />
+          ) : (
+            <BookmarkCheck className="w-3.5 h-3.5" />
+          )}
         </Button>
       )}
 

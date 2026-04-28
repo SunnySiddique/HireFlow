@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { AUTH_TABS } from "@/constants";
+import { AUTH_TABS } from "@/constants/authData";
 import { useLoginUser } from "@/hooks/auth/useAuth";
 import { createClient } from "@/lib/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";

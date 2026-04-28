@@ -5,7 +5,12 @@ import {
 } from "@/lib/action/jobs/applicants.actions";
 import { invalidateQuery } from "@/lib/react-query/invalidateQueries";
 import { InterviewFilters } from "@/types/interview";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 // employer
@@ -14,6 +19,7 @@ export const useEmployerApplicants = (filters?: InterviewFilters) => {
     queryKey: ["applicants", filters?.status, filters?.page, filters?.archived],
     staleTime: 1000 * 60 * 2,
     queryFn: () => employerApplicants(filters),
+    placeholderData: keepPreviousData,
   });
 };
 

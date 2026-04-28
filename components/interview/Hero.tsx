@@ -65,7 +65,7 @@ const Hero = ({
 
   return (
     <>
-      <div className="bg-card rounded-3xl border border-border/50 p-6 sm:p-10 shadow-sm relative overflow-hidden mb-8">
+      <div className="bg-card rounded-2xl lg:rounded-3xl border border-border/50 p-4 sm:p-6 lg:p-8 xl:p-10 shadow-sm relative overflow-hidden mb-6 lg:mb-8">
         {interview.status === "upcoming" && (
           <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
         )}
@@ -143,52 +143,52 @@ const Hero = ({
           </div>
         )}
 
-        <div className="relative z-10 flex flex-col md:flex-row gap-8 justify-between">
-          <div className="flex gap-6">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl border-2 border-muted bg-card shadow-sm overflow-hidden shrink-0">
+        <div className="relative z-10 flex flex-col lg:flex-row gap-6 lg:gap-8 justify-between">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-2xl border-2 border-muted bg-card shadow-sm overflow-hidden shrink-0 mx-auto sm:mx-0">
               <Image
-                src={interview?.employer?.company_logo_url ?? "N/A"}
-                alt={interview?.employer?.company_name ?? "N/A"}
+                src={interview?.employer?.company_logo_url ?? ""}
+                alt={interview?.employer?.company_name ?? ""}
                 width={96}
                 height={96}
                 className="object-cover w-full h-full"
               />
             </div>
-            <div className="flex flex-col ">
-              <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight mb-2">
-                {interview?.applicant?.job.job_title ?? "N/A"}
+            <div className="flex flex-col text-center sm:text-left">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-foreground tracking-tight mb-2">
+                {interview?.applicant?.job.job_title ?? ""}
               </h1>
-              <p className="text-lg text-muted-foreground font-medium flex items-center gap-2">
-                <Briefcase className="w-5 h-5" />
-                {interview?.employer?.company_name ?? "N/A"}
+              <p className="text-base sm:text-lg text-muted-foreground font-medium flex items-center justify-center sm:justify-start gap-2">
+                <Briefcase className="w-4 h-4 sm:w-5 sm:h-5" />
+                {interview?.employer?.company_name ?? ""}
               </p>
             </div>
           </div>
 
           {/* Quick Stats */}
-          <div className="flex flex-col gap-4 bg-muted/30 p-5 rounded-2xl border border-border/50 min-w-[250px]">
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 sm:gap-4 lg:gap-4 bg-muted/30 p-4 sm:p-5 rounded-2xl border border-border/50 w-full sm:w-auto lg:min-w-[250px] lg:max-w-[280px]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
-                <Calendar className="w-5 h-5 text-blue-500" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
               </div>
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-xs text-muted-foreground font-medium">
                   Scheduled For
                 </p>
-                <p className="text-sm font-bold text-foreground">
+                <p className="text-sm font-bold text-foreground truncate">
                   {formattedDate}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center shrink-0">
-                <Clock className="w-5 h-5 text-purple-500" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-purple-500/10 flex items-center justify-center shrink-0">
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
               </div>
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-xs text-muted-foreground font-medium">
                   Time & Duration
                 </p>
-                <p className="text-sm font-bold text-foreground">
+                <p className="text-sm font-bold text-foreground truncate">
                   {formattedTime} • {interview.duration_minutes}m
                 </p>
               </div>
@@ -198,44 +198,51 @@ const Hero = ({
 
         {/* Action Bar for Upcoming */}
         {interview.status === "upcoming" && (
-          <div className="mt-8 pt-6 border-t border-border/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-sm w-full sm:w-auto">
-              {isJoinAvailable ? (
-                <div className="flex items-center gap-2 text-emerald-500 font-semibold bg-emerald-500/10 px-4 py-2.5 rounded-lg border border-emerald-500/20 w-full sm:w-auto justify-center sm:justify-start">
-                  <span className="relative flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                  </span>
-                  Meeting is ready to join
-                </div>
-              ) : (
-                <div className="flex flex-col items-end gap-1.5">
-                  {!isJoinAvailable && (
-                    <p className="text-xs text-muted-foreground text-right animate-pulse">
-                      ⏳ Your join button will be ready in{" "}
-                      <span className="font-bold font-mono text-primary dark:text-primary">
-                        {getRemainingLabel()}
-                      </span>{" "}
-                      — it opens up 5 minutes before your interview 🎯
-                    </p>
-                  )}
-                </div>
-              )}
+          <div className="mt-6 lg:mt-8 pt-4 lg:pt-6 border-t border-border/50 flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+              <div className="flex items-center gap-2 text-sm w-full sm:w-auto">
+                {isJoinAvailable ? (
+                  <div className="flex items-center gap-2 text-emerald-500 font-semibold bg-emerald-500/10 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-emerald-500/20 w-full sm:w-auto justify-center sm:justify-start">
+                    <span className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                    <span className="text-xs sm:text-sm">
+                      Meeting is ready to join
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-start sm:items-end gap-1.5 w-full sm:w-auto">
+                    {!isJoinAvailable && (
+                      <p className="text-xs text-muted-foreground text-left sm:text-right animate-pulse leading-relaxed">
+                        ⏳ Your join button will be ready in{" "}
+                        <span className="font-bold font-mono text-primary dark:text-primary">
+                          {getRemainingLabel()}
+                        </span>{" "}
+                        — it opens up 5 minutes before your interview 🎯
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+              <Button
+                className={cn(
+                  "w-full sm:w-auto rounded-xl font-bold px-6 sm:px-8 h-10 sm:h-12 transition-all duration-300 text-sm sm:text-base",
+                  isJoinAvailable
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 hover:scale-105"
+                    : "bg-muted text-muted-foreground cursor-not-allowed opacity-70",
+                )}
+                disabled={!isJoinAvailable}
+                onClick={() =>
+                  window.open(interview?.meeting_link ?? "", "_blank")
+                }
+              >
+                <span className="flex items-center gap-2">
+                  Join Meeting{" "}
+                  <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                </span>
+              </Button>
             </div>
-            <Button
-              className={cn(
-                "w-full sm:w-auto rounded-xl font-bold px-8 h-12 transition-all duration-300 text-base",
-                isJoinAvailable
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 hover:scale-105"
-                  : "bg-muted text-muted-foreground cursor-not-allowed opacity-70",
-              )}
-              disabled={!isJoinAvailable}
-              onClick={() =>
-                window.open(interview?.meeting_link ?? "N/A", "_blank")
-              }
-            >
-              Join Meeting <ExternalLink className="w-5 h-5 ml-2 shrink-0" />
-            </Button>
           </div>
         )}
       </div>

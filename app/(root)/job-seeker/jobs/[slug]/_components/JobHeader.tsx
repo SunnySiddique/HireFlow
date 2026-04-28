@@ -75,7 +75,7 @@ const HeaderCard = ({
   };
 
   return (
-    <div className="px-12 py-5">
+    <>
       <Card className="p-6 lg:p-8 bg-background border border-border overflow-hidden relative">
         <motion.div
           className="absolute top-0 left-0 h-[3px] bg-primary"
@@ -252,7 +252,7 @@ const HeaderCard = ({
           </DialogContent>
         </Dialog>
       )}
-    </div>
+    </>
   );
 };
 

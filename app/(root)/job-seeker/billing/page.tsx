@@ -1,7 +1,7 @@
 "use client";
 
 import Checkout from "@/components/subscription/Checkout";
-import { seekerPlans } from "@/constants/BillingData";
+import { seekerPlans } from "@/constants/billingData";
 import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { cn } from "@/lib/utils";
 import { UserSubscription } from "@/types";
@@ -17,7 +17,7 @@ const JobSeekerBillingPage = () => {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/5 blur-[120px]" />
       </div>
 
-      <main className="p-8">
+      <main>
         {/* Header */}
         <div className="text-center mb-16 lg:mb-24 ">
           <div>

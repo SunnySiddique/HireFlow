@@ -12,6 +12,7 @@ import {
   BookmarkCheck,
   ChevronRight,
   ExternalLink,
+  Loader,
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
@@ -31,7 +32,7 @@ const JobCard = ({
   isSubscribed,
   featured = false,
 }: JobCardProps) => {
-  const { mutate: saveJob } = useSavedJob();
+  const { mutate: saveJob, isPending } = useSavedJob();
   const { data } = useSeekerSavedJobs();
   const savedJobs = data?.saved_jobs ?? [];
   const isSaved = savedJobs?.some((s) => s.job_id === job.id);
@@ -68,14 +69,14 @@ const JobCard = ({
               className={`h-10 w-10 flex-shrink-0 rounded-lg border ${featured ? "border-primary/30" : "border-border"}`}
             >
               <AvatarImage
-                src={job?.employer?.company_logo_url ?? "N/A"}
-                alt={job?.employer?.company_name ?? "N/A"}
+                src={job?.employer?.company_logo_url ?? ""}
+                alt={job?.employer?.company_name ?? ""}
                 className="object-cover"
               />
               <AvatarFallback
                 className={`rounded-lg text-xs font-bold ${featured ? "bg-primary/10 text-primary" : "bg-muted text-foreground"}`}
               >
-                {getInitials(job?.employer?.company_name ?? "N/A")}
+                {getInitials(job?.employer?.company_name ?? "")}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
@@ -83,13 +84,13 @@ const JobCard = ({
                 {job.job_title}
               </h4>
               <a
-                href={job?.employer?.website ?? "N/A"}
+                href={job?.employer?.website ?? ""}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
                 className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-primary transition-colors w-fit mt-0.5"
               >
-                {job?.employer?.company_name ?? "N/A"}
+                {job?.employer?.company_name ?? ""}
                 <ExternalLink className="h-2.5 w-2.5 ml-0.5 opacity-60" />
               </a>
             </div>
@@ -116,8 +117,11 @@ const JobCard = ({
                   e.stopPropagation();
                   saveJob(job.id);
                 }}
+                disabled={isPending}
               >
-                {isSaved ? (
+                {isPending ? (
+                  <Loader className="h-3 w-3 animate-spin" />
+                ) : isSaved ? (
                   <BookmarkCheck className="w-3.5 h-3.5" />
                 ) : (
                   <Bookmark className="w-3.5 h-3.5" />
@@ -137,9 +141,9 @@ const JobCard = ({
         {/* Type badges */}
         <div className="flex flex-wrap gap-1.5">
           {[
-            formatLabel(job.remote_option ?? "N/A"),
-            formatLabel(job.employment_type ?? "N/A"),
-            formatLabel(job.experience_level ?? "N/A"),
+            formatLabel(job.remote_option ?? ""),
+            formatLabel(job.employment_type ?? ""),
+            formatLabel(job.experience_level ?? ""),
           ].map((label) => (
             <Badge
               key={label}

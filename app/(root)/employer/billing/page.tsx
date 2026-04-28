@@ -1,7 +1,7 @@
 "use client";
 
 import Checkout from "@/components/subscription/Checkout";
-import { employerPlans } from "@/constants/BillingData";
+import { employerPlans } from "@/constants/billingData";
 import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { cn } from "@/lib/utils";
 import { UserSubscription } from "@/types";

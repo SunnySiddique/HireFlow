@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const AICareerHubPage = () => {
   return (
-    <div className="p-8">
+    <>
       {/* Header Section */}
       <div className="mb-16 space-y-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-widest mb-2">
@@ -81,7 +81,7 @@ const AICareerHubPage = () => {
           </div>
         </Link>
       </div>
-    </div>
+    </>
   );
 };
 export default AICareerHubPage;

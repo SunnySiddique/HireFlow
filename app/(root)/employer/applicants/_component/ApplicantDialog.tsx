@@ -111,9 +111,7 @@ const ApplicantDialog = ({
               <p>
                 <span className="text-muted-foreground">Applied: </span>
                 <span className="text-foreground">
-                  {formatDate(
-                    applicant.applied_at ? applicant.applied_at : "N/A",
-                  )}
+                  {formatDate(applicant.applied_at ? applicant.applied_at : "")}
                 </span>
               </p>
             </div>

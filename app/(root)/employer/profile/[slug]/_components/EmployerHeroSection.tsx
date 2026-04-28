@@ -5,7 +5,7 @@ import EmptyState from "@/components/EmptyState";
 import { statusLabel } from "@/constants/employerData";
 import { Employer, EmployerFormData } from "@/types/employer";
 import { motion } from "framer-motion";
-import { Building2, Star, Upload } from "lucide-react";
+import { Building2, Star } from "lucide-react";
 import Image from "next/image";
 import { UseFormReturn } from "react-hook-form";
 
@@ -38,12 +38,12 @@ const EmployerHeroSection = ({
 
   return (
     <>
-      <div className="border rounded-sm p-8 shadow-lg relative overflow-hidden bg-card">
-        <div className="flex items-start gap-6">
+      <div className="border rounded-lg p-4 sm:p-6 md:p-8 shadow-lg relative overflow-hidden bg-card">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
           {/* Logo Wrapper */}
-          <div className="relative shrink-0">
+          <div className="relative shrink-0 mx-auto sm:mx-0">
             <div
-              className={`relative w-24 h-24 rounded-lg bg-muted flex items-center justify-center overflow-hidden z-10 transition-all ${
+              className={`relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg bg-muted flex items-center justify-center overflow-hidden z-10 transition-all ${
                 employer?.is_featured
                   ? "border-4 border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.2)]"
                   : "border-2 border-border"
@@ -62,13 +62,13 @@ const EmployerHeroSection = ({
                 <Building2 className="w-12 h-12 text-muted-foreground" />
               )}
 
-              {editMode && (
-                <div
-                  className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer transition-opacity opacity-0 hover:opacity-100"
-                  onClick={() => logoRef.current?.click()}
-                >
-                  <Upload className="w-6 h-6 text-white" />
-                </div>
+              {!editMode && employer?.is_featured && (
+                <motion.div className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] sm:text-xs font-bold shadow">
+                    <Star className="w-3 h-3 fill-white" />
+                    Featured
+                  </div>
+                </motion.div>
               )}
             </div>
 
@@ -140,7 +140,7 @@ const EmployerHeroSection = ({
                         stiffness: 500,
                         delay: 0.5,
                       }}
-                      className="flex shrink-0 items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md shadow-amber-500/20"
+                      className="hidden md:flex shrink-0 items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md shadow-amber-500/20"
                       title="Featured Company"
                     >
                       <Star className="w-4 h-4 sm:w-4 sm:h-4 fill-white" />

@@ -197,170 +197,123 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
 
   return (
     <>
-      <main>
-        {/* Page Header */}
+      <main className="w-full">
         <div className="">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-2">
+          {/* Header */}
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 leading-tight">
               Create New Job Posting
             </h1>
-            <p className="text-muted-foreground text-base">
+            <p className="text-muted-foreground text-sm sm:text-base">
               Complete all steps to publish your job opening
             </p>
           </div>
 
           {/* Step Indicator */}
-          <div className="flex items-center justify-between mb-8">
-            {/* Step 1 */}
-            <div className="flex flex-col items-center flex-1">
-              <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold mb-2">
-                {currentStep > 1 ? <Check className="w-5 h-5" /> : "1"}
-              </div>
-              <span className="text-sm font-medium text-foreground">
-                Basic Info
-              </span>
-            </div>
+          <div className="w-full mb-6 sm:mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 sm:gap-2">
+              {[
+                { step: 1, label: "Basic Info" },
+                { step: 2, label: "Location" },
+                { step: 3, label: "Salary & Benefits" },
+                { step: 4, label: "Description" },
+              ].map((item, index) => {
+                const isActive = currentStep >= item.step;
+                const isCompleted = currentStep > item.step;
 
-            {/* Connector Line 1 */}
-            <div
-              className={`flex-1 h-1 mx-2 rounded mb-8 ${currentStep > 1 ? "bg-primary" : "bg-border"}`}
-            />
+                return (
+                  <div
+                    key={item.step}
+                    className="flex-1 flex flex-col sm:flex-row items-center"
+                  >
+                    <div className="flex flex-col items-center text-center sm:text-left sm:flex-row sm:gap-3 w-full">
+                      <div
+                        className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full font-semibold transition-all
+                  ${
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground border border-border"
+                  }`}
+                      >
+                        {isCompleted ? (
+                          <Check className="w-4 h-4 sm:w-5 sm:h-5" />
+                        ) : (
+                          item.step
+                        )}
+                      </div>
 
-            {/* Step 2 */}
-            <div className="flex flex-col items-center flex-1">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold mb-2 ${
-                  currentStep >= 2
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground border border-border"
-                }`}
-              >
-                {currentStep > 2 ? <Check className="w-5 h-5" /> : "2"}
-              </div>
-              <span
-                className={`text-sm font-medium ${currentStep >= 2 ? "text-foreground" : "text-muted-foreground"}`}
-              >
-                Location
-              </span>
-            </div>
+                      <span
+                        className={`mt-1 sm:mt-0 text-xs sm:text-sm md:text-base font-medium leading-tight
+                  ${isActive ? "text-foreground" : "text-muted-foreground"}`}
+                      >
+                        {item.label}
+                      </span>
+                    </div>
 
-            {/* Connector Line 2 */}
-            <div
-              className={`flex-1 h-1 mx-2 rounded mb-8 ${currentStep > 2 ? "bg-primary" : "bg-border"}`}
-            />
-
-            {/* Step 3 */}
-            <div className="flex flex-col items-center flex-1">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold mb-2 ${
-                  currentStep >= 3
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground border border-border"
-                }`}
-              >
-                {currentStep > 3 ? <Check className="w-5 h-5" /> : "3"}
-              </div>
-              <span
-                className={`text-sm font-medium ${currentStep >= 3 ? "text-foreground" : "text-muted-foreground"}`}
-              >
-                Salary & Benefits
-              </span>
-            </div>
-
-            {/* Connector Line 3 */}
-            <div
-              className={`flex-1 h-1 mx-2 rounded mb-8 ${currentStep > 3 ? "bg-primary" : "bg-border"}`}
-            />
-
-            {/* Step 4 */}
-            <div className="flex flex-col items-center flex-1">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold mb-2 ${
-                  currentStep >= 4
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground border border-border"
-                }`}
-              >
-                {currentStep > 4 ? <Check className="w-5 h-5" /> : "4"}
-              </div>
-              <span
-                className={`text-sm font-medium ${currentStep >= 4 ? "text-foreground" : "text-muted-foreground"}`}
-              >
-                Description
-              </span>
+                    {index !== 3 && (
+                      <div className="hidden sm:block flex-1 h-[2px] mx-2 rounded bg-border relative">
+                        <div
+                          className={`absolute left-0 top-0 h-full rounded transition-all duration-300
+                    ${currentStep > item.step ? "bg-primary w-full" : "w-0"}`}
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
-        </div>
 
-        {/* Form Content */}
-        <div className=" pb-12">
-          <FormProvider {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
-              {/* Step 1: Basic Information */}
-              <Card className="p-8 border-border">
-                {currentStep === 1 && <BasicInfo form={form} />}
+          {/* Form */}
+          <div className="pb-8 sm:pb-12">
+            <FormProvider {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
+                <Card className="p-4 sm:p-6 md:p-8 border-border rounded-xl">
+                  {currentStep === 1 && <BasicInfo form={form} />}
+                  {currentStep === 2 && <WorkLocation form={form} />}
+                  {currentStep === 3 && <SalaryAndBenefits form={form} />}
+                  {currentStep === 4 && <JobDescription form={form} />}
 
-                {/* Step 2: Work Location */}
-                {currentStep === 2 && <WorkLocation form={form} />}
-
-                {/* Step 3: Salary & Benefits */}
-                {currentStep === 3 && <SalaryAndBenefits form={form} />}
-
-                {/* Step 4: Job Description */}
-                {currentStep === 4 && <JobDescription form={form} />}
-
-                {/* Navigation Buttons */}
-                <div className="flex justify-between gap-3 pt-6 border-t border-border mt-8">
-                  {currentStep > 1 && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                    >
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="border-border hover:bg-muted hover:border-primary/40 transition-all duration-200"
-                        onClick={handleDecreaseCurrentStep}
-                      >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Back
-                      </Button>
-                    </motion.div>
-                  )}
-                  <div className="flex gap-2 ml-auto">
-                    {fromType === "edit" && currentStep < 4 && (
+                  {/* Buttons */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-6 border-t border-border mt-6 sm:mt-8">
+                    {/* Back */}
+                    {currentStep > 1 && (
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
                       >
                         <Button
                           type="button"
                           variant="outline"
-                          className="border-primary/40 text-primary hover:bg-primary/10 hover:border-primary transition-all duration-200"
+                          className="w-full sm:w-auto"
+                          onClick={handleDecreaseCurrentStep}
+                        >
+                          <ArrowLeft className="w-4 h-4 mr-2" />
+                          Back
+                        </Button>
+                      </motion.div>
+                    )}
+
+                    {/* Right buttons */}
+                    <div className="flex flex-col sm:flex-row gap-2 sm:ml-auto w-full sm:w-auto">
+                      {fromType === "edit" && currentStep < 4 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full sm:w-auto border-primary/40 text-primary"
                           onClick={() => setCurrentStep(4)}
                           disabled={
                             !isValid() || isJobCreating || isJobUpdating
                           }
                         >
                           <SkipForward className="w-4 h-4 mr-2" />
-                          Skip to Review
+                          Skip
                         </Button>
-                      </motion.div>
-                    )}
-                    <motion.div
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 10 }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
+                      )}
+
                       <Button
                         type="button"
-                        className="w-full h-12 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 transition-all duration-300"
+                        className="w-full sm:w-auto h-11 sm:h-12 rounded-xl font-bold bg-primary text-primary-foreground"
                         onClick={
                           currentStep < 4
                             ? handleIncreaseCurrentStep
@@ -392,12 +345,12 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
                             ?.btnTxt ?? "")
                         )}
                       </Button>
-                    </motion.div>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            </form>
-          </FormProvider>
+                </Card>
+              </form>
+            </FormProvider>
+          </div>
         </div>
       </main>
     </>

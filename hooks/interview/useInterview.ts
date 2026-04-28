@@ -40,13 +40,7 @@ export const useInterviews = (
   role: "employer" | "seeker" = "employer",
 ) => {
   return useQuery({
-    queryKey: [
-      "interviews",
-      role,
-      filters?.page,
-      filters?.status,
-      filters?.search,
-    ],
+    queryKey: ["interviews", role, filters?.page, filters?.status],
     queryFn: () => interviews(filters, role),
     staleTime: 1000 * 60 * 5,
     placeholderData: keepPreviousData,

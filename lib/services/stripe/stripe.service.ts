@@ -2,7 +2,7 @@ import {
   EmployerPlanKey,
   JobSeekerPlanKey,
   PRICE_IDS,
-} from "@/constants/BillingData";
+} from "@/constants/billingData";
 import { getServerUser } from "@/lib/action/auth/serverAuth";
 import { redirect } from "next/navigation";
 import Stripe from "stripe";

@@ -37,7 +37,7 @@ const EmployerApplicantsPage = () => {
 
   return (
     <>
-      <div className="px-4 sm:px-6 lg:px-4">
+      <div>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div>
             <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground mb-3">
@@ -59,12 +59,12 @@ const EmployerApplicantsPage = () => {
         </div>
 
         {/* Tabs & Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center mb-8">
+        <div className="flex flex-col lg:flex-row justify-between gap-4 mb-8">
           <div className="flex items-center gap-2 bg-card p-1.5 rounded-xl border border-border/50 shadow-sm">
             <button
               onClick={() => handleTabChange("active")}
               className={cn(
-                "px-6 py-2 rounded-lg text-sm font-semibold transition-all",
+                "px-4 sm:px-6 py-2 rounded-lg text-sm font-semibold transition-all",
                 activeTab === "active"
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -75,7 +75,7 @@ const EmployerApplicantsPage = () => {
             <button
               onClick={() => handleTabChange("archived")}
               className={cn(
-                "px-6 py-2 rounded-lg text-sm font-semibold transition-all",
+                "px-4 sm:px-6 py-2 rounded-lg text-sm font-semibold transition-all",
                 activeTab === "archived"
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -85,7 +85,7 @@ const EmployerApplicantsPage = () => {
             </button>
           </div>
 
-          <div className="flex items-center gap-2 bg-card p-1.5 rounded-xl border border-border/50 shadow-sm overflow-x-auto hide-scrollbar w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-2 bg-card p-1.5 rounded-xl border border-border/50 shadow-sm">
             {[
               "all",
               "pending",
@@ -101,7 +101,7 @@ const EmployerApplicantsPage = () => {
                   setFilter(f as applicantFiltersType);
                 }}
                 className={cn(
-                  "px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all whitespace-nowrap",
+                  "px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all whitespace-nowrap",
                   filter === f
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -112,7 +112,7 @@ const EmployerApplicantsPage = () => {
             ))}
             <button
               onClick={handleReset}
-              className="px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all whitespace-nowrap text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all whitespace-nowrap text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               Reset
             </button>

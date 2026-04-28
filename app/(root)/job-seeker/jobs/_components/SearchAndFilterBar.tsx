@@ -16,10 +16,8 @@ import {
   JOB_CATEGORY,
   SALARY_RANGES,
 } from "@/constants/jobsData";
-import { useDebounce } from "@/hooks/useDebounce";
 import { JobFiltersType } from "@/types/jobs";
 import { MapPin, Search } from "lucide-react";
-import { useEffect } from "react";
 
 interface SearchAndFilterBarProps {
   filters: JobFiltersType;
@@ -36,16 +34,6 @@ const SearchAndFilterBar = ({
   onSalaryChange,
   onClear,
 }: SearchAndFilterBarProps) => {
-  const debouncedSearch = useDebounce(filters.search, 500);
-  const debouncedLocation = useDebounce(filters.location, 500);
-
-  useEffect(() => {
-    onFilterChange({
-      search: debouncedSearch?.trim() ?? "",
-      location: debouncedLocation?.trim() ?? "",
-    });
-  }, [debouncedSearch, debouncedLocation]);
-
   return (
     <Card className="p-4 md:p-5 lg:p-6 bg-background border border-border">
       <div className="space-y-4">

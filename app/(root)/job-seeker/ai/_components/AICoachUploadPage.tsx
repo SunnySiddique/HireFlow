@@ -143,7 +143,7 @@ const AICoachUploadPage = () => {
     <>
       {/* Main Content */}
       {!result ? (
-        <main className="p-12 flex flex-col lg:flex-row gap-12 lg:gap-8 items-center lg:items-start justify-between min-h-screen">
+        <main className="flex flex-col lg:flex-row gap-12 lg:gap-8 items-center lg:items-start justify-between min-h-screen">
           {/* Left Column: Hero & Upload (approx 55%) */}
           <div className="w-full lg:w-[55%] flex flex-col gap-8 max-w-2xl">
             {/* Hero Text */}

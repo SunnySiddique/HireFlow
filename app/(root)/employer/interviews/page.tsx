@@ -5,14 +5,12 @@ import InterviewHeader from "@/components/interview/InterviewHeader";
 import Loader from "@/components/Loader";
 import { useInterviews } from "@/hooks/interview/useInterview";
 import { useInterviewFilters } from "@/hooks/interview/useInterviewFilters";
-import { filtersType, Interview } from "@/types/interview";
+import { Interview } from "@/types/interview";
 import { Filter } from "lucide-react";
-import { useState } from "react";
 import Pagination from "../../job-seeker/jobs/_components/Pagination";
 
 const EmployerInterviewsPage = () => {
   const { filters, updateFilter, resetFilters } = useInterviewFilters();
-  const [filter, setFilter] = useState<filtersType>("all");
 
   const { data, isLoading } = useInterviews(filters, "employer");
 
@@ -21,12 +19,11 @@ const EmployerInterviewsPage = () => {
 
   if (isLoading) return <Loader mode="inline" />;
   return (
-    <div className="py-4">
+    <div>
       <InterviewHeader
         resetFilters={resetFilters}
         updateFilter={updateFilter}
-        filter={filter}
-        setFilter={setFilter}
+        filters={filters}
         role={"employer"}
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -47,8 +44,9 @@ const EmployerInterviewsPage = () => {
               No interviews found
             </h3>
             <p className="text-muted-foreground max-w-md">
-              You {`don't`} have any {filter !== "all" ? filter : ""} interviews
-              at the moment.
+              You {`don't`} have any{" "}
+              {filters.status !== "all" ? filters.status : ""} interviews at the
+              moment.
             </p>
           </div>
         )}

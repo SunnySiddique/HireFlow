@@ -1,17 +1,13 @@
 import {
   Bell,
   Briefcase,
-  Building2,
   CheckCircle,
   CreditCard,
   FileText,
-  Globe,
   GraduationCap,
   Heart,
   LayoutDashboard,
-  MapPin,
   MessageSquare,
-  PlusCircle,
   Sparkles,
   Target,
   TrendingUp,
@@ -122,15 +118,6 @@ export const JOB_PLATFORM_TESTIMONIALS = [
   },
 ];
 
-// <--- HOME ---> //
-
-// <--- AUTH TABS ---> //
-export const AUTH_TABS = [
-  { value: "job_seeker", label: "Job Seeker" },
-  { value: "employer", label: "Employer" },
-];
-// <--- AUTH TABS ---> //
-
 // <--- JOB SEEKER PROFILE ---> //
 
 export const jobSeekerLinks = [
@@ -220,111 +207,6 @@ export const FREE_LINKS = {
 
 // <---  EMPLOYER PROFILE  ---> //
 
-export const employerLinks = [
-  {
-    label: "Dashboard",
-    href: "/employer/dashboard",
-    icon: LayoutDashboard,
-    section: "main",
-  },
-  {
-    label: "Manage Jobs",
-    href: "/employer/jobs",
-    icon: Briefcase,
-    section: "main",
-  },
-  {
-    label: "Applicants",
-    href: "/employer/applicants",
-    icon: Users,
-    section: "main",
-  },
-  {
-    label: "Interviews",
-    href: "/employer/interviews",
-    icon: MessageSquare,
-    section: "main",
-  },
-
-  {
-    label: "Find Talents",
-    href: "/employer/talents",
-    icon: Building2,
-    section: "main",
-    plan: "elite",
-  },
-  {
-    label: "Notifications",
-    href: "/employer/notifications",
-    icon: Bell,
-    section: "main",
-    plan: "growth",
-  },
-  {
-    label: "Post a Job",
-    href: "/employer/jobs/create",
-    icon: PlusCircle,
-    section: "manage",
-  },
-  {
-    label: "Billing",
-    href: "/employer/billing",
-    icon: CreditCard,
-    section: "manage",
-  },
-  {
-    label: "Profile",
-    href: (slug: string) => `/employer/profile/${slug}`,
-    icon: Building2,
-    section: "manage",
-  },
-];
-
-export const employerSections = [
-  { id: "about", label: "About", icon: Building2 },
-  { id: "positions", label: "Open Positions", icon: Briefcase },
-  { id: "culture", label: "Culture", icon: Heart },
-  { id: "locations", label: "Locations", icon: MapPin },
-  { id: "social", label: "Social Links", icon: Globe },
-  { id: "billing", label: "Billing", icon: CreditCard },
-];
-
-export const employerHiringStatus = [
-  "actively_hiring",
-  "selective",
-  "not_hiring",
-];
 // <--- EMPLOYER PROFILE ---> //
 
 // protected route links
-export const PUBLIC_ROUTES = [
-  "/",
-  "/auth/signin",
-  "/auth/signup",
-  "/auth/forgot-password",
-  "/auth/update-password",
-  "/auth/callback",
-  "/auth/auth-code-error",
-];
-
-export const AUTH_REDIRECT_ROUTES = ["/", "/auth/signin", "/auth/signup"];
-
-export const RESTRICTED_EMP_ROUTES = [
-  "/employer/jobs",
-  "/employer/applicants",
-  "/employer/jobs/create",
-  "/employer/talents",
-];
-
-export const RESTRICTED_SEEKER_ROUTES = [
-  "/job-seeker/applications",
-  "/job-seeker/companies",
-  "/job-seeker/saved-jobs",
-];
-
-export const BYPASS_ROUTES = [
-  "/auth/forgot-password",
-  "/auth/update-password",
-  "/auth/callback",
-  "/auth/auth-code-error",
-];

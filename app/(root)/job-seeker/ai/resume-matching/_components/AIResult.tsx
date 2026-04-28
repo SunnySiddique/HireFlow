@@ -4,7 +4,7 @@ import RightContent from "./RightContent";
 const AIResult = ({ jobs }: { jobs: any }) => {
   return (
     <>
-      <main className="px-6 py-8 flex flex-col lg:flex-row gap-8">
+      <main className="flex flex-col lg:flex-row gap-8">
         {/* Left Sidebar (30%) */}
         <LeftSidebar
           summary={jobs?.resume_summary}

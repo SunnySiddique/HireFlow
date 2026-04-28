@@ -3,7 +3,7 @@ import {
   BYPASS_ROUTES,
   RESTRICTED_EMP_ROUTES,
   RESTRICTED_SEEKER_ROUTES,
-} from "@/constants";
+} from "@/constants/authData";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { employerProfileService } from "../services/employer-profile/employer-profile.service";

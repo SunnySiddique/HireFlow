@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
 import { getInitials } from "@/lib/utils";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2, LogOut } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
@@ -15,19 +15,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { createClient } from "@/lib/supabase/client";
+import { useSignOut } from "@/hooks/auth/useAuth";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 
 const JobsNavbar = () => {
   const { data: seeker } = useSeekerProfile();
+  const { mutateAsync: signOut, isPending } = useSignOut();
+
   const router = useRouter();
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    toast.success("Signed out");
-    router.push("/auth/signin");
+    await signOut();
   };
 
   return (
@@ -75,6 +73,7 @@ const JobsNavbar = () => {
             <DropdownMenuSeparator />
 
             <DropdownMenuItem
+              className="cursor-pointer"
               onClick={() => router.push(`/job-seeker/profile/${seeker?.slug}`)}
             >
               Profile
@@ -82,8 +81,21 @@ const JobsNavbar = () => {
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem className="text-red-500" onClick={handleLogout}>
-              Logout
+            <DropdownMenuItem
+              className="text-red-500 cursor-pointer"
+              onClick={handleLogout}
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Logging Out...</span>
+                </>
+              ) : (
+                <>
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </>
+              )}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

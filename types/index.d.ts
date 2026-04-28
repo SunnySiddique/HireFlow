@@ -40,3 +40,8 @@ export interface NotificationPayload {
   message: string;
   type: string;
 }
+
+// auth
+export type ServiceResult<T = void> =
+  | { success: true; data: T }
+  | { success: false; code: string };

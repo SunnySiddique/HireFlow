@@ -197,9 +197,9 @@ const ManageJobsPage = () => {
                     {/* Type badges */}
                     <div className="flex flex-wrap gap-1.5 mb-4">
                       {[
-                        formatLabel(job.category ?? "N/A"),
-                        formatLabel(job.employment_type ?? "N/A"),
-                        formatLabel(job.experience_level ?? "N/A"),
+                        formatLabel(job.category ?? ""),
+                        formatLabel(job.employment_type ?? ""),
+                        formatLabel(job.experience_level ?? ""),
                       ].map((label, idx) => (
                         <motion.div
                           key={label}

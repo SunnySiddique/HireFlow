@@ -7,7 +7,6 @@ export const useInterviewFilters = () => {
     page: 1,
     limit: 5,
     archived: false,
-    search: "",
   });
 
   const updateFilter = (
@@ -18,10 +17,7 @@ export const useInterviewFilters = () => {
       ...prev,
       [key]: value,
       page:
-        key === "status" ||
-        key === "archived" ||
-        key === "search" ||
-        key === "limit"
+        key === "status" || key === "archived" || key === "limit"
           ? 1
           : prev.page,
     }));

@@ -5,7 +5,7 @@ import {
   createUserService,
   forgotPasswordService,
   loginUserService,
-  siginOutService,
+  signOutService,
   updatePasswordService,
 } from "../../services/auth/auth.service";
 
@@ -37,5 +37,5 @@ export async function updatePassword(password: string) {
 
 // update password
 export async function signinOut() {
-  return siginOutService();
+  return signOutService();
 }

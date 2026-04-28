@@ -1,4 +1,4 @@
-import { employerPlans, seekerPlans } from "@/constants/BillingData";
+import { employerPlans, seekerPlans } from "@/constants/billingData";
 import { createPortalSession } from "@/lib/action/stripe/stripe.actions";
 import { UserSubscription } from "@/types";
 import { AlertCircle, Calendar, CreditCard, Zap } from "lucide-react";

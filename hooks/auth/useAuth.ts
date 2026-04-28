@@ -10,6 +10,22 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
+const ERROR_MESSAGES: Record<string, string> = {
+  PASSWORD_REQUIRED: "Password is required",
+  USER_EXISTS: "An account with this email already exists",
+  SIGNUP_FAILED: "Failed to create account. Please try again",
+  INVALID_CREDENTIALS: "Invalid email or password",
+  ROLE_MISMATCH: "This account belongs to a different role",
+  LOGIN_FAILED: "Login failed. Please try again",
+  RESET_EMAIL_FAILED: "Could not send reset email. Please try again",
+  UPDATE_PASSWORD_FAILED: "Could not update password. Please try again",
+  SIGNOUT_FAILED: "Sign out failed. Please try again",
+  MISSING_DOMAIN: "Configuration error. Please contact support",
+};
+
+const getMsg = (code: string) =>
+  ERROR_MESSAGES[code] ?? "Something went wrong. Please try again";
+
 // create account
 export const useCreateUser = () => {
   const router = useRouter();
@@ -21,18 +37,18 @@ export const useCreateUser = () => {
         | { role: "employer"; data: EmployerAuth },
     ) => createUser(payload.role, payload.data),
 
-    onSuccess: (_, variables) => {
-      toast.success("Account created");
+    onSuccess: (result, variables) => {
+      if (!result.success) {
+        toast.error(getMsg(result.code));
+        return;
+      }
+      toast.success("Account created successfully");
 
       const rolePath =
         variables.role === "job_seeker" ? "job-seeker" : "employer";
-
       router.push(`/${rolePath}/dashboard`);
     },
-
-    onError: (error) => {
-      toast.error(error.message || "Something went wrong");
-    },
+    onError: () => toast.error("Something went wrong. Please try again"),
   });
 };
 
@@ -47,7 +63,11 @@ export const useLoginUser = () => {
         | { role: "employer"; data: EmployerAuth },
     ) => loginUser(payload.role, payload.data),
 
-    onSuccess: (_, variables) => {
+    onSuccess: (result, variables) => {
+      if (!result.success) {
+        toast.error(getMsg(result.code));
+        return;
+      }
       const path =
         variables.role === "job_seeker"
           ? "/job-seeker/dashboard"
@@ -56,20 +76,7 @@ export const useLoginUser = () => {
       toast.success("Login successful");
       router.push(path);
     },
-
-    onError: (error) => {
-      if (error.message === "INVALID_CREDENTIALS") {
-        toast.error("Invalid email or password");
-        return;
-      }
-
-      if (error.message === "ROLE_MISMATCH") {
-        toast.error("This account belongs to a different role");
-        return;
-      }
-
-      toast.error(error.message || "Login failed");
-    },
+    onError: () => toast.error("Something went wrong. Please try again"),
   });
 };
 
@@ -77,7 +84,13 @@ export const useLoginUser = () => {
 export const useForgotPassword = () => {
   return useMutation({
     mutationFn: (email: string) => forgotPassword(email),
-
+    onSuccess: (result) => {
+      if (!result.success) {
+        toast.error(getMsg(result.code));
+        return;
+      }
+      toast.success("Reset email sent. Please check your inbox");
+    },
     onError: (error) => {
       toast.error(error.message || "Something went wrong. Sending email");
     },
@@ -88,10 +101,14 @@ export const useForgotPassword = () => {
 export const useUpdatePassword = () => {
   return useMutation({
     mutationFn: (password: string) => updatePassword(password),
-
-    onError: (error) => {
-      toast.error(error.message || "Something went wrong. Sending email");
+    onSuccess: (result) => {
+      if (!result.success) {
+        toast.error(getMsg(result.code));
+        return;
+      }
+      toast.success("Password updated successfully");
     },
+    onError: () => toast.error("Something went wrong. Please try again"),
   });
 };
 
@@ -102,13 +119,16 @@ export const useSignOut = () => {
 
   return useMutation({
     mutationFn: signinOut,
-    onSuccess: () => {
+    onSuccess: (result) => {
+      if (!result.success) {
+        toast.error(getMsg(result.code));
+        return;
+      }
       queryClient.clear();
       toast.success("Signed out successfully");
       router.push("/auth/signin");
     },
-    onError: (error) => {
-      toast.error(error.message || "Something went wrong signing out");
-    },
+
+    onError: () => toast.error("Something went wrong. Please try again"),
   });
 };

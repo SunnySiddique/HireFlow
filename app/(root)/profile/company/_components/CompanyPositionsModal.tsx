@@ -39,7 +39,7 @@ const CompanyPositionsModal = ({
 
     const matchesFilter =
       activeFilter === "all" ||
-      activeFilter === (job.employment_type ?? "N/A").toLowerCase();
+      activeFilter === (job.employment_type ?? "").toLowerCase();
 
     return matchesSearch && matchesFilter;
   });
@@ -160,12 +160,12 @@ const CompanyPositionsModal = ({
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {formatDate(selectedJob.created_at ?? "N/A")}
+                        {formatDate(selectedJob.created_at ?? "")}
                       </span>
                     </div>
                   </div>
 
-                  {(selectedJob.job_description ?? "N/A") && (
+                  {(selectedJob.job_description ?? "") && (
                     <div>
                       <h4 className="font-semibold text-foreground mb-2">
                         Description
@@ -234,7 +234,7 @@ const CompanyPositionsModal = ({
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {formatDate(job.created_at ?? "N/A")}
+                        {formatDate(job.created_at ?? "")}
                       </span>
                     </div>
                   </div>

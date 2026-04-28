@@ -1,3 +1,4 @@
+import { randomImage } from "@/lib/utils/randomImage";
 import { JobSeekerProfile } from "@/types/job-seeker";
 import {
   Briefcase,
@@ -10,7 +11,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 
-export function FeaturedTalentCard({ talent }: { talent: JobSeekerProfile }) {
+const FeaturedTalentCard = ({ talent }: { talent: JobSeekerProfile }) => {
+  console.log(talent);
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl bg-gradient-to-br from-primary/5 via-card to-card border border-primary/20 shadow-md transition-all duration-300 hover:shadow-xl hover:border-primary/40 hover:-translate-y-1">
       <div className="absolute top-0 right-0 p-3">
@@ -25,7 +27,7 @@ export function FeaturedTalentCard({ talent }: { talent: JobSeekerProfile }) {
           <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-primary/20 shadow-sm">
             {talent.profile_url ? (
               <Image
-                src={talent.profile_url}
+                src={talent.profile_url ?? randomImage(talent.full_name)}
                 alt={talent.full_name || "Profile Picture"}
                 fill
                 className="object-cover"
@@ -135,4 +137,6 @@ export function FeaturedTalentCard({ talent }: { talent: JobSeekerProfile }) {
       </div>
     </div>
   );
-}
+};
+
+export default FeaturedTalentCard;

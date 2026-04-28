@@ -34,7 +34,7 @@ export default function EmployerLayout({
           onMenuClick={() => setSidebarOpen((prev) => !prev)}
           isSidebarOpen={sidebarOpen}
         />
-        <main className="flex-1 overflow-y-auto p-8 bg-background">
+        <main className="flex-1 overflow-y-auto px-4 py-6 lg:px-8 bg-background">
           {children}
         </main>
       </div>

@@ -8,6 +8,7 @@ export async function companyProfileService(slug: string) {
     .select(
       `
         id,
+        auth_id,
         company_name,
         website,
         company_logo_url,
@@ -29,14 +30,14 @@ export async function companyProfileService(slug: string) {
         `,
     )
     .eq("slug", slug)
-    .single();
+    .maybeSingle();
 
-  if (companyError || !company) return null;
+  if (!company || companyError) return { company: null, jobs: [] };
 
   const { data: jobs } = await supabase
     .from("jobs")
     .select("*")
-    .eq("employer_id", company.id)
+    .eq("employer_id", company.auth_id)
     .eq("status", "open")
     .order("created_at", { ascending: false });
 

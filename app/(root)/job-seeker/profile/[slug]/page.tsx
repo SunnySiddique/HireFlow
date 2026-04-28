@@ -185,8 +185,8 @@ const ProfilePage = () => {
         portfolio_url: data.portfolioUrl?.trim(),
         open_to_work: data.openToWork,
         preferred_job_type: data.preferred_job_type,
-        profile_url: (profileUrl || jobSeekerProfile.profile_url) ?? "N/A",
-        resume_url: (resumeUrl || jobSeekerProfile.resume_url) ?? "N/A",
+        profile_url: (profileUrl || jobSeekerProfile.profile_url) ?? "",
+        resume_url: (resumeUrl || jobSeekerProfile.resume_url) ?? "",
         profile_path: profilePath || "",
         resume_path: resumePath || "",
         experience: experiences.length
@@ -273,8 +273,8 @@ const ProfilePage = () => {
         jobSeekerProfile={jobSeekerProfile as JobSeekerProfile}
       />
       {/* Main Content */}
-      <div className="p-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-5">
           {/* Sidebar Navigation */}
           <NavigationSidebar
             activeSection={activeSection}

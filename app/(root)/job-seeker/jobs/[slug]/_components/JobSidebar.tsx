@@ -135,7 +135,7 @@ const JobSidebar = ({
                       />
                     ) : (
                       <AvatarFallback className="rounded-lg text-white font-bold">
-                        {getInitials(job?.employer?.company_name ?? "N/A")}
+                        {getInitials(job?.employer?.company_name ?? "")}
                       </AvatarFallback>
                     )}
                   </Avatar>
@@ -145,7 +145,7 @@ const JobSidebar = ({
                     {job?.employer?.company_name}
                   </h4>
                   <a
-                    href={job?.employer?.website ?? "N/A"}
+                    href={job?.employer?.website ?? ""}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-primary hover:underline flex items-center gap-1"

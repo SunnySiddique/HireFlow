@@ -35,7 +35,7 @@ const JobDetailClient = ({ job }: { job: Job }) => {
 
       <HeaderCard job={job} isSubscribed={isSubscribed} />
       {/* ── Main Grid ─────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column */}
         <JobDetailContent job={job} />
         {/* Right Column */}

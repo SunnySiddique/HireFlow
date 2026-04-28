@@ -26,7 +26,8 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { employerLinks, FREE_LINKS, jobSeekerLinks } from "@/constants";
+import { FREE_LINKS, jobSeekerLinks } from "@/constants";
+import { employerLinks } from "@/constants/employerData";
 import { useSignOut } from "@/hooks/auth/useAuth";
 import { useEmployerProfile } from "@/hooks/employer-profile/useEmployer";
 import { useSeekerProfile } from "@/hooks/seeker-profile/useSeeker";

@@ -5,6 +5,7 @@ import Loader from "@/components/Loader";
 import { useInterviewFilters } from "@/hooks/interview/useInterviewFilters";
 import { useSavedJob, useSeekerSavedJobs } from "@/hooks/jobs/useSeekerJob";
 import { Bookmark } from "lucide-react";
+import { useState } from "react";
 import Pagination from "../jobs/_components/Pagination";
 import Header from "./_components/Header";
 
@@ -12,16 +13,24 @@ const SavedJobsPage = () => {
   const { filters, updateFilter } = useInterviewFilters();
 
   const { data, isLoading } = useSeekerSavedJobs(filters);
-  const { mutate: saveJob } = useSavedJob();
+  const { mutate: saveJob, isPending } = useSavedJob();
+
+  const [activeJobId, setActiveJobId] = useState<string | null>(null);
 
   const savedJobs = data?.saved_jobs ?? [];
 
   const totalPages = data?.totalPages ?? 0;
 
   const handleSave = (jobId: string) => {
-    saveJob(jobId);
+    setActiveJobId(jobId);
+
+    saveJob(jobId, {
+      onSettled: () => {
+        setActiveJobId(null);
+      },
+    });
   };
-  console.log("sss:", savedJobs);
+
   if (isLoading) return <Loader mode="inline" />;
   return (
     <div className="flex flex-col gap-4 p-8">
@@ -37,7 +46,12 @@ const SavedJobsPage = () => {
         {(savedJobs ?? []).length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
             {(savedJobs ?? []).map((job) => (
-              <SavedJobCard job={job} key={job.id} onSave={handleSave} />
+              <SavedJobCard
+                job={job}
+                key={job.id}
+                onSave={handleSave}
+                isSaving={isPending && activeJobId === job.job_id}
+              />
             ))}
           </div>
         ) : (

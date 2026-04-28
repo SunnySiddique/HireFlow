@@ -43,6 +43,8 @@ export async function seekerJobsService(filters: JobFiltersType) {
 
   if (!user) throw new Error("Unauthorized: Please login to continue");
 
+  const hasValue = (val?: string) => !!val && val !== "all";
+
   let query = supabase
     .from("jobs")
     .select(
@@ -58,22 +60,23 @@ export async function seekerJobsService(filters: JobFiltersType) {
     )
     .eq("status", "open");
 
-  if (filters.category) {
-    query = query.eq("category", filters.category);
+  if (hasValue(filters.category)) {
+    query = query.eq("category", filters.category!);
   }
 
-  if (filters.employmentType) {
-    query = query.eq("employment_type", filters.employmentType);
+  if (hasValue(filters.employmentType)) {
+    query = query.eq("employment_type", filters.employmentType!);
   }
 
-  if (filters.experienceLevel) {
-    query = query.eq("experience_level", filters.experienceLevel);
+  if (hasValue(filters.experienceLevel)) {
+    query = query.eq("experience_level", filters.experienceLevel!);
   }
+
   if (filters.salaryMin !== undefined) {
-    query = query.gte("salary_min", filters.salaryMin);
+    query = query.gte("salary_max", filters.salaryMin);
   }
   if (filters.salaryMax !== undefined) {
-    query = query.lte("salary_max", filters.salaryMax);
+    query = query.lte("salary_min", filters.salaryMax);
   }
 
   if (filters.search) {
@@ -255,7 +258,7 @@ export async function seekerAppliedJobsService(filters?: InterviewFilters) {
 // seeker  saved jobs
 export async function seekerSavedJobsService(filters?: InterviewFilters) {
   const { supabase, user } = await getServerUser();
-  console.log("fff:", filters);
+
   if (!user) throw new Error("Unauthorized: Please login to continue");
 
   let query = supabase
@@ -286,6 +289,7 @@ export async function seekerSavedJobsService(filters?: InterviewFilters) {
     )
     .eq("user_id", user.id);
   const search = filters?.search && filters.search.toLowerCase().trim();
+
   if (search) {
     query = query.or(
       `job.job_title.ilike.%${search}%,job.employer.company_name.ilike.%${search}%`,

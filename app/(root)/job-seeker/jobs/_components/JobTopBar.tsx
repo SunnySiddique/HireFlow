@@ -36,19 +36,6 @@ const JobTopBar = ({
           </span>
         )}
       </p>
-      {/* {featuredCount > 0 && (
-        <button
-          onClick={() => onFeaturedChange(!featured)}
-          className={cn(
-            "text-xs font-medium px-3 py-1 rounded-full border transition-all",
-            featured
-              ? "bg-primary text-primary-foreground border-primary"
-              : "bg-transparent text-primary border-primary/30 hover:border-primary/60",
-          )}
-        >
-          {featured ? "⭐ Featured Only" : "⭐ Show Featured"}
-        </button>
-      )} */}
 
       <div className="flex items-center rounded-lg border border-border bg-muted p-1 shrink-0">
         <Select

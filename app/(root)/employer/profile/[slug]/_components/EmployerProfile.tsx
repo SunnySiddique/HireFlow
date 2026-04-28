@@ -177,85 +177,103 @@ const EmployerProfile = ({ slug }: EmployerProfileProps) => {
   if (isLoading) return <Loader mode="inline" />;
 
   return (
-    <FormProvider {...form}>
-      {/* Header */}
-      <Header
-        handleProfileSave={form.handleSubmit(onSubmit, onError)}
-        form={form}
-        editMode={editMode}
-        setEditMode={setEditMode}
-        isLoading={isSaving}
-      />
-
-      {/* Main Content */}
-      <div className="py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar Navigation */}
-          <NavigationSidebar
-            isSubscribed={isSubscribed}
-            activeSection={activeSection}
-            setActiveSection={setActiveSection}
-            role="employer"
+    <div className="w-full">
+      <div>
+        <FormProvider {...form}>
+          {/* Header */}
+          <Header
+            handleProfileSave={form.handleSubmit(onSubmit, onError)}
+            form={form}
+            editMode={editMode}
+            setEditMode={setEditMode}
+            isLoading={isSaving}
           />
 
-          {/* Content Area */}
-          <div className="lg:col-span-3 space-y-8">
-            {/* Hero Section */}
-            <EmployerHeroSection
-              editMode={editMode}
-              form={form}
-              setEditMode={setEditMode}
-              employer={employerProfile ?? undefined}
-              setLogoFile={setLogoFile}
-              isLoading={isSaving}
-            />
-            {/* About Section */}
-            {activeSection === "about" && (
-              <EmployerAbout
-                editMode={editMode}
-                form={form}
-                setEditMode={setEditMode}
-                employer={employerProfile ?? undefined}
+          {/* Main Content */}
+          <div className="mt-6 sm:mt-8">
+            {/* Mobile Navigation (top) */}
+            <div className="lg:hidden mb-6">
+              <NavigationSidebar
+                isSubscribed={isSubscribed}
+                activeSection={activeSection}
+                setActiveSection={setActiveSection}
+                role="employer"
+                variant="horizontal" // 👈 add this prop (see below)
               />
-            )}
-            {/* Open Positions Section */}
-            {activeSection === "positions" && (
-              <OpenPositions
-                editMode={editMode}
-                form={form}
-                employer={employerProfile ?? undefined}
-              />
-            )}
-            {/* Culture Section */}
-            {activeSection === "culture" && (
-              <EmployerCulture form={form} editMode={editMode} />
-            )}
-            {/* Locations Section */}
-            {activeSection === "locations" && (
-              <EmployerLocations
-                editMode={editMode}
-                form={form}
-                employer={employerProfile ?? undefined}
-              />
-            )}
-            {/* Social Links Section */}
-            {activeSection === "social" && (
-              <EmployerSocialLinks
-                editMode={editMode}
-                form={form}
-                employer={employerProfile ?? undefined}
-              />
-            )}
-            {isSubscribed && activeSection === "billing" && (
-              <ManageSubscription
-                subscription={subscription as UserSubscription}
-                userRole="employer"
-              />
-            )}
+            </div>
+
+            {/* Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+              {/* Sidebar (desktop only) */}
+              <div className="hidden lg:block lg:col-span-1">
+                <NavigationSidebar
+                  isSubscribed={isSubscribed}
+                  activeSection={activeSection}
+                  setActiveSection={setActiveSection}
+                  role="employer"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="lg:col-span-3 space-y-6 sm:space-y-8">
+                <EmployerHeroSection
+                  editMode={editMode}
+                  form={form}
+                  setEditMode={setEditMode}
+                  employer={employerProfile ?? undefined}
+                  setLogoFile={setLogoFile}
+                  isLoading={isSaving}
+                />
+
+                {activeSection === "about" && (
+                  <EmployerAbout
+                    editMode={editMode}
+                    form={form}
+                    setEditMode={setEditMode}
+                    employer={employerProfile ?? undefined}
+                  />
+                )}
+
+                {activeSection === "positions" && (
+                  <OpenPositions
+                    editMode={editMode}
+                    form={form}
+                    employer={employerProfile ?? undefined}
+                  />
+                )}
+
+                {activeSection === "culture" && (
+                  <EmployerCulture form={form} editMode={editMode} />
+                )}
+
+                {activeSection === "locations" && (
+                  <EmployerLocations
+                    editMode={editMode}
+                    form={form}
+                    employer={employerProfile ?? undefined}
+                  />
+                )}
+
+                {activeSection === "social" && (
+                  <EmployerSocialLinks
+                    editMode={editMode}
+                    form={form}
+                    employer={employerProfile ?? undefined}
+                  />
+                )}
+
+                {isSubscribed && activeSection === "billing" && (
+                  <ManageSubscription
+                    subscription={subscription as UserSubscription}
+                    userRole="employer"
+                  />
+                )}
+              </div>
+            </div>
           </div>
-        </div>
+        </FormProvider>
       </div>
-    </FormProvider>
+    </div>
   );
 };
 
