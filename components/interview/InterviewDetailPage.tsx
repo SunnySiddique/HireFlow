@@ -1,6 +1,6 @@
 "use client";
 
-import { getStatusConfig } from "@/constants/interviewsData";
+import { getStatusConfig } from "@/constants/interveiwsData";
 import { useInterview } from "@/hooks/interview/useInterview";
 import { cn } from "@/lib/utils";
 import { Calendar, ChevronLeft } from "lucide-react";

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/button";
 
-import { getStatusConfig } from "@/constants/interviewsData";
+import { getStatusConfig } from "@/constants/interveiwsData";
 import { useDeleteInterview } from "@/hooks/interview/useInterview";
 import { useInterviewTimer } from "@/hooks/interview/useInterviewTimer";
 import { Interview } from "@/types/interview";
