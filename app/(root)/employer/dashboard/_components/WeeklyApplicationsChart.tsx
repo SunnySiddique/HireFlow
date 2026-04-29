@@ -21,7 +21,6 @@ interface WeeklyApplicationsChartProps {
 const WeeklyApplicationsChart = ({
   chartData,
 }: WeeklyApplicationsChartProps) => {
-  console.log("Chart Data:", chartData);
   return (
     <Card className="p-4 lg:p-6 bg-background border border-border">
       <div className="flex items-center justify-between mb-4 lg:mb-6">

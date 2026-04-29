@@ -35,7 +35,7 @@ export default function JobSeekerLayout({
 
       <div className="flex flex-col flex-1">
         {isJobs ? (
-          <JobNavbar />
+          <JobNavbar role="job-seeker" />
         ) : (
           <DashboardNavbar
             role="job-seeker"

@@ -1,5 +1,6 @@
 "use client";
 
+import JobsNavbar from "@/components/jobs/JobNavbar";
 import DashboardNavbar from "@/components/navbar/DashboardNavbar";
 import DashboardSidebar from "@/components/sidebar/DashboardSidebar";
 import { usePathname } from "next/navigation";
@@ -14,26 +15,33 @@ export default function EmployerLayout({
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-const isDetailPage = /^\/employer\/(jobs|interviews)\/[^/]+$/.test(pathname);    
+  const isInterviewDetail = /^\/employer\/interviews\/[^/]+$/.test(pathname);
+  const isJobDetail = /^\/employer\/jobs\/[^/]+$/.test(pathname);
 
-  if (isDetailPage) {
+  if (isInterviewDetail) {
     return <>{children}</>;
   }
 
   return (
     <div className="flex h-screen bg-background">
-      <DashboardSidebar
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        role="employer"
-      />
+      {!isJobDetail && (
+        <DashboardSidebar
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          role="employer"
+        />
+      )}
 
       <div className="flex flex-col flex-1">
-        <DashboardNavbar
-          role="employer"
-          onMenuClick={() => setSidebarOpen((prev) => !prev)}
-          isSidebarOpen={sidebarOpen}
-        />
+        {isJobDetail ? (
+          <JobsNavbar role="employer" />
+        ) : (
+          <DashboardNavbar
+            role="employer"
+            onMenuClick={() => setSidebarOpen((prev) => !prev)}
+            isSidebarOpen={sidebarOpen}
+          />
+        )}
         <main className="flex-1 overflow-y-auto px-4 py-6 lg:px-8 bg-background">
           {children}
         </main>

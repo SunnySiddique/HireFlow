@@ -16,7 +16,6 @@ import Link from "next/link";
 
 const JobListings = ({ jobs }: { jobs: JobListingsType[] }) => {
   const { mutateAsync: deleteJob, isPending } = useDeleteJob();
-  console.log("Job Listings:", jobs);
   return (
     <div className="lg:col-span-2">
       <div className="flex items-center justify-between mb-4 lg:mb-6">

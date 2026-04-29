@@ -30,7 +30,6 @@ export const useSendInterviewInvite = () => {
       toast.error(
         error.message ? error.message : "Failed to send interview invite.",
       );
-      console.log("[useSendInterviewInvite]", error);
     },
   });
 };
@@ -75,7 +74,6 @@ export const useUpdateInterviewStatus = () => {
       toast.error(
         error.message ? error.message : "Failed to update interview status.",
       );
-      console.log("[useUpdateInterviewStatus]", error);
     },
   });
 };
@@ -98,7 +96,6 @@ export const useDeleteInterview = () => {
       toast.error(
         error.message ? error.message : "Failed to delete interview.",
       );
-      console.log("[useDeleteInterview]", error);
     },
   });
 };

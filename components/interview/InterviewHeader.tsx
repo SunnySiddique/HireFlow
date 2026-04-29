@@ -14,7 +14,6 @@ const InterviewHeader = ({
   filters,
   role,
 }: InterviewHeaderProps) => {
-  console.log(filters);
   const handleReset = () => {
     resetFilters();
   };

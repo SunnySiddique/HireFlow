@@ -16,13 +16,24 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { useSignOut } from "@/hooks/auth/useAuth";
+import { useEmployerProfile } from "@/hooks/employer-profile/useEmployer";
+import { randomImage } from "@/lib/utils/randomImage";
 import { useRouter } from "next/navigation";
 
-const JobsNavbar = () => {
+const JobsNavbar = ({ role }: { role: "job-seeker" | "employer" }) => {
   const { data: seeker } = useSeekerProfile();
+  const { data: employer } = useEmployerProfile();
   const { mutateAsync: signOut, isPending } = useSignOut();
 
+  const userName =
+    role === "job-seeker" ? seeker?.full_name : employer?.company_name;
+  const userProfile =
+    role === "job-seeker" ? seeker?.profile_url : employer?.company_logo_url;
+  const userSlug = role === "job-seeker" ? seeker?.slug : employer?.slug;
   const router = useRouter();
+
+  const redirectUrl =
+    role === "job-seeker" ? "/job-seeker/dashboard" : "/employer/jobs";
 
   const handleLogout = async () => {
     await signOut();
@@ -32,7 +43,7 @@ const JobsNavbar = () => {
     <header className="sticky top-0 z-30 bg-background/80 backdrop-blur border-b border-border">
       <div className="flex items-center justify-between px-4 md:px-14 h-14">
         {/* LEFT */}
-        <Link href="/job-seeker/dashboard">
+        <Link href={redirectUrl}>
           <Button
             variant="ghost"
             size="sm"
@@ -51,11 +62,13 @@ const JobsNavbar = () => {
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 hover:opacity-80 transition">
               <Avatar className="h-8 w-8">
-                {seeker?.profile_url ? (
-                  <AvatarImage src={seeker.profile_url} />
+                {userProfile ? (
+                  <AvatarImage
+                    src={userProfile || randomImage(userName as string)}
+                  />
                 ) : (
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                    {getInitials(seeker?.full_name ?? "U")}
+                    {getInitials(userName ?? "Jhon")}
                   </AvatarFallback>
                 )}
               </Avatar>
@@ -64,17 +77,17 @@ const JobsNavbar = () => {
 
           <DropdownMenuContent align="end" className="w-48">
             <div className="px-2 py-2">
-              <p className="text-sm font-medium">
-                {seeker?.full_name ?? "User"}
+              <p className="text-sm font-medium">{userName ?? "Jhon"}</p>
+              <p className="text-xs text-muted-foreground">
+                {role === "job-seeker" ? "Job Seeker" : "Employer"}
               </p>
-              <p className="text-xs text-muted-foreground">Job Seeker</p>
             </div>
 
             <DropdownMenuSeparator />
 
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={() => router.push(`/job-seeker/profile/${seeker?.slug}`)}
+              onClick={() => router.push(`/${role}/profile/${userSlug}`)}
             >
               Profile
             </DropdownMenuItem>

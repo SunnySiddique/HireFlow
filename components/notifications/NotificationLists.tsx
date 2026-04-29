@@ -28,7 +28,7 @@ const NotificationLists = ({
 }) => {
   const { mutateAsync: markNotificationAsRead } = useMarkNotificationAsRead();
   const { mutateAsync: deleteNotification } = useDeleteNotification();
-  console.log(notification);
+
   const handleMarkNotificationAsRead = async (notifyId: string) => {
     await markNotificationAsRead(notifyId, {
       onSuccess: () => {

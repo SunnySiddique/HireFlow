@@ -24,6 +24,7 @@ import {
   BookmarkCheck,
   CalendarX,
   DollarSign,
+  Loader,
   MapPin,
   Users,
 } from "lucide-react";
@@ -39,13 +40,16 @@ const HeaderCard = ({
 }) => {
   // hook
   const { mutate: applyJob, isPending: isApplying } = useApplyJob();
-  const { mutate: saveJob } = useSavedJob();
+  const { mutateAsync: saveJob, isPending } = useSavedJob();
   const { data } = useSeekerAppliedJobs();
   const { data: saveJobs } = useSeekerSavedJobs();
   const { data: employerProfile } = useEmployerProfile();
 
+  // states
   const [open, setOpen] = useState(false);
   const [coverLetter, setCoverLetter] = useState("");
+  const [jobId, setJobId] = useState<string | null>(null);
+
   const appliedJobs = data?.jobs;
   const router = useRouter();
 
@@ -70,9 +74,16 @@ const HeaderCard = ({
     );
   };
 
-  const handleSaveJob = () => {
-    saveJob(job.id);
+  const handleSaveJob = async () => {
+    setJobId(job.id);
+    await saveJob(job.id, {
+      onSettled: () => {
+        setJobId(null);
+      },
+    });
   };
+
+  const isSaving = isPending && jobId === job.id;
 
   return (
     <>
@@ -172,8 +183,11 @@ const HeaderCard = ({
                     variant="outline"
                     className={`border-border transition-all duration-200 ${isSaved ? "border-primary/50 text-primary bg-primary/5" : "text-foreground hover:bg-muted"}`}
                     onClick={handleSaveJob}
+                    disabled={isSaving}
                   >
-                    {isSaved ? (
+                    {isSaving ? (
+                      <Loader className="h-3 w-3 animate-spin" />
+                    ) : isSaved ? (
                       <BookmarkCheck className="w-4 h-4" />
                     ) : (
                       <Bookmark className="w-4 h-4" />
