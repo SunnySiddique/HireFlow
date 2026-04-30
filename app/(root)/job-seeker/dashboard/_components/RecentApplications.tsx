@@ -32,7 +32,7 @@ const RecentApplications = ({ jobs }: { jobs: JobWithEmployer[] }) => {
         <>
           <div className="flex items-center justify-between mb-4 lg:mb-6">
             <h2 className="text-base lg:text-lg font-bold text-foreground">
-              Recent Applications {jobs.length}
+              Recent Jobs {jobs.length}
             </h2>
             {jobs.length > 0 && (
               <Link

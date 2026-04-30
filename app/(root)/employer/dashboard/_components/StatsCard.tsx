@@ -1,13 +1,15 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { EMPLOYER_STATS_CONFIG } from "@/constants/dashboard.config";
 import { useEmployerApplicationStats } from "@/hooks/stats/useStats";
 import { createEmployerStatsData } from "@/lib/dashboard/stats-data";
 import { TrendingDown, TrendingUp } from "lucide-react";
 
 const StatsCard = () => {
-  const { data } = useEmployerApplicationStats();
+  const { data, isLoading } = useEmployerApplicationStats();
+
   const stats = createEmployerStatsData({
     totalActiveJobs: data?.totalActiveJobs ?? 0,
     weeklyApplicants: data?.weeklyApplicants ?? 0,
@@ -28,6 +30,16 @@ const StatsCard = () => {
       arrowColor: stat.trend === "up" ? "text-green-600" : "text-red-600",
     };
   });
+
+  if (isLoading) {
+    return (
+      <div className={`grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 mb-10`}>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-30 lg:h-35 rounded-xl" />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 mb-10">

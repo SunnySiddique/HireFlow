@@ -65,6 +65,7 @@ const DashboardSidebar = ({
 
   const { data: subscription, isLoading: subLoading } =
     useGetCurrentUserSubscription();
+
   const { mutateAsync: signOut, isPending } = useSignOut();
 
   const router = useRouter();
@@ -99,8 +100,8 @@ const DashboardSidebar = ({
 
     return (
       subscription?.plan === link.plan ||
-      link?.plan === "growth" ||
-      link?.plan === "accelerator"
+      link?.plan === "starter" ||
+      link?.plan === "explorer"
     );
   });
 

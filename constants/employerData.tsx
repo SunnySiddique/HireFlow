@@ -72,7 +72,7 @@ export const employerLinks = [
     href: "/employer/notifications",
     icon: Bell,
     section: "main",
-    plan: "growth",
+    plan: "starter",
   },
   {
     label: "Post a Job",

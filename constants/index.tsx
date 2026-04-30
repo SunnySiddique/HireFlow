@@ -164,7 +164,7 @@ export const jobSeekerLinks = [
     href: "/job-seeker/notifications",
     icon: Bell,
     section: "main",
-    plan: "accelerator",
+    plan: "explorer",
   },
   {
     label: "Saved Jobs",

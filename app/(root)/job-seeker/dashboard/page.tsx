@@ -24,6 +24,8 @@ const JobSeekerDashboardPage = () => {
     useGetRecentJobs();
   const { data: recommendedJobs = [], isLoading: recommendedLoading } =
     useRecommandedJobs();
+  // const { data: seekerStats, isLoading: isStatsLoading } =
+  //   useSeekerApplicationStats();
 
   if (subLoading) return <Loader mode="full" />;
 
@@ -31,6 +33,7 @@ const JobSeekerDashboardPage = () => {
     subscription?.subscription_status as string,
     subscription?.plan_expires_at as string,
   );
+
   const isAcceleratorPlan =
     subscription?.plan?.toLowerCase() === "acccelerator" ||
     subscription?.plan?.toLowerCase() === "champion";
@@ -43,7 +46,6 @@ const JobSeekerDashboardPage = () => {
           isAcceleratorPlan={isAcceleratorPlan}
         />
       </section>
-
       {isSubscribed ? (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mb-6 lg:mb-8">
