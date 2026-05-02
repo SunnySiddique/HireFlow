@@ -13,8 +13,14 @@ export const PUBLIC_ROUTES = [
   "/auth/auth-code-error",
 ];
 
-export const AUTH_REDIRECT_ROUTES = ["/", "/auth/signin", "/auth/signup"];
-
+export const AUTH_REDIRECT_ROUTES = [
+  "/auth/signin",
+  "/auth/signup",
+  "/auth/forgot-password",
+  "/auth/update-password",
+  "/auth/callback",
+  "/auth/auth-code-error",
+];
 export const RESTRICTED_EMP_ROUTES = [
   "/employer/jobs",
   "/employer/applicants",
@@ -26,11 +32,4 @@ export const RESTRICTED_SEEKER_ROUTES = [
   "/job-seeker/applications",
   "/job-seeker/companies",
   "/job-seeker/saved-jobs",
-];
-
-export const BYPASS_ROUTES = [
-  "/auth/forgot-password",
-  "/auth/update-password",
-  "/auth/callback",
-  "/auth/auth-code-error",
 ];

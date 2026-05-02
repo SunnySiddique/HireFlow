@@ -27,7 +27,7 @@ const BrowseJobs = () => {
     salaryMin: undefined,
     salaryMax: undefined,
     page: 1,
-    limit: 10,
+    limit: 5,
     sort: "all",
     featured: false,
   });
@@ -36,6 +36,7 @@ const BrowseJobs = () => {
 
   const debouncedSearch = useDebounce(filters.search, 500);
   const debouncedLocation = useDebounce(filters.location, 500);
+
   const { data = { jobs: [], totalCount: 0, totalPages: 0 }, isLoading } =
     useSeekerJobs({
       ...filters,

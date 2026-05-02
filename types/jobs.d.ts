@@ -21,6 +21,7 @@ export interface jobFormData {
   application_deadline?: string;
   status: string;
   skills_required?: string[];
+  is_featured?: boolean;
 }
 
 export type jobUpdateFormData = Partial<Omit<jobFormData, "employer_id">>;

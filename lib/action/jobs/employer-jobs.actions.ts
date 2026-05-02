@@ -13,8 +13,8 @@ import {
   updateJobStatusService,
 } from "../../services/jobs/employer-job.service";
 
-export async function employerJobs() {
-  return employerJobsService();
+export async function employerJobs(filters: { page: number; limit: number }) {
+  return employerJobsService(filters);
 }
 
 // Get job by slug

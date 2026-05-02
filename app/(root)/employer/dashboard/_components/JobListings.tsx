@@ -10,14 +10,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useDeleteJob } from "@/hooks/jobs/useEmployerJobs";
 import { formatLabel } from "@/lib/utils";
 import { JobListingsType } from "@/types/jobs";
-import { Briefcase, Edit, Eye, Loader2, Trash2 } from "lucide-react";
+import { Briefcase, Edit, Eye } from "lucide-react";
 import Link from "next/link";
 
 const JobListings = ({ jobs }: { jobs: JobListingsType[] }) => {
-  const { mutateAsync: deleteJob, isPending } = useDeleteJob();
   return (
     <div className="lg:col-span-2">
       <div className="flex items-center justify-between mb-4 lg:mb-6">
@@ -126,16 +124,6 @@ const JobListings = ({ jobs }: { jobs: JobListingsType[] }) => {
                         >
                           <Eye className="w-3 lg:w-4 h-3 lg:h-4" />
                         </a>
-                        <button
-                          onClick={() => deleteJob(job.id)}
-                          className="p-1.5 lg:p-2 hover:bg-muted rounded-md text-muted-foreground hover:text-foreground"
-                        >
-                          {isPending ? (
-                            <Loader2 className="w-3 lg:w-4 h-3 lg:h-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-3 lg:w-4 h-3 lg:h-4" />
-                          )}
-                        </button>
                       </div>
                     </TableCell>
                   </TableRow>

@@ -9,11 +9,11 @@ interface PaginationProps {
 
 const Pagination = ({ page, onPageChange, totalPages }: PaginationProps) => {
   if (totalPages <= 1) return null;
-  const safePage = Math.max(1, Math.min(page, totalPages));
-  const items = buildPagination(safePage, totalPages);
+
+  const items = buildPagination(page, totalPages);
 
   const handleChange = (newPage: number) => {
-    if (newPage !== safePage) {
+    if (newPage !== page) {
       onPageChange(newPage);
     }
   };
@@ -50,7 +50,7 @@ const Pagination = ({ page, onPageChange, totalPages }: PaginationProps) => {
             );
           }
 
-          const isActive = item.value === safePage;
+          const isActive = item.value === page;
 
           return (
             <Button
@@ -70,8 +70,8 @@ const Pagination = ({ page, onPageChange, totalPages }: PaginationProps) => {
       <Button
         variant="outline"
         size="sm"
-        disabled={safePage === totalPages}
-        onClick={() => handleChange(safePage + 1)}
+        disabled={page === totalPages}
+        onClick={() => handleChange(page + 1)}
         className="flex items-center gap-1 px-2.5 sm:px-3 md:px-4 h-8 sm:h-9 text-xs sm:text-sm rounded-lg"
       >
         Next

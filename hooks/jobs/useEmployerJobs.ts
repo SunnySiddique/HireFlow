@@ -15,10 +15,11 @@ import { jobFormData, jobUpdateFormData } from "@/types/jobs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
-export const useEmployerJobs = () => {
+export const useEmployerJobs = (filters: { page: number; limit: number }) => {
   return useQuery({
-    queryKey: ["employer-jobs"],
-    queryFn: employerJobs,
+    queryKey: ["employer-jobs", filters],
+    queryFn: () => employerJobs(filters),
+    staleTime: 1000 * 60 * 5,
   });
 };
 
@@ -71,11 +72,11 @@ export const useUpdateJobStatus = () => {
     mutationFn: ({ jobId, status }: { jobId: string; status: string }) =>
       updateJobStatus(jobId, status),
     onSuccess: () => {
-      invalidateQuery(queryClient, ["employer-jobs"]);
+      queryClient.refetchQueries({ queryKey: ["employer-jobs"] });
     },
     onError: (error) => {
       toast.error(error.message || "Something went wrong updating job status");
-      invalidateQuery(queryClient, ["employer-jobs"]);
+      queryClient.refetchQueries({ queryKey: ["employer-jobs"] });
     },
   });
 };
@@ -85,7 +86,6 @@ export const useDeleteJob = () => {
   return useMutation({
     mutationFn: (jobId: string) => deleteJobPost(jobId),
     onSuccess: () => {
-      toast.success("Job deleted successfully");
       invalidateQuery(queryClient, ["employer-jobs"]);
       invalidateQuery(queryClient, ["active-jobs"]);
       invalidateQuery(queryClient, ["recent-applicants"]);

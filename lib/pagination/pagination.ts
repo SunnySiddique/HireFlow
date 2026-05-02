@@ -1,5 +1,5 @@
 export function applyPagination(page = 1, limit = 10) {
-  const safePage = Math.max(page, 1);
+  const safePage = Math.max(page, 1); //3
 
   return {
     from: (safePage - 1) * limit,

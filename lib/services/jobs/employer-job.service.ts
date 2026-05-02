@@ -1,5 +1,6 @@
 import { PLAN_LIMITS } from "@/constants/billingData";
 import { getServerUser } from "@/lib/action/auth/serverAuth";
+import { applyPagination } from "@/lib/pagination/pagination";
 import {
   sendJobMatchNotifications,
   sendNotification,
@@ -8,19 +9,36 @@ import { createClient } from "@/lib/supabase/server";
 import { createSlug } from "@/lib/utils";
 import { jobFormData, JobFormValues, jobUpdateFormData } from "@/types/jobs";
 
-export async function employerJobsService() {
+export async function employerJobsService(filters: {
+  page: number;
+  limit: number;
+}) {
   const { supabase, user } = await getServerUser();
 
   if (!user) throw new Error("Unauthorized: Please login to continue");
 
-  const { data, error } = await supabase
+  const query = supabase
     .from("jobs")
-    .select("*")
-    .eq("employer_id", user?.id);
+    .select("*", { count: "exact" })
+    .eq("employer_id", user.id);
+
+  const { from, to, limit, page } = applyPagination(
+    filters?.page,
+    filters?.limit ?? 5,
+  );
+  const { data, error, count } = await query.range(from, to);
 
   if (error) throw new Error(error.message);
 
-  return data;
+  const totalCount = count ?? 0;
+  const totalPages = Math.ceil(totalCount / limit);
+
+  return {
+    empJobs: data ?? [],
+    totalCount,
+    currentPage: page,
+    totalPages,
+  };
 }
 
 // Get job by slug
@@ -162,6 +180,7 @@ export async function updateJobPostService(
     application_deadline: jobData.applicationDeadline || null,
     status: jobData.status,
     skills_required: jobData.skills ?? [],
+    is_featured: jobData.isFeatured,
   };
 
   const { data: updatedJob, error } = await supabase

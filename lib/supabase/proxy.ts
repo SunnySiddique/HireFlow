@@ -1,6 +1,5 @@
 import {
   AUTH_REDIRECT_ROUTES,
-  BYPASS_ROUTES,
   RESTRICTED_EMP_ROUTES,
   RESTRICTED_SEEKER_ROUTES,
 } from "@/constants/authData";
@@ -15,9 +14,6 @@ import { hasAccess } from "../utils";
 export async function updateSession(request: NextRequest) {
   const response = NextResponse.next();
   const { pathname } = request.nextUrl;
-
-  if (BYPASS_ROUTES.some((route) => pathname.startsWith(route)))
-    return response;
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -43,8 +39,9 @@ export async function updateSession(request: NextRequest) {
   const isJobSeekerRoute = pathname.startsWith("/job-seeker");
   const isEmployerRoute = pathname.startsWith("/employer");
   const isProtectedRoute = isJobSeekerRoute || isEmployerRoute;
-  const isAuthRedirectRoute = AUTH_REDIRECT_ROUTES.includes(pathname);
-
+  const isAuthRedirectRoute = AUTH_REDIRECT_ROUTES.some((route) =>
+    pathname.startsWith(route),
+  );
   // redirect logout users acessing to the dashboard
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
@@ -72,7 +69,7 @@ export async function updateSession(request: NextRequest) {
   );
 
   // if logged in user tries to access the auth page they redirect to the dashboard based on the role
-  if (userRole && isAuthRedirectRoute) {
+  if (user && userRole && isAuthRedirectRoute) {
     const url = request.nextUrl.clone();
     url.pathname =
       userRole === "job-seeker"
@@ -100,6 +97,7 @@ export async function updateSession(request: NextRequest) {
   const isRestrictedEmpRoute = RESTRICTED_EMP_ROUTES.some((p) =>
     pathname.startsWith(p),
   );
+
   const isRestrictedSeekerRoute = RESTRICTED_SEEKER_ROUTES.some((p) =>
     pathname.startsWith(p),
   );

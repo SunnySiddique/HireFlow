@@ -16,7 +16,9 @@ export default function EmployerLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const isInterviewDetail = /^\/employer\/interviews\/[^/]+$/.test(pathname);
-  const isJobDetail = /^\/employer\/jobs\/[^/]+$/.test(pathname);
+  const isJobDetail =
+    /^\/employer\/jobs\/[^/]+$/.test(pathname) ||
+    /^\/employer\/jobs\/[^/]+\/edit$/.test(pathname);
 
   if (isInterviewDetail) {
     return <>{children}</>;

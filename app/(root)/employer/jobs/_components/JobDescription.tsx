@@ -401,7 +401,7 @@ const JobDescription = ({ form }: JobDescriptionProps) => {
             label=""
             options={[
               { label: "Open", value: "open" },
-              { label: "Closed", value: "close" },
+              { label: "Closed", value: "closed" },
               { label: "Pending", value: "pending" },
             ]}
             placeholder="Select Status"
