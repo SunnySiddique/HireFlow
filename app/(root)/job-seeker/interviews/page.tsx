@@ -20,7 +20,7 @@ const JobSeekerInterviewsPage = () => {
   if (isLoading) return <Loader mode="inline" />;
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/5">
-      <div className="">
+      <div>
         <InterviewHeader
           resetFilters={resetFilters}
           updateFilter={updateFilter}

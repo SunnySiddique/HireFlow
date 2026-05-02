@@ -7,6 +7,7 @@ import {
   useGetRecentJobs,
   useRecommandedJobs,
 } from "@/hooks/jobs/useSeekerJob";
+import { useSeekerApplicationStats } from "@/hooks/stats/useStats";
 import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { hasAccess } from "@/lib/utils";
 import DashboardStats from "./_components/DashboardStats";
@@ -24,10 +25,17 @@ const JobSeekerDashboardPage = () => {
     useGetRecentJobs();
   const { data: recommendedJobs = [], isLoading: recommendedLoading } =
     useRecommandedJobs();
-  // const { data: seekerStats, isLoading: isStatsLoading } =
-  //   useSeekerApplicationStats();
+  const { data: statsData, isLoading: statsLoading } =
+    useSeekerApplicationStats();
 
-  if (subLoading) return <Loader mode="full" />;
+  const isLoading =
+    subLoading ||
+    interviewsLoading ||
+    recentJobsLoading ||
+    recommendedLoading ||
+    statsLoading;
+
+  if (isLoading) return <Loader mode="full" />;
 
   const isSubscribed = hasAccess(
     subscription?.subscription_status as string,
@@ -42,6 +50,7 @@ const JobSeekerDashboardPage = () => {
     <main>
       <section className="mb-6 lg:mb-8">
         <DashboardStats
+          data={statsData}
           isSubscribed={isSubscribed}
           isAcceleratorPlan={isAcceleratorPlan}
         />
@@ -51,19 +60,11 @@ const JobSeekerDashboardPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mb-6 lg:mb-8">
             <div className="lg:col-span-2 space-y-6 lg:space-y-8">
               <section>
-                {interviewsLoading ? (
-                  <div className="animate-pulse h-48 bg-muted rounded-xl" />
-                ) : (
-                  <UpcomingInterviews interviews={upcomingInterviews} />
-                )}
+                <UpcomingInterviews interviews={upcomingInterviews} />
               </section>
 
               <section>
-                {recentJobsLoading ? (
-                  <div className="animate-pulse h-48 bg-muted rounded-xl" />
-                ) : (
-                  <RecentApplications jobs={recentJobs} />
-                )}
+                <RecentApplications jobs={recentJobs} />
               </section>
             </div>
 
@@ -75,11 +76,7 @@ const JobSeekerDashboardPage = () => {
           </div>
 
           <section>
-            {recommendedLoading ? (
-              <div className="animate-pulse h-64 bg-muted rounded-xl" />
-            ) : (
-              <RecommendedJobs jobs={recommendedJobs} />
-            )}
+            <RecommendedJobs jobs={recommendedJobs} />
           </section>
         </>
       ) : (

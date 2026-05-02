@@ -262,11 +262,21 @@ export async function notifyBeforeInterviewService(interviewId: string) {
 
   const { data, error } = await supabase
     .from("interviews")
-    .select("id, scheduled_at")
+    .select("id, scheduled_at, status")
     .eq("id", interviewId)
     .maybeSingle();
 
   if (!data || error || !data.scheduled_at) throw error;
+  if (data.status === "completed") return;
+
+  const { data: existing } = await supabase
+    .from("notifications")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("reference_id", data.id)
+    .eq("type", "interview_reminder")
+    .maybeSingle();
+  if (existing) return;
 
   await sendNotification(
     supabase,

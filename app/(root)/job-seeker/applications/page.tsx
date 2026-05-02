@@ -52,7 +52,6 @@ const JobSeekerApplicationsPage = () => {
       {/* Search + Filters */}
       <div className="flex flex-col gap-2 sm:gap-3 mb-4 sm:mb-6 lg:mb-8">
         <div className="w-fit max-w-full overflow-x-auto scrollbar-hide">
-          {" "}
           {/* ← add w-fit here */}
           <div className="flex flex-wrap md:flex-row items-center gap-1 sm:gap-1.5 bg-card p-1 sm:p-1.5 rounded-xl border border-border/50 shadow-sm">
             <button

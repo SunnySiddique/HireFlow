@@ -1,21 +1,26 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { DASHBOARD_STATS_CONFIG } from "@/constants/dashboard.config";
-import { useSeekerApplicationStats } from "@/hooks/stats/useStats";
 import { createStatsData } from "@/lib/dashboard/stats-data";
 import { TrendingDown, TrendingUp } from "lucide-react";
+
+interface DashboardStatsProps {
+  data?: {
+    weeklyApplications: number | null;
+    monthlySavedJobs: number | null;
+    weeklyInterviews: number | null;
+    weeklyProfileViews: number | null;
+  };
+  isSubscribed: boolean;
+  isAcceleratorPlan: boolean;
+}
 
 const DashboardStats = ({
   isSubscribed,
   isAcceleratorPlan,
-}: {
-  isSubscribed: boolean;
-  isAcceleratorPlan: boolean;
-}) => {
-  const { data, isLoading } = useSeekerApplicationStats();
-
+  data,
+}: DashboardStatsProps) => {
   const stats = createStatsData({
     weeklyApplications: data?.weeklyApplications ?? 0,
     monthlySavedJobs: data?.monthlySavedJobs ?? 0,
@@ -43,26 +48,6 @@ const DashboardStats = ({
       return false;
     return true;
   });
-
-  const skeletonCount = isSubscribed && isAcceleratorPlan ? 4 : 3;
-  const gridCols =
-    skeletonCount === (2 as 3 | 4)
-      ? "lg:grid-cols-2"
-      : skeletonCount === 3
-        ? "lg:grid-cols-3"
-        : "lg:grid-cols-4";
-
-  if (isLoading) {
-    return (
-      <div
-        className={`grid grid-cols-1 sm:grid-cols-2 ${gridCols} gap-4 lg:gap-6`}
-      >
-        {Array.from({ length: skeletonCount }).map((_, i) => (
-          <Skeleton key={i} className="h-30 lg:h-35 rounded-xl" />
-        ))}
-      </div>
-    );
-  }
 
   return (
     <div

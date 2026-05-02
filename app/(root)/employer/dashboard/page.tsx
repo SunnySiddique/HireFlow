@@ -7,6 +7,7 @@ import {
   useChartApplicants,
   useRecentApplicants,
 } from "@/hooks/jobs/useEmployerJobs";
+import { useEmployerApplicationStats } from "@/hooks/stats/useStats";
 import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
 import { hasAccess } from "@/lib/utils";
 import JobListings from "./_components/JobListings";
@@ -22,8 +23,16 @@ const EmployerDashboardPage = () => {
     useChartApplicants();
   const { data: recentApplicants = [], isLoading: applicantsLoading } =
     useRecentApplicants();
+  const { data: statsData, isLoading: statsLoading } =
+    useEmployerApplicationStats();
 
-  if (subLoading) return <Loader mode="full" />;
+  const isLoading =
+    subLoading ||
+    jobsLoading ||
+    chartLoading ||
+    applicantsLoading ||
+    statsLoading;
+  if (isLoading) return <Loader mode="full" />;
 
   const isSubscribed = hasAccess(
     subscription?.subscription_status as string,
@@ -32,28 +41,16 @@ const EmployerDashboardPage = () => {
 
   return (
     <>
-      <StatsCard />
+      <StatsCard data={statsData} />
 
       {isSubscribed ? (
         <>
-          {jobsLoading ? (
-            <div className="animate-pulse h-40 bg-muted rounded-xl mt-6" />
-          ) : (
-            <JobListings jobs={jobListings} />
-          )}
+          <JobListings jobs={jobListings} />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mt-10">
-            {chartLoading ? (
-              <div className="animate-pulse h-64 bg-muted rounded-xl" />
-            ) : (
-              <WeeklyApplicationsChart chartData={chartData} />
-            )}
+            <WeeklyApplicationsChart chartData={chartData} />
 
-            {applicantsLoading ? (
-              <div className="animate-pulse h-64 bg-muted rounded-xl" />
-            ) : (
-              <RecentApplicants applicants={recentApplicants} />
-            )}
+            <RecentApplicants applicants={recentApplicants} />
           </div>
         </>
       ) : (
