@@ -19,7 +19,6 @@ export const useEmployerJobs = () => {
   return useQuery({
     queryKey: ["employer-jobs"],
     queryFn: employerJobs,
-    staleTime: 1000 * 60 * 5,
   });
 };
 
@@ -33,7 +32,7 @@ export const useCreateJob = () => {
           ? `Job posted! ${notified} seekers notified.`
           : "Job posted!",
       );
-      invalidateQuery(queryClient, ["employer-jobs"]);
+      queryClient.refetchQueries({ queryKey: ["employer-jobs"] });
     },
     onError: (error: Error) => {
       toast.error(error.message || "Something went wrong creating Job");
@@ -57,7 +56,7 @@ export const useUpdateJob = () => {
           ? `Job updated! ${notified} new seekers notified.`
           : "Job updated!",
       );
-      invalidateQuery(queryClient, ["employer-jobs"]);
+      queryClient.refetchQueries({ queryKey: ["employer-jobs"] });
     },
     onError: (error: Error) => {
       toast.error(error.message || "Something went wrong updating Job");
@@ -72,7 +71,7 @@ export const useUpdateJobStatus = () => {
     mutationFn: ({ jobId, status }: { jobId: string; status: string }) =>
       updateJobStatus(jobId, status),
     onSuccess: () => {
-      invalidateQuery(queryClient, ["employer-jobs"]);
+      queryClient.refetchQueries({ queryKey: ["employer-jobs"] });
     },
     onError: (error) => {
       toast.error(error.message || "Something went wrong updating job status");
@@ -87,7 +86,7 @@ export const useDeleteJob = () => {
     mutationFn: (jobId: string) => deleteJobPost(jobId),
     onSuccess: () => {
       toast.success("Job deleted successfully");
-      invalidateQuery(queryClient, ["employer-jobs"]);
+      queryClient.refetchQueries({ queryKey: ["employer-jobs"] });
       invalidateQuery(queryClient, ["active-jobs"]);
       invalidateQuery(queryClient, ["recent-applicants"]);
     },

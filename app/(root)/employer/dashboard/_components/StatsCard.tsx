@@ -15,7 +15,6 @@ interface StatsCardProps {
 }
 
 const StatsCard = ({ data }: StatsCardProps) => {
-  console.log(data);
   const stats = createEmployerStatsData({
     totalActiveJobs: data?.totalActiveJobs ?? 0,
     weeklyApplicants: data?.weeklyApplicants ?? 0,

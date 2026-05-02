@@ -134,24 +134,13 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
         skills_required: data.skills.map((s: string) => s.toLowerCase()),
       };
 
-      createJob(payload, {
-        onSuccess: () => {
-          form.reset();
-          router.push("/employer/jobs");
-        },
-      });
+      await createJob(payload);
+      form.reset();
+      router.push("/employer/jobs");
     } else {
-      await updateJobPost(
-        { job_slug: initialData.job_slug, jobData: data },
-        {
-          onSuccess: () => {
-            form.reset();
-          },
-          onSettled: () => {
-            router.push("/employer/jobs");
-          },
-        },
-      );
+      await updateJobPost({ job_slug: initialData.job_slug, jobData: data });
+      form.reset();
+      router.push("/employer/jobs");
     }
   };
 
@@ -300,7 +289,7 @@ const CreateJobForm = ({ fromType, initialData }: CreateJobFormProps) => {
                         <Button
                           type="button"
                           variant="outline"
-                          className="w-full sm:w-auto border-primary/40 text-primary"
+                          className="w-full sm:w-auto h-11 sm:h-12 border-primary/40 text-primary"
                           onClick={() => setCurrentStep(4)}
                           disabled={
                             !isValid() || isJobCreating || isJobUpdating

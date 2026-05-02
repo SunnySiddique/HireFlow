@@ -90,16 +90,12 @@ const ManageJobsPage = () => {
     <main>
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          >
+          <div>
             <h1 className="text-4xl font-bold text-foreground">Manage Jobs</h1>
             <p className="text-muted-foreground mt-2">
               Create, edit and manage your job postings
             </p>
-          </motion.div>
+          </div>
           <motion.div
             whileHover={{
               scale: 1.05,
@@ -123,31 +119,9 @@ const ManageJobsPage = () => {
         </div>
 
         {jobs.length > 0 ? (
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.1,
-                },
-              },
-            }}
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {jobs.map((job) => (
-              <motion.div
-                key={job.id}
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0 },
-                }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                whileHover={{ y: -4 }}
-                className="group"
-              >
+              <motion.div key={job.id} whileHover={{ y: -4 }} className="group">
                 <Card className="p-0 border-border bg-card hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 flex flex-col rounded-xl overflow-hidden h-full group-hover:bg-card/95">
                   <div className="p-5 flex-1 flex flex-col">
                     {/* Status row */}
@@ -333,7 +307,7 @@ const ManageJobsPage = () => {
                 </Card>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         ) : (
           <NoJobsFound isEmployer={true} />
         )}
