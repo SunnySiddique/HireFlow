@@ -1,3 +1,5 @@
+"use client";
+
 import EmptyState from "@/components/EmptyState";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";

@@ -1,3 +1,5 @@
+"use client";
+
 import { Card } from "./ui/card";
 
 import { Button } from "@/components/ui/button";

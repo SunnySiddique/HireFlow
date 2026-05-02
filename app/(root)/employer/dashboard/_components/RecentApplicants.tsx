@@ -1,3 +1,5 @@
+"use client";
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { getInitials, timeAgo } from "@/lib/utils";

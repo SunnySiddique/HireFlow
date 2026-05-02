@@ -1,14 +1,5 @@
-"use client";
-
-import Loader from "@/components/Loader";
 import UnSubscribeEmptyState from "@/components/UnSubscribeEmptyState";
-import { useUpcomingInterviews } from "@/hooks/interview/useInterview";
-import {
-  useGetRecentJobs,
-  useRecommandedJobs,
-} from "@/hooks/jobs/useSeekerJob";
-import { useSeekerApplicationStats } from "@/hooks/stats/useStats";
-import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
+import { getSeekerDashboardData } from "@/lib/dashboard/getDashboardData";
 import { hasAccess } from "@/lib/utils";
 import DashboardStats from "./_components/DashboardStats";
 import ProfileCompletion from "./_components/ProfileCompletion";
@@ -16,26 +7,9 @@ import RecentApplications from "./_components/RecentApplications";
 import RecommendedJobs from "./_components/RecommendedJobs";
 import UpcomingInterviews from "./_components/UpcomingInterviews";
 
-const JobSeekerDashboardPage = () => {
-  const { data: subscription, isLoading: subLoading } =
-    useGetCurrentUserSubscription();
-  const { data: upcomingInterviews = [], isLoading: interviewsLoading } =
-    useUpcomingInterviews(true);
-  const { data: recentJobs = [], isLoading: recentJobsLoading } =
-    useGetRecentJobs();
-  const { data: recommendedJobs = [], isLoading: recommendedLoading } =
-    useRecommandedJobs();
-  const { data: statsData, isLoading: statsLoading } =
-    useSeekerApplicationStats();
-
-  const isLoading =
-    subLoading ||
-    interviewsLoading ||
-    recentJobsLoading ||
-    recommendedLoading ||
-    statsLoading;
-
-  if (isLoading) return <Loader mode="full" />;
+const JobSeekerDashboardPage = async () => {
+  const { subscription, interviews, recentJobs, recommendedJobs, stats } =
+    await getSeekerDashboardData();
 
   const isSubscribed = hasAccess(
     subscription?.subscription_status as string,
@@ -50,7 +24,7 @@ const JobSeekerDashboardPage = () => {
     <main>
       <section className="mb-6 lg:mb-8">
         <DashboardStats
-          data={statsData}
+          data={stats ?? []}
           isSubscribed={isSubscribed}
           isAcceleratorPlan={isAcceleratorPlan}
         />
@@ -60,7 +34,7 @@ const JobSeekerDashboardPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mb-6 lg:mb-8">
             <div className="lg:col-span-2 space-y-6 lg:space-y-8">
               <section>
-                <UpcomingInterviews interviews={upcomingInterviews} />
+                <UpcomingInterviews interviews={interviews ?? []} />
               </section>
 
               <section>

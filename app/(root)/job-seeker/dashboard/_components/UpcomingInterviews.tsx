@@ -1,3 +1,5 @@
+"use client";
+
 import EmptyState from "@/components/EmptyState";
 import InterviewCard from "@/components/interview/InterviewCard";
 import { Interview } from "@/types/interview";
