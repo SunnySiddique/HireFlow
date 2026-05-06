@@ -5,9 +5,9 @@ import {
   createUserService,
   forgotPasswordService,
   loginUserService,
-  signOutService,
   updatePasswordService,
 } from "../../services/auth/auth.service";
+import { getServerUser } from "./serverAuth";
 
 // create user
 export async function createUser(
@@ -36,6 +36,7 @@ export async function updatePassword(password: string) {
 }
 
 // update password
-export async function signinOut() {
-  return signOutService();
+export async function signOut() {
+  const { supabase } = await getServerUser();
+  await supabase.auth.signOut();
 }

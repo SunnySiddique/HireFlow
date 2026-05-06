@@ -1,6 +1,7 @@
 "use server";
 
 import { getServerUser } from "../action/auth/serverAuth";
+import { employerProfileService } from "../services/employer-profile/employer-profile.service";
 import { upcomingInterviewsService } from "../services/interview/interview.service";
 import {
   activeJobsService,
@@ -11,6 +12,7 @@ import {
   seekerRecentJobsService,
   seekerRecommendedJobsService,
 } from "../services/jobs/seeker-job.service";
+import { seekerProfileService } from "../services/seeker-profile/seeker-profile.service";
 import {
   employerApplicationStatsService,
   seekerApplicationStatsService,
@@ -47,4 +49,28 @@ export async function getSeekerDashboardData() {
     ]);
 
   return { subscription, interviews, recentJobs, recommendedJobs, stats };
+}
+
+export async function getEmployerSidebarData() {
+  const { user } = await getServerUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const [employerProfile, subscription] = await Promise.all([
+    employerProfileService(),
+    getMySubscriptionService(),
+  ]);
+
+  return { employerProfile, subscription };
+}
+
+export async function getSeekerSidebarData() {
+  const { user } = await getServerUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const [seekerProfile, subscription] = await Promise.all([
+    seekerProfileService(),
+    getMySubscriptionService(),
+  ]);
+
+  return { seekerProfile, subscription };
 }

@@ -134,11 +134,11 @@ Each job includes:
 - Fit score must be consistent and explainable
 - learning_path ONLY if fit_score < 70
 - Sort job_matches by fit_score descending
+- ONLY include jobs where fit_score >= 60 — OMIT all jobs below 60, do not list them at all
 - Output MUST be valid JSON only (no markdown, no explanation)
 - ALWAYS include "location" field in every job_match
 - If missing in input → return "N/A"
 - If remote_option includes remote → prefer "Remote"
 ---
-
 Now analyze the resume and job postings.
 `;

@@ -3,6 +3,7 @@
 import InterviewCard from "@/components/interview/InterviewCard";
 import InterviewHeader from "@/components/interview/InterviewHeader";
 import Loader from "@/components/Loader";
+import CardSkeleton from "@/components/skeletons/CardSkeleton";
 import { useInterviews } from "@/hooks/interview/useInterview";
 import { useInterviewFilters } from "@/hooks/interview/useInterviewFilters";
 import { Interview } from "@/types/interview";
@@ -12,7 +13,7 @@ import Pagination from "../jobs/_components/Pagination";
 const JobSeekerInterviewsPage = () => {
   const { filters, updateFilter, resetFilters } = useInterviewFilters();
 
-  const { data, isLoading } = useInterviews(filters, "seeker");
+  const { data, isLoading, isFetching } = useInterviews(filters, "seeker");
 
   const interviews = (data?.data ?? []) as Interview[];
   const totalPages = data?.totalPages ?? 0;
@@ -27,8 +28,18 @@ const JobSeekerInterviewsPage = () => {
           filters={filters}
           role={"seeker"}
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-          {interviews.length > 0 ? (
+        <div
+          className={
+            "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6"
+          }
+        >
+          {isFetching && interviews.length === 0 ? (
+            <CardSkeleton
+              rows={4}
+              className="lg:col-span-1"
+              variant="interview"
+            />
+          ) : interviews.length > 0 ? (
             interviews.map((interview: Interview) => (
               <InterviewCard
                 key={interview.id}

@@ -17,7 +17,7 @@ import {
   SALARY_RANGES,
 } from "@/constants/jobsData";
 import { JobFiltersType } from "@/types/jobs";
-import { MapPin, Search } from "lucide-react";
+import { Loader2, MapPin, Search } from "lucide-react";
 
 interface SearchAndFilterBarProps {
   filters: JobFiltersType;
@@ -25,6 +25,8 @@ interface SearchAndFilterBarProps {
   onFilterChange: (updated: Partial<JobFiltersType>) => void;
   onSalaryChange: (label: string) => void;
   onClear: () => void;
+  isSearching?: boolean;
+  isLocationSearching?: boolean;
 }
 
 const SearchAndFilterBar = ({
@@ -33,6 +35,8 @@ const SearchAndFilterBar = ({
   onFilterChange,
   onSalaryChange,
   onClear,
+  isSearching = false,
+  isLocationSearching = false,
 }: SearchAndFilterBarProps) => {
   return (
     <Card className="p-4 md:p-5 lg:p-6 bg-background border border-border">
@@ -48,6 +52,9 @@ const SearchAndFilterBar = ({
               value={filters.search}
               onChange={(e) => onFilterChange({ search: e.target.value })}
             />
+            {isSearching && (
+              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />
+            )}
           </div>
 
           {/* Location */}
@@ -59,6 +66,9 @@ const SearchAndFilterBar = ({
               value={filters.location}
               onChange={(e) => onFilterChange({ location: e.target.value })}
             />
+            {isLocationSearching && (
+              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />
+            )}
           </div>
         </div>
 

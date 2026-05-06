@@ -61,7 +61,13 @@ export async function employerProfilesService(search?: string) {
 
   if (!user) throw new Error("Unauthorized: Please login to continue");
 
-  let query = supabase.from("employers").select("*");
+  let query = supabase
+    .from("employers")
+    .select(
+      "id, auth_id, company_name, company_logo_url, industry, core_values, description, work_email, headquarters_location, company_size, open_positions_count, hiring_status, slug, is_featured",
+    )
+    .order("is_featured", { ascending: false })
+    .order("created_at", { ascending: false });
 
   if (search?.trim()) {
     query = query.ilike("company_name", `%${search.trim()}%`);

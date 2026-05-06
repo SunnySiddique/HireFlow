@@ -80,7 +80,7 @@ export const useSeekerJobs = (filters: JobFiltersType) => {
 
   return useQuery({
     queryKey: ["get-all-jobs", normalized],
-    queryFn: () => seekerJobs(filters),
+    queryFn: () => seekerJobs(normalized),
     staleTime: 1000 * 60 * 5,
     placeholderData: (prevData) => prevData,
   });

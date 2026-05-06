@@ -1,6 +1,7 @@
 "use client";
 
 import Loader from "@/components/Loader";
+import CardSkeleton from "@/components/skeletons/CardSkeleton";
 import { Button } from "@/components/ui/button";
 import { useInterviewFilters } from "@/hooks/interview/useInterviewFilters";
 import { useSeekerAppliedJobs } from "@/hooks/jobs/useSeekerJob";
@@ -14,7 +15,7 @@ const JobSeekerApplicationsPage = () => {
   const { filters, updateFilter, resetFilters } = useInterviewFilters();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const { data, isLoading } = useSeekerAppliedJobs(filters);
+  const { data, isLoading, isFetching } = useSeekerAppliedJobs(filters);
 
   const applications = data?.jobs ?? [];
   const totalPages = data?.totalPages ?? 0;
@@ -68,7 +69,10 @@ const JobSeekerApplicationsPage = () => {
             {statuses.map((f) => (
               <button
                 key={f}
-                onClick={() => updateFilter("status", f)}
+                onClick={() => {
+                  updateFilter("status", f);
+                  updateFilter("page", 1);
+                }}
                 className={cn(
                   "px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold capitalize transition-all whitespace-nowrap",
                   activeStatus === f
@@ -84,8 +88,18 @@ const JobSeekerApplicationsPage = () => {
       </div>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5 xl:gap-6 items-start">
-        {applications.length > 0 ? (
+      <div
+        className={
+          "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5 xl:gap-6 items-start transition-opacity duration-200"
+        }
+      >
+        {isFetching && applications.length === 0 ? (
+          <CardSkeleton
+            rows={4}
+            className="lg:col-span-1"
+            variant="interview"
+          />
+        ) : applications.length > 0 ? (
           applications.map((app, index) => (
             <ApplicationCard
               key={app.id}

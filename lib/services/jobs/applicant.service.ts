@@ -50,6 +50,7 @@ export async function employerApplicantsService(filters?: InterviewFilters) {
             job:job_id(id, job_title),
             seeker:user_id(id, auth_id, full_name, email, profile_url, resume_url, slug)
           `,
+      { count: "exact" },
     )
     .eq("employer_id", user.id)
     .order("applied_at", { ascending: false });

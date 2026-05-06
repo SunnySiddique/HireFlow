@@ -23,7 +23,7 @@ const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
 
   const [filterMode, setFilterMode] = useState<FilterMode>("all");
   const [search, setSearch] = useState("");
-  const debounceSearch = useDebounce(search, 500);
+  const debounceSearch = useDebounce(search, 650);
 
   const { data: seekerData, isLoading: seekerLoading } = useSeekerProfiles(
     !isJobSeeker ? debounceSearch : undefined,
@@ -34,7 +34,6 @@ const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
 
   const isEmployer = (p: Profile): p is Employer => "company_name" in p;
 
-  // Pick the right data source based on role
   const profileData = isJobSeeker ? employerData : seekerData;
   const featuredProfiles = profileData?.featured ?? [];
   const regularProfiles = profileData?.regular ?? [];

@@ -41,7 +41,7 @@ const InterviewHeader = ({
                   updateFilter("status", f);
                 }}
                 className={cn(
-                  "px-2.5 sm:px-3.5 md:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm md:text-base font-semibold capitalize transition-all whitespace-nowrap duration-200",
+                  "px-2 sm:px-3.5 md:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm md:text-[14px] font-semibold capitalize transition-all whitespace-nowrap duration-200",
                   filters.status === f
                     ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
                     : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
@@ -53,7 +53,7 @@ const InterviewHeader = ({
             <div className="ml-auto h-6 w-px bg-border/30 hidden xs:block" />
             <button
               onClick={handleReset}
-              className="px-2.5 sm:px-3.5 md:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm md:text-base font-semibold capitalize transition-all whitespace-nowrap text-muted-foreground hover:bg-muted/60 hover:text-foreground ml-1"
+              className="px-2.5 sm:px-3.5 md:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm md:text-[14px] font-semibold capitalize transition-all whitespace-nowrap text-muted-foreground hover:bg-muted/60 hover:text-foreground ml-1"
             >
               Reset
             </button>

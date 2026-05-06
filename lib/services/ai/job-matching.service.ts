@@ -79,6 +79,7 @@ ${
 
 export async function analyzeResumeAndJobMatchService(resume: any) {
   const jobs = await getFilteredJobsForAIQuery();
+
   const jobsText = formatJobsForAI(jobs);
 
   const userMessage = `
@@ -91,7 +92,7 @@ ${jobsText}
 
   const completion = await openrouter.chat.completions.create({
     model: "meta-llama/llama-3-8b-instruct",
-    temperature: 0.2,
+    temperature: 0.1,
     response_format: { type: "json_object" },
     messages: [
       {
@@ -108,5 +109,21 @@ ${jobsText}
   const rawContent = completion.choices[0]?.message?.content;
   if (!rawContent) throw new Error("No response from AI");
 
-  return JSON.parse(rawContent);
+  let parsed;
+  try {
+    parsed = JSON.parse(rawContent);
+  } catch {
+    const clean = rawContent.replace(/```json|```/g, "").trim();
+    parsed = JSON.parse(clean);
+  }
+
+  if (parsed?.job_matches && Array.isArray(parsed.job_matches)) {
+    parsed.job_matches = parsed.job_matches
+      .filter(
+        (job: any) => job.fit_score >= 60 && job.apply_recommendation !== "NO",
+      )
+      .sort((a: any, b: any) => b.fit_score - a.fit_score);
+  }
+
+  return parsed;
 }

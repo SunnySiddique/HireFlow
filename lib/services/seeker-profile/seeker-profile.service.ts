@@ -70,7 +70,14 @@ export async function getSeekerProfilesService(search?: string) {
 
   if (!user) throw new Error("Unauthorized: Please login to continue");
 
-  let query = supabase.from("job_seekers").select("*").neq("auth_id", user.id);
+  let query = supabase
+    .from("job_seekers")
+    .select(
+      "id, auth_id, full_name, email, profile_url, headline, skills, about, bio, preferred_locations, preferred_job_type, expected_salary_min, expected_salary_max, open_to_work, profile_completion, slug, is_featured",
+    )
+    .neq("auth_id", user.id)
+    .order("is_featured", { ascending: false })
+    .order("created_at", { ascending: false });
 
   if (search?.trim()) {
     query = query.ilike("full_name", `%${search.trim()}%`);

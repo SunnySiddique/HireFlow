@@ -117,13 +117,3 @@ export async function updatePasswordService(
   await supabase.auth.signOut();
   return { success: true, data: undefined };
 }
-
-// ─── Sign Out ──────────────────────────────────────────────────
-export async function signOutService(): Promise<ServiceResult> {
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signOut();
-
-  if (error) return { success: false, code: "SIGNOUT_FAILED" };
-
-  return { success: true, data: undefined };
-}

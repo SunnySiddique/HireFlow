@@ -73,10 +73,11 @@ export async function seekerJobsService(filters: JobFiltersType) {
   }
 
   if (filters.salaryMin !== undefined) {
-    query = query.gte("salary_max", filters.salaryMin);
+    query = query.or(`salary_max.gte.${filters.salaryMin},salary_max.is.null`);
   }
+
   if (filters.salaryMax !== undefined) {
-    query = query.lte("salary_min", filters.salaryMax);
+    query = query.or(`salary_min.lte.${filters.salaryMax},salary_min.is.null`);
   }
 
   if (filters.search) {
@@ -93,25 +94,22 @@ export async function seekerJobsService(filters: JobFiltersType) {
 
   /* ---------------- SORTING ---------------- */
 
-  if (filters.sort !== "all") {
-    if (filters.sort === "recent") {
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-      query = query
-        .gte("created_at", sevenDaysAgo.toISOString())
-        .order("created_at", { ascending: false });
-    } else if (filters.sort === "salary-high") {
-      query = query.order("salary_max", {
-        ascending: false,
-        nullsFirst: false,
-      });
-    } else if (filters.sort === "salary-low") {
-      query = query.order("salary_max", {
-        ascending: true,
-        nullsFirst: false,
-      });
-    }
+  if (filters.sort === "recent") {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    query = query
+      .gte("created_at", sevenDaysAgo.toISOString())
+      .order("created_at", { ascending: false });
+  } else if (filters.sort === "salary-high") {
+    query = query
+      .order("salary_max", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false });
+  } else if (filters.sort === "salary-low") {
+    query = query
+      .order("salary_max", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: false });
+  } else {
+    query = query.order("created_at", { ascending: false });
   }
 
   const { from, to, limit, page } = applyPagination(
@@ -202,15 +200,10 @@ export async function seekerAppliedJobsService(filters?: InterviewFilters) {
         )
       )
     `,
+      { count: "exact" },
     )
     .eq("user_id", user.id);
-
-  if (filters?.search && filters.search.trim()) {
-    query = query.or(
-      `job.job_title.ilike.%${filters.search}%,job.employer.company_name.ilike.%${filters.search}%`,
-      { referencedTable: "job" },
-    );
-  }
+  query = query.order("applied_at", { ascending: false });
 
   if (filters?.status && filters.status !== "all") {
     query = query.eq("status", filters.status);

@@ -24,7 +24,7 @@ import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { ScrollArea } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
-
+import { Skeleton } from "../ui/skeleton";
 interface DashboardNavbarProps {
   role: "job-seeker" | "employer";
   onMenuClick?: () => void;
@@ -37,8 +37,10 @@ const DashboardNavbar = ({
   isSidebarOpen = false,
 }: DashboardNavbarProps) => {
   // hooks
-  const { data: jobSeekerProfile } = useSeekerProfile();
-  const { data: employerProfile } = useEmployerProfile();
+  const { data: jobSeekerProfile, isLoading: seekerLoading } =
+    useSeekerProfile();
+  const { data: employerProfile, isLoading: employerLoading } =
+    useEmployerProfile();
   const { mutate: markNotificationAsRead } = useMarkNotificationAsRead();
   const { mutate: markAllNotificationsAsRead } =
     useMarkAllNotificationsAsRead();
@@ -50,6 +52,23 @@ const DashboardNavbar = ({
 
   const notifications = data?.notifications ?? [];
   const unreadCount = data?.unreadCount ?? 0;
+
+  const isLoading = role === "job-seeker" ? seekerLoading : employerLoading;
+
+  const displayName =
+    role === "job-seeker"
+      ? jobSeekerProfile?.full_name
+      : employerProfile?.company_name;
+
+  const avatarSrc =
+    role === "job-seeker"
+      ? jobSeekerProfile?.profile_url
+      : employerProfile?.company_logo_url;
+
+  const profileHref =
+    role === "job-seeker"
+      ? `/job-seeker/profile/${jobSeekerProfile?.slug ?? "profile"}`
+      : `/employer/profile/${employerProfile?.slug ?? "company"}`;
 
   useEffect(() => {
     const supabase = createClient();
@@ -91,27 +110,26 @@ const DashboardNavbar = ({
   return (
     <div className="px-4 lg:px-8 py-4 bg-background border-b border-border/40 sticky top-0 z-30 backdrop-blur-md">
       <div className="flex flex-row items-center justify-between gap-4">
-        {/* Welcome Text */}
+        {/* Welcome text */}
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-1">
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-1 flex items-center gap-2 flex-wrap">
             Welcome back,{" "}
-            <span className="text-primary">
-              {role === "job-seeker"
-                ? (jobSeekerProfile?.full_name ?? "Jone")
-                : (employerProfile?.company_name ?? "MT")}
-              !
-            </span>
+            {isLoading ? (
+              <Skeleton className="h-8 w-36 rounded-md inline-block" />
+            ) : (
+              <span className="text-primary">{displayName ?? "User"}!</span>
+            )}
           </h1>
           <p className="text-sm lg:text-base text-muted-foreground">
             {role === "job-seeker"
-              ? `Here's what's happening with your job search today.`
-              : `Here's what's happening with your job listings today.`}
+              ? "Here's what's happening with your job search today."
+              : "Here's what's happening with your job listings today."}
           </p>
         </div>
 
-        {/* Quick Search & Notifications */}
+        {/* Right side actions */}
         <div className="flex justify-end items-center gap-3">
-          {/* Bell — sm+ only */}
+          {/* Bell */}
           <div className="hidden sm:block">
             <Popover
               open={isOpenNotificationModal}
@@ -153,15 +171,15 @@ const DashboardNavbar = ({
                 <ScrollArea className="h-[300px] sm:h-[400px]">
                   <div className="flex flex-col">
                     {notifications.map((notification) => (
-                      <a
+                      <Link
+                        key={notification.id}
                         href={
                           getNotificationLink(
                             notification.type ?? "",
                             notification.reference_id ?? "",
                             role,
-                          ) || undefined
+                          ) || "#"
                         }
-                        key={notification.id}
                         onClick={() => {
                           markNotificationAsRead(notification.id as string);
                           setIsOpenNotificationModal(false);
@@ -169,33 +187,20 @@ const DashboardNavbar = ({
                         target="_blank"
                       >
                         <div
-                          className={`p-4 hover:bg-muted/50 cursor-pointer transition-colors relative group ${
-                            !notification.is_read ? "bg-primary/[0.02]" : ""
-                          }`}
+                          className={`p-4 hover:bg-muted/50 cursor-pointer transition-colors relative group ${!notification.is_read ? "bg-primary/[0.02]" : ""}`}
                         >
                           <div className="flex gap-3 sm:gap-4 items-start">
-                            {/* Icon */}
                             <div
-                              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                notification.is_read
-                                  ? "bg-primary/10"
-                                  : "bg-muted"
-                              }`}
+                              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${notification.is_read ? "bg-primary/10" : "bg-muted"}`}
                             >
                               <NotificationIcon
                                 type={notification.type ?? ""}
                               />
                             </div>
-
-                            {/* Text Content */}
                             <div className="flex-1 min-w-0 space-y-1">
                               <div className="flex items-start justify-between gap-2">
                                 <h4
-                                  className={`text-sm font-semibold break-words ${
-                                    notification.is_read
-                                      ? "text-foreground"
-                                      : "text-muted-foreground"
-                                  }`}
+                                  className={`text-sm font-semibold break-words ${notification.is_read ? "text-foreground" : "text-muted-foreground"}`}
                                 >
                                   {notification.title}
                                 </h4>
@@ -203,20 +208,16 @@ const DashboardNavbar = ({
                                   {timeAgo(notification.created_at)}
                                 </span>
                               </div>
-
-                              {/* Message */}
                               <p className="text-xs text-muted-foreground leading-snug break-words max-h-14 overflow-hidden">
                                 {notification.message}
                               </p>
                             </div>
-
-                            {/* Unread indicator */}
                             {!notification.is_read && (
                               <div className="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 bg-primary rounded-full" />
                             )}
                           </div>
                         </div>
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 </ScrollArea>
@@ -243,41 +244,22 @@ const DashboardNavbar = ({
             </Popover>
           </div>
 
+          {/* Avatar */}
           <div className="hidden sm:block">
-            {role === "job-seeker" ? (
-              <Link
-                href={`/job-seeker/profile/${jobSeekerProfile?.slug ?? "profile"}`}
-              >
-                <Avatar className="h-10 w-10 lg:h-12 lg:w-12 border-2 border-primary cursor-pointer hover:scale-105 transition-transform shadow-sm">
-                  {jobSeekerProfile?.profile_url ? (
-                    <AvatarImage
-                      src={jobSeekerProfile?.profile_url || "/placeholder.svg"}
-                      alt={jobSeekerProfile?.full_name || "Job-seeker logo"}
-                    />
-                  ) : (
-                    <AvatarFallback className="bg-primary text-primary-foreground font-bold">
-                      {getInitials(jobSeekerProfile?.full_name ?? "Jone")}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-              </Link>
+            {isLoading ? (
+              // ← skeleton circle while profile loads
+              <Skeleton className="h-10 w-10 lg:h-12 lg:w-12 rounded-full" />
             ) : (
-              <Link
-                href={`/employer/profile/${employerProfile?.slug ?? "company"}`}
-              >
-                <Avatar className="h-10 w-10 lg:h-12 lg:w-12 cursor-pointer hover:scale-105 transition-transform shadow-sm">
-                  {employerProfile?.company_logo_url ? (
+              <Link href={profileHref}>
+                <Avatar className="h-10 w-10 lg:h-12 lg:w-12 border-2 border-primary cursor-pointer hover:scale-105 transition-transform shadow-sm">
+                  {avatarSrc ? (
                     <AvatarImage
-                      src={
-                        employerProfile?.company_logo_url || "/placeholder.svg"
-                      }
-                      alt={employerProfile?.company_name || "Employer logo"}
+                      src={avatarSrc}
+                      alt={displayName ?? "Profile"}
                     />
                   ) : (
                     <AvatarFallback className="bg-primary text-primary-foreground font-bold">
-                      {getInitials(
-                        (employerProfile?.company_name as string) ?? "MT",
-                      )}
+                      {getInitials(displayName ?? "U")}
                     </AvatarFallback>
                   )}
                 </Avatar>
@@ -285,7 +267,7 @@ const DashboardNavbar = ({
             )}
           </div>
 
-          {/* Menu icon — mobile only */}
+          {/* Mobile menu toggle */}
           <div className="block lg:hidden">
             <button
               onClick={onMenuClick}

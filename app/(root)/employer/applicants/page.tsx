@@ -1,6 +1,7 @@
 "use client";
 
 import Loader from "@/components/Loader";
+import CardSkeleton from "@/components/skeletons/CardSkeleton";
 import { Button } from "@/components/ui/button";
 import { useInterviewFilters } from "@/hooks/interview/useInterviewFilters";
 import { useEmployerApplicants } from "@/hooks/jobs/useApplicants";
@@ -13,24 +14,24 @@ import Pagination from "../../job-seeker/jobs/_components/Pagination";
 import { ApplicantCard } from "./_component/ApplicantCard";
 
 const EmployerApplicantsPage = () => {
-  const [filter, setFilter] = useState<applicantFiltersType>("all");
   const [activeTab, setActiveTab] = useState<"active" | "archived">("active");
 
   const { filters, updateFilter, resetFilters } = useInterviewFilters();
+  const { data, isLoading, isFetching } = useEmployerApplicants(filters);
 
-  const { data, isLoading } = useEmployerApplicants(filters);
+  const filter = (filters.status as applicantFiltersType) ?? "all";
 
   const applicants = data?.data ?? [];
   const totalPages = data?.totalPages ?? 0;
 
   const handleReset = () => {
     resetFilters();
-    setFilter("all");
   };
 
   const handleTabChange = (tab: "active" | "archived") => {
     setActiveTab(tab);
     updateFilter("archived", tab === "archived");
+    updateFilter("page", 1);
   };
 
   if (isLoading) return <Loader mode="inline" />;
@@ -98,7 +99,7 @@ const EmployerApplicantsPage = () => {
                 key={f}
                 onClick={() => {
                   updateFilter("status", f);
-                  setFilter(f as applicantFiltersType);
+                  updateFilter("page", 1);
                 }}
                 className={cn(
                   "px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all whitespace-nowrap",
@@ -119,11 +120,20 @@ const EmployerApplicantsPage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6">
-          {applicants.length > 0 ? (
-            applicants.map((applicant) => (
-              <ApplicantCard key={applicant.id} applicant={applicant} />
-            ))
+        <div
+          className={cn(
+            "grid grid-cols-1 gap-6 transition-opacity duration-200",
+            isFetching && "pointer-events-none",
+          )}
+        >
+          {isFetching && applicants.length === 0 ? (
+            <CardSkeleton rows={3} />
+          ) : applicants.length > 0 ? (
+            <div>
+              {applicants.map((applicant) => (
+                <ApplicantCard key={applicant.id} applicant={applicant} />
+              ))}
+            </div>
           ) : (
             <div className="col-span-full py-24 flex flex-col items-center justify-center text-center bg-card/50 rounded-3xl border border-dashed border-border">
               <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-6">

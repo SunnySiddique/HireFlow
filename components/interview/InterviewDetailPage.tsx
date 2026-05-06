@@ -4,6 +4,7 @@ import { getStatusConfig } from "@/constants/interveiwsData";
 import { useInterview } from "@/hooks/interview/useInterview";
 import { cn } from "@/lib/utils";
 import { Calendar, ChevronLeft } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Loader from "../Loader";
 import { Button } from "../ui/button";
@@ -61,13 +62,17 @@ const InterviewDetailPage = ({
       {/* Header Area */}
       <div className="bg-card border-b border-border/50 sticky top-0 z-40 backdrop-blur-xl bg-card/80">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <button
-            onClick={() => router.push("/job-seeker/interviews")}
+          <Link
+            href={`${
+              role === "seeker"
+                ? "/job-seeker/interviews"
+                : "/employer/interviews"
+            }`}
             className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
             Back to Interviews
-          </button>
+          </Link>
 
           <div
             className={cn(

@@ -109,7 +109,7 @@ export const ApplicantCard = ({
   };
 
   return (
-    <>
+    <div className="mt-4">
       <ApplicantDialog
         key={selectedApplicant?.id}
         applicant={selectedApplicant}
@@ -280,6 +280,6 @@ export const ApplicantCard = ({
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };

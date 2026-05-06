@@ -7,6 +7,7 @@ import { hasAccess } from "@/lib/utils";
 import { JobFiltersType } from "@/types/jobs";
 import { useState } from "react";
 
+import JobCardSkeleton from "@/components/jobs/JobCardSkeleton";
 import Loader from "@/components/Loader";
 import { useSeekerJobs } from "@/hooks/jobs/useSeekerJob";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -34,24 +35,33 @@ const BrowseJobs = () => {
 
   const [salaryLabel, setSalaryLabel] = useState("any");
 
-  const debouncedSearch = useDebounce(filters.search, 500);
-  const debouncedLocation = useDebounce(filters.location, 500);
+  const debouncedSearch = useDebounce(filters.search, 400);
+  const debouncedLocation = useDebounce(filters.location, 400);
 
-  const { data = { jobs: [], totalCount: 0, totalPages: 0 }, isLoading } =
-    useSeekerJobs({
-      ...filters,
-      search: debouncedSearch,
-      location: debouncedLocation,
-    });
+  const isSearching = filters.search !== debouncedSearch;
+  const isLocationSearching = filters.location !== debouncedLocation;
+
+  const {
+    data = { jobs: [], totalCount: 0, totalPages: 0 },
+    isLoading,
+    isFetching,
+  } = useSeekerJobs({
+    ...filters,
+    search: debouncedSearch,
+    location: debouncedLocation,
+  });
 
   const { jobs, totalCount, totalPages } = data;
 
   const featuredJobs = jobs.filter((job) => job.is_featured);
   const regularJobs = jobs.filter((job) => !job.is_featured);
 
-  const activeJobs = filters.featured
-    ? featuredJobs
-    : [...featuredJobs, ...regularJobs];
+  const activeJobs = (() => {
+    if (filters.featured) return featuredJobs;
+    if (filters.sort !== "all") return jobs;
+
+    return [...featuredJobs, ...regularJobs];
+  })();
 
   const updateFilters = (updated: Partial<typeof filters>) => {
     setFilters((prev) => ({ ...prev, ...updated, page: 1 }));
@@ -64,7 +74,8 @@ const BrowseJobs = () => {
       return;
     }
     const selected = SALARY_RANGES.find((s) => s.label === label);
-    updateFilters({ salaryMin: selected?.min, salaryMax: selected?.max });
+    if (!selected) return;
+    updateFilters({ salaryMin: selected.min, salaryMax: selected.max });
   };
 
   const clearFilters = () => {
@@ -78,16 +89,24 @@ const BrowseJobs = () => {
       salaryMin: undefined,
       salaryMax: undefined,
       page: 1,
-      limit: 10,
+      limit: 5,
       sort: "all",
       featured: false,
     });
   };
-
+  console.log({
+    totalCount,
+    totalPages,
+    page: filters.page,
+    limit: filters.limit,
+    jobsLength: jobs.length,
+  });
   const isSubscribed = hasAccess(
     subscription?.subscription_status as string,
     subscription?.plan_expires_at as string,
   );
+
+  const showSkeleton = isFetching && !isLoading;
 
   if (isLoading) return <Loader mode="inline" />;
   return (
@@ -107,6 +126,8 @@ const BrowseJobs = () => {
         onFilterChange={updateFilters}
         onSalaryChange={updateSalary}
         onClear={clearFilters}
+        isSearching={isSearching}
+        isLocationSearching={isLocationSearching}
       />
 
       <JobTopBar
@@ -118,7 +139,15 @@ const BrowseJobs = () => {
         onFeaturedChange={(val) => updateFilters({ featured: val })}
       />
 
-      {jobs.length === 0 ? (
+      {showSkeleton ? (
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <JobCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      ) : jobs.length === 0 ? (
         <NoJobsFound />
       ) : (
         <div className="space-y-6">

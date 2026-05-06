@@ -4,7 +4,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   ChevronLeft,
   ChevronRight,
-  Loader2,
   LogOut,
   MoreVertical,
   X,
@@ -28,47 +27,38 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FREE_LINKS, jobSeekerLinks } from "@/constants";
 import { employerLinks } from "@/constants/employerData";
-import { useSignOut } from "@/hooks/auth/useAuth";
-import { useEmployerProfile } from "@/hooks/employer-profile/useEmployer";
-import { useSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
-import { useGetCurrentUserSubscription } from "@/hooks/stripe/useSubscripiton";
+import { signOut } from "@/lib/action/auth/auth.actions";
 import { getInitials, hasAccess } from "@/lib/utils";
 import { randomImage } from "@/lib/utils/randomImage";
+import { UserSubscription } from "@/types";
+import { Employer } from "@/types/employer";
+import { JobSeekerProfile } from "@/types/job-seeker";
 import { Check, MonitorIcon, Moon, PaletteIcon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
-import Loader from "../Loader";
+import { useState, useTransition } from "react";
+import toast from "react-hot-toast";
 
 interface DashboardSidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   role: "job-seeker" | "employer";
+  seekerProfile: JobSeekerProfile | null;
+  employerProfile: Employer | null;
+  subscription: UserSubscription | null;
 }
 
 const DashboardSidebar = ({
   sidebarOpen,
   setSidebarOpen,
   role,
+  employerProfile,
+  seekerProfile,
+  subscription,
 }: DashboardSidebarProps) => {
-  // hook
-  const { data: jobSeekerProfile, isLoading: seekerLoading } = useSeekerProfile(
-    {
-      enabled: role === "job-seeker",
-    },
-  );
-  const { data: employerProfile, isLoading: employerLoading } =
-    useEmployerProfile({
-      enabled: role === "employer",
-    });
-
-  const { data: subscription, isLoading: subLoading } =
-    useGetCurrentUserSubscription();
-
-  const { mutateAsync: signOut, isPending } = useSignOut();
-
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   // state
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -82,13 +72,14 @@ const DashboardSidebar = ({
     subscription?.plan_expires_at as string,
   );
 
-  const handleLogout = async () => {
-    await signOut();
+  const handleLogout = () => {
+    startTransition(async () => {
+      await signOut();
+      toast.success("Signed out successfully");
+      router.push("/auth/signin");
+    });
   };
-
-  const isActive = (href: string) => {
-    return pathname === href;
-  };
+  const isActive = (href: string) => pathname === href;
 
   const links = role === "employer" ? employerLinks : jobSeekerLinks;
 
@@ -113,7 +104,7 @@ const DashboardSidebar = ({
       typeof link.href === "function"
         ? link.href(
             role === "job-seeker"
-              ? (jobSeekerProfile?.slug ?? "")
+              ? (seekerProfile?.slug ?? "")
               : (employerProfile?.slug ?? ""),
           )
         : link.href;
@@ -139,23 +130,53 @@ const DashboardSidebar = ({
     );
   };
 
-  const isLoading =
-    subLoading || (role === "job-seeker" ? seekerLoading : employerLoading);
+  const profileSlug =
+    role === "job-seeker" ? seekerProfile?.slug : employerProfile?.slug;
+  const displayName =
+    role === "job-seeker"
+      ? (seekerProfile?.full_name ?? "User")
+      : (employerProfile?.company_name ?? "Company");
+  const avatarSrc =
+    role === "job-seeker"
+      ? seekerProfile?.profile_url
+      : employerProfile?.company_logo_url;
+  const avatarAlt =
+    role === "job-seeker"
+      ? (seekerProfile?.full_name ?? "User Profile")
+      : (employerProfile?.company_name ?? "Company Profile");
 
-  if (isLoading) return <Loader mode="full" />;
+  const AvatarUI = (size: "sm" | "lg" = "lg") => (
+    <Avatar
+      className={`${size === "lg" ? "h-10 w-10" : "h-8 w-8"} flex-shrink-0`}
+    >
+      {avatarSrc ? (
+        <AvatarImage
+          src={avatarSrc || randomImage(displayName)}
+          alt={avatarAlt}
+        />
+      ) : (
+        <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+          {getInitials(displayName)}
+        </AvatarFallback>
+      )}
+    </Avatar>
+  );
+
   return (
     <>
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/75 bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/75 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
+
       <aside
         className={`fixed lg:static inset-y-0 left-0 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col z-40 transition-all duration-300
-${isCollapsed ? "w-24" : "w-60"}
-${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+          ${isCollapsed ? "w-24" : "w-60"}
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
+        {/* Collapse toggle */}
         <button
           onClick={() => setIsCollapsed((prev) => !prev)}
           className="hidden lg:flex absolute -right-4 top-6 w-8 h-8 rounded-full bg-sidebar border border-sidebar-border items-center justify-center text-sidebar-foreground z-50 hover:bg-sidebar-accent transition-colors shadow-sm"
@@ -166,6 +187,7 @@ ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
             <ChevronLeft className="w-4 h-4" />
           )}
         </button>
+
         {/* Logo */}
         <div
           className={`p-4 lg:p-6 flex items-center border-b border-sidebar-border transition-all duration-300 ${
@@ -191,23 +213,18 @@ ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
         </div>
 
         {/* Navigation */}
-
         <nav
-          className={`flex-1 overflow-y-auto p-4 ${isCollapsed ? "space-y-0" : "space-y-6"} `}
+          className={`flex-1 overflow-y-auto p-4 ${isCollapsed ? "space-y-0" : "space-y-6"}`}
         >
-          {/* Main Section */}
           <div>
             {!isCollapsed && (
-              <p
-                className={`text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-3 px-2`}
-              >
+              <p className="text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-3 px-2">
                 Main
               </p>
             )}
             <div className="space-y-1">{mainLinks.map(renderLink)}</div>
           </div>
 
-          {/* Manage Section */}
           <div>
             {!isCollapsed && (
               <p className="text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-3 px-2">
@@ -228,47 +245,12 @@ ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
                   isCollapsed ? "px-0 justify-center" : "px-3 justify-start"
                 }`}
               >
-                {role === "job-seeker" ? (
-                  <Avatar className="h-10 w-10 flex-shrink-0">
-                    {jobSeekerProfile?.profile_url ? (
-                      <AvatarImage
-                        src={
-                          jobSeekerProfile?.profile_url ||
-                          randomImage(jobSeekerProfile?.full_name)
-                        }
-                        alt={jobSeekerProfile?.full_name || "User Profile"}
-                      />
-                    ) : (
-                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                        {getInitials(jobSeekerProfile?.full_name ?? "Jhon")}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                ) : (
-                  <Avatar className="h-10 w-10 flex-shrink-0">
-                    {employerProfile?.company_logo_url ? (
-                      <AvatarImage
-                        src={
-                          employerProfile?.company_logo_url ||
-                          randomImage(employerProfile?.company_name)
-                        }
-                        alt={employerProfile?.company_name || "Company Profile"}
-                      />
-                    ) : (
-                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                        {getInitials(employerProfile?.company_name ?? "CO")}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                )}
-
+                {AvatarUI()}
                 {!isCollapsed && (
                   <>
                     <div className="flex-1 text-left ml-3 min-w-0">
                       <p className="text-sm font-semibold text-foreground truncate">
-                        {role === "job-seeker"
-                          ? (jobSeekerProfile?.full_name ?? "User")
-                          : (employerProfile?.company_name ?? "Company")}
+                        {displayName}
                       </p>
                       <p className="text-xs text-muted-foreground truncate">
                         {role === "job-seeker" ? "Job Seeker" : "Employer"}
@@ -281,103 +263,52 @@ ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-56">
-              {/* User Info */}
+              {/* User info header */}
               <div
                 className="flex items-center gap-3 px-2 py-3 cursor-pointer"
-                onClick={() =>
-                  router.push(
-                    `/${role}/profile/${role === "job-seeker" ? jobSeekerProfile?.slug : employerProfile?.slug}`,
-                  )
-                }
+                onClick={() => router.push(`/${role}/profile/${profileSlug}`)}
               >
-                {role === "job-seeker" ? (
-                  <Avatar className="h-10 w-10 flex-shrink-0 cursor-pointer ">
-                    {jobSeekerProfile?.profile_url ? (
-                      <AvatarImage
-                        src={
-                          jobSeekerProfile?.profile_url ||
-                          randomImage(jobSeekerProfile?.full_name)
-                        }
-                        alt={jobSeekerProfile?.full_name || "User Profile"}
-                      />
-                    ) : (
-                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                        {getInitials(jobSeekerProfile?.full_name ?? "User")}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                ) : (
-                  <Avatar className="h-10 w-10 flex-shrink-0 cursor-pointer">
-                    {employerProfile?.company_logo_url ? (
-                      <AvatarImage
-                        src={
-                          employerProfile?.company_logo_url ||
-                          randomImage(employerProfile?.company_name)
-                        }
-                        alt={employerProfile?.company_name || "User Profile"}
-                      />
-                    ) : (
-                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                        {getInitials(employerProfile?.company_name ?? "User")}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                )}
-
-                <div className="flex flex-col gap-0.5">
-                  <p className="text-sm font-semibold text-foreground">
-                    {role === "job-seeker"
-                      ? (jobSeekerProfile?.full_name ?? "JB")
-                      : (employerProfile?.company_name ?? "CM")}
-                  </p>
-                </div>
+                {AvatarUI()}
+                <p className="text-sm font-semibold text-foreground">
+                  {displayName}
+                </p>
               </div>
 
               <DropdownMenuSeparator />
+
+              {/* Theme switcher */}
               <DropdownMenuGroup>
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
-                    <PaletteIcon />
+                    <PaletteIcon className="w-4 h-4 mr-2" />
                     Theme
                   </DropdownMenuSubTrigger>
-
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent className="w-44">
                       <DropdownMenuLabel>Appearance</DropdownMenuLabel>
-
-                      <DropdownMenuItem
-                        onClick={() => setTheme("light")}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <Sun className="w-4 h-4" />
-                        <span>Light</span>
-                        {theme === "light" && (
-                          <Check className="w-4 h-4 ml-auto text-primary" />
-                        )}
-                      </DropdownMenuItem>
-
-                      <DropdownMenuItem
-                        onClick={() => setTheme("dark")}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <Moon className="w-4 h-4" />
-                        <span>Dark</span>
-                        {theme === "dark" && (
-                          <Check className="w-4 h-4 ml-auto text-primary" />
-                        )}
-                      </DropdownMenuItem>
-
-                      <DropdownMenuItem
-                        onClick={() => setTheme("system")}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <MonitorIcon />
-
-                        <span>System</span>
-                        {theme === "system" && (
-                          <Check className="w-4 h-4 ml-auto text-primary" />
-                        )}
-                      </DropdownMenuItem>
+                      {(
+                        [
+                          { value: "light", label: "Light", Icon: Sun },
+                          { value: "dark", label: "Dark", Icon: Moon },
+                          {
+                            value: "system",
+                            label: "System",
+                            Icon: MonitorIcon,
+                          },
+                        ] as const
+                      ).map(({ value, label, Icon }) => (
+                        <DropdownMenuItem
+                          key={value}
+                          onClick={() => setTheme(value)}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
+                          <Icon className="w-4 h-4" />
+                          <span>{label}</span>
+                          {theme === value && (
+                            <Check className="w-4 h-4 ml-auto text-primary" />
+                          )}
+                        </DropdownMenuItem>
+                      ))}
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
@@ -385,23 +316,13 @@ ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
 
               <DropdownMenuSeparator />
 
-              {/* Logout Option */}
+              {/* Logout */}
               <DropdownMenuItem
                 className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
                 onClick={handleLogout}
-                disabled={isPending}
               >
-                {isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Logging Out...</span>
-                  </>
-                ) : (
-                  <>
-                    <LogOut className="w-4 h-4" />
-                    <span>Logout</span>
-                  </>
-                )}
+                <LogOut className="w-4 h-4 mr-2" />
+                <span>Logout</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

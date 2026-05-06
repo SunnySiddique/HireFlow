@@ -97,36 +97,6 @@ const ManageSubscription = ({
             </div>
           )}
         </div>
-        {/* <div className="p-6 sm:p-8 border rounded-lg bg-background">
-          <h3 className="text-lg font-bold mb-2">Subscription Cost</h3>
-          <p className="text-2xl font-extrabold mb-2">
-            {subCost?.price ?? "0"}
-          </p>
-          <p className="text-sm text-muted-foreground mb-4">per month</p>
-
-          {subscription?.subscription_status === "cancelling" ? (
-            <div className="text-sm text-yellow-600 font-medium">
-              You have cancelled your subscription. You will retain access until{" "}
-              {subscription?.plan_expires_at
-                ? new Date(subscription.plan_expires_at).toLocaleDateString()
-                : "the end of your current period"}
-              .
-            </div>
-          ) : subscription?.subscription_status === "active" ? (
-            <div className="text-sm text-muted-foreground">
-              Next Renewal:{" "}
-              {subscription?.plan_expires_at
-                ? new Date(subscription.plan_expires_at).toLocaleDateString()
-                : "-"}
-              <br />
-              Your card will be charged automatically.
-            </div>
-          ) : (
-            <div className="text-sm text-muted-foreground">
-              You do not have an active subscription.
-            </div>
-          )}
-        </div> */}
 
         {/* Footer / Actions */}
 

@@ -1,59 +1,56 @@
 import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const JobCardSkeleton = () => {
   return (
-    <Card className="bg-card border border-border overflow-hidden mb-5">
-      <div className="p-6 space-y-5">
+    <Card className="p-0 relative w-full rounded-xl border border-border bg-card text-card-foreground overflow-hidden">
+      <div className="p-4 flex flex-col gap-3">
         {/* Header */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-4 flex-1 min-w-0">
-            {/* Company Logo */}
-            <Skeleton className="w-14 h-14 rounded-xl flex-shrink-0" />
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            {/* Avatar (h-10 w-10 rounded-lg) */}
+            <Skeleton className="h-10 w-10 rounded-lg flex-shrink-0" />
 
-            {/* Title + Company + Badges */}
-            <div className="flex-1 min-w-0 space-y-2">
-              <Skeleton className="h-5 w-3/4" />
-              <Skeleton className="h-4 w-1/3" />
-              <div className="flex gap-2 mt-2">
-                <Skeleton className="h-5 w-20 rounded-full" />
-                <Skeleton className="h-5 w-16 rounded-full" />
-                <Skeleton className="h-5 w-14 rounded-full" />
-              </div>
+            {/* Title + Company */}
+            <div className="flex-1 min-w-0 space-y-1.5">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-3 w-1/2" />
             </div>
           </div>
 
-          {/* Save Button */}
-          <Skeleton className="w-9 h-9 rounded-md flex-shrink-0" />
+          {/* Save Button (h-7 w-7) */}
+          <Skeleton className="h-7 w-7 rounded-md flex-shrink-0" />
         </div>
 
-        {/* Description */}
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-5/6" />
+        {/* Description (line-clamp-2) */}
+        <div className="space-y-1.5">
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-3 w-11/12" />
         </div>
 
-        {/* Meta Section */}
-        <div className="flex flex-wrap items-center gap-6">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-4 w-28" />
-          <Skeleton className="h-4 w-20" />
+        {/* Type badges (text-[10px] px-2 py-0.5) */}
+        <div className="flex flex-wrap gap-1.5">
+          <Skeleton className="h-[18px] w-16 rounded-sm" />
+          <Skeleton className="h-[18px] w-20 rounded-sm" />
+          <Skeleton className="h-[18px] w-14 rounded-sm" />
         </div>
 
-        {/* Skills */}
-        <div className="flex flex-wrap gap-2">
-          <Skeleton className="h-5 w-16 rounded-full" />
-          <Skeleton className="h-5 w-20 rounded-full" />
-          <Skeleton className="h-5 w-14 rounded-full" />
+        {/* Skills (text-[10px] px-1.5 py-0.5) */}
+        <div className="flex flex-wrap gap-1">
+          <Skeleton className="h-[18px] w-12 rounded-sm" />
+          <Skeleton className="h-[18px] w-16 rounded-sm" />
+          <Skeleton className="h-[18px] w-14 rounded-sm" />
+          <Skeleton className="h-[18px] w-10 rounded-sm" />
         </div>
 
-        <Separator className="bg-border" />
-
-        {/* Footer */}
+        {/* Salary + CTA */}
         <div className="flex items-center justify-between">
-          <Skeleton className="h-4 w-28" />
-          <Skeleton className="h-9 w-32 rounded-md" />
+          <div className="space-y-1">
+            <Skeleton className="h-2.5 w-16" />
+            <Skeleton className="h-4 w-24" />
+          </div>
+          {/* Button (h-7 px-3) */}
+          <Skeleton className="h-7 w-24 rounded-lg" />
         </div>
       </div>
     </Card>
