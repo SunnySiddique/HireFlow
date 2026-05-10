@@ -10,6 +10,7 @@ import {
   updateInterviewStatusService,
 } from "@/lib/services/interview/interview.service";
 import { InterviewFilters, InterviewInvite } from "@/types/interview";
+import { getServerUser } from "../auth/serverAuth";
 
 export async function sendInterviewInvite(interview: InterviewInvite) {
   return sendInterviewInviteService(interview);
@@ -44,7 +45,10 @@ export async function interivew(interviewId: string) {
 
 // upcoming interview
 export async function upcomingInterviews(isView: boolean) {
-  return upcomingInterviewsService(isView);
+  const { user } = await getServerUser();
+  if (!user) throw new Error("UNAUTHROIZED PLS LOGIN");
+
+  return upcomingInterviewsService(isView, user.id);
 }
 
 // send interview before interview start

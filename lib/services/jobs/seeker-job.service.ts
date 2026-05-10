@@ -1,6 +1,7 @@
 import { getServerUser } from "@/lib/action/auth/serverAuth";
 import { applyPagination } from "@/lib/pagination/pagination";
 import { createClient } from "@/lib/supabase/server";
+import { serviceClient } from "@/lib/supabase/service";
 import { InterviewFilters } from "@/types/interview";
 import { JobFiltersType } from "@/types/jobs";
 
@@ -332,7 +333,7 @@ export async function seekerSavedJobsService(filters?: InterviewFilters) {
 
 // seeker recent jobs
 export async function seekerRecentJobsService() {
-  const supabase = await createClient();
+  const supabase = await serviceClient;
 
   const { data, error: jobError } = await supabase
     .from("jobs")
@@ -363,15 +364,13 @@ export async function seekerRecentJobsService() {
 }
 
 // seeker recommended jobs
-export async function seekerRecommendedJobsService() {
-  const { supabase, user } = await getServerUser();
-
-  if (!user) throw new Error("Unauthorized: Please login to continue");
+export async function seekerRecommendedJobsService(userId: string) {
+  const supabase = await serviceClient;
 
   const { data: jobSeeker, error: jobSeekerError } = await supabase
     .from("job_seekers")
     .select("skills")
-    .eq("auth_id", user.id)
+    .eq("auth_id", userId)
     .maybeSingle();
 
   if (jobSeekerError || !jobSeeker) {

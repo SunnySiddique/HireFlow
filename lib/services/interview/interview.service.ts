@@ -1,6 +1,7 @@
 import { getServerUser } from "@/lib/action/auth/serverAuth";
 import { applyPagination } from "@/lib/pagination/pagination";
 import { createClient } from "@/lib/supabase/server";
+import { serviceClient } from "@/lib/supabase/service";
 import {
   Interview,
   InterviewFilters,
@@ -215,10 +216,11 @@ export async function interivewService(interviewId: string) {
 }
 
 // upcoming interview
-export async function upcomingInterviewsService(isView: boolean) {
-  const { supabase, user } = await getServerUser();
-
-  if (!user) throw new Error("Unauthorized: Please login to continue");
+export async function upcomingInterviewsService(
+  isView: boolean,
+  userId: string,
+) {
+  const supabase = await serviceClient;
 
   const now = new Date().toISOString();
 
@@ -236,7 +238,7 @@ export async function upcomingInterviewsService(isView: boolean) {
           )
         `,
     )
-    .eq("seeker_id", user.id)
+    .eq("seeker_id", userId)
     .eq("status", "upcoming")
     .gte("scheduled_at", now)
     .order("scheduled_at", { ascending: true });

@@ -1,22 +1,19 @@
 "use server";
 
 import { getServerUser } from "../action/auth/serverAuth";
+import {
+  getCachedActiveJobs,
+  getCachedChartData,
+  getCachedEmployerStats,
+  getCachedInterviews,
+  getCachedRecentApplicants,
+  getCachedRecentJobs,
+  getCachedRecommendedJobs,
+  getCachedSeekerStats,
+  getCachedSubscription,
+} from "../services/dashboard/cachedServices.service";
 import { employerProfileService } from "../services/employer-profile/employer-profile.service";
-import { upcomingInterviewsService } from "../services/interview/interview.service";
-import {
-  activeJobsService,
-  chartApplicantsService,
-  recentJobsService,
-} from "../services/jobs/employer-job.service";
-import {
-  seekerRecentJobsService,
-  seekerRecommendedJobsService,
-} from "../services/jobs/seeker-job.service";
 import { seekerProfileService } from "../services/seeker-profile/seeker-profile.service";
-import {
-  employerApplicationStatsService,
-  seekerApplicationStatsService,
-} from "../services/stats/stats.service";
 import { getMySubscriptionService } from "../services/stripe/stripe.service";
 
 export async function getEmployerDashboardData() {
@@ -25,11 +22,11 @@ export async function getEmployerDashboardData() {
 
   const [subscription, jobs, chartData, recentApplicants, stats] =
     await Promise.all([
-      getMySubscriptionService(),
-      activeJobsService(),
-      chartApplicantsService(),
-      recentJobsService(),
-      employerApplicationStatsService(),
+      getCachedSubscription(user.id),
+      getCachedActiveJobs(user.id),
+      getCachedChartData(user.id),
+      getCachedRecentApplicants(user.id),
+      getCachedEmployerStats(user.id),
     ]);
 
   return { subscription, jobs, chartData, recentApplicants, stats };
@@ -41,11 +38,11 @@ export async function getSeekerDashboardData() {
 
   const [subscription, interviews, recentJobs, recommendedJobs, stats] =
     await Promise.all([
-      getMySubscriptionService(),
-      upcomingInterviewsService(true),
-      seekerRecentJobsService(),
-      seekerRecommendedJobsService(),
-      seekerApplicationStatsService(),
+      getCachedSubscription(user.id),
+      getCachedInterviews(user.id),
+      getCachedRecentJobs(),
+      getCachedRecommendedJobs(user.id),
+      getCachedSeekerStats(user.id),
     ]);
 
   return { subscription, interviews, recentJobs, recommendedJobs, stats };

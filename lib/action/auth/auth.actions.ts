@@ -1,6 +1,7 @@
 "use server";
 
 import { EmployerAuth, JobSeekerAuth } from "@/types/auth";
+import { redirect } from "next/navigation";
 import {
   createUserService,
   forgotPasswordService,
@@ -39,4 +40,5 @@ export async function updatePassword(password: string) {
 export async function signOut() {
   const { supabase } = await getServerUser();
   await supabase.auth.signOut();
+  redirect("/auth/signin");
 }

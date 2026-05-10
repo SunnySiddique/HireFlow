@@ -12,6 +12,7 @@ import {
 } from "@/lib/services/jobs/seeker-job.service";
 import { InterviewFilters } from "@/types/interview";
 import { JobFiltersType } from "@/types/jobs";
+import { getServerUser } from "../auth/serverAuth";
 
 export async function applyJob(jobId: string, coverLetter: string) {
   return applyJobService(jobId, coverLetter);
@@ -49,5 +50,8 @@ export async function seekerRecentJobs() {
 
 // seeker recommended jobs
 export async function seekerRecommendedJobs() {
-  return seekerRecommendedJobsService();
+  const { user } = await getServerUser();
+  if (!user) throw new Error("UNAUTHROIZED PLS LOGIN");
+
+  return seekerRecommendedJobsService(user.id);
 }

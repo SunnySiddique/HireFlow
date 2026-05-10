@@ -10,8 +10,6 @@ const EmployerDashboardPage = async () => {
   const { subscription, jobs, chartData, recentApplicants, stats } =
     await getEmployerDashboardData();
 
-  // if (isLoading) return <Loader mode="full" />;
-
   const isSubscribed = hasAccess(
     subscription?.subscription_status as string,
     subscription?.plan_expires_at as string,

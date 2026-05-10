@@ -12,6 +12,7 @@ import {
   updateJobPostService,
   updateJobStatusService,
 } from "../../services/jobs/employer-job.service";
+import { getServerUser } from "../auth/serverAuth";
 
 export async function employerJobs(filters: { page: number; limit: number }) {
   return employerJobsService(filters);
@@ -44,15 +45,24 @@ export async function deleteJobPost(jobId: string) {
 
 // active jobs
 export async function activeJobs() {
-  return activeJobsService();
+  const { user } = await getServerUser();
+  if (!user) throw new Error("UNAUTHROIZED PLS LOGIN");
+
+  return activeJobsService(user.id);
 }
 
 // recent job
 export async function recentJobs() {
-  return recentJobsService();
+  const { user } = await getServerUser();
+  if (!user) throw new Error("UNAUTHROIZED PLS LOGIN");
+
+  return recentJobsService(user.id);
 }
 
 // chart applicants job
 export async function chartApplicants() {
-  return chartApplicantsService();
+  const { user } = await getServerUser();
+  if (!user) throw new Error("UNAUTHROIZED PLS LOGIN");
+
+  return chartApplicantsService(user.id);
 }
