@@ -1,10 +1,8 @@
-import { getServerUser } from "@/lib/action/auth/serverAuth";
+import { serviceClient } from "@/lib/supabase/service";
 import { startOfMonth, startOfWeek } from "date-fns";
 
-export async function seekerApplicationStatsService() {
-  const { supabase, user } = await getServerUser();
-
-  if (!user) throw new Error("Unauthorized: Please login to continue");
+export async function seekerApplicationStatsService(userId: string) {
+  const supabase = await serviceClient;
 
   const pastWeekDate = startOfWeek(new Date(), { weekStartsOn: 1 });
   const pastMonth = startOfMonth(new Date());
@@ -18,23 +16,23 @@ export async function seekerApplicationStatsService() {
     supabase
       .from("applicants")
       .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("applied_at", pastWeekDate.toISOString()),
     supabase
       .from("save_jobs")
       .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("saved_at", pastMonth.toISOString()),
     supabase
       .from("profile_views")
       .select("*", { count: "exact", head: true })
-      .eq("target_id", user.id)
+      .eq("target_id", userId)
       .eq("target_type", "seeker")
       .gte("viewed_at", pastWeekDate.toISOString()),
     supabase
       .from("interviews")
       .select("*", { count: "exact", head: true })
-      .eq("seeker_id", user.id)
+      .eq("seeker_id", userId)
       .gte("scheduled_at", pastWeekDate.toISOString()),
   ]);
 
@@ -47,26 +45,16 @@ export async function seekerApplicationStatsService() {
 }
 
 // employer
-export async function employerApplicationStatsService() {
-  const { supabase, user } = await getServerUser();
+export async function employerApplicationStatsService(userId: string) {
+  const supabase = await serviceClient;
 
-  if (!user) throw new Error("Unauthorized: Please login to continue");
-
-  const userId = user.id;
-  const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-
-  const { data: jobs } = await supabase
-    .from("jobs")
-    .select("id")
-    .eq("employer_id", userId);
-
-  const jobIds = jobs?.map((j) => j.id) ?? [];
+  const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 }).toISOString();
 
   const [
-    { count: totalActiveJobs = 0 },
-    { count: weeklyApplicants = 0 },
-    { count: totalProfileViews = 0 },
-    jobViews,
+    { count: totalActiveJobs },
+    { count: weeklyApplicants },
+    { count: totalProfileViews },
+    { count: weeklyJobViews },
   ] = await Promise.all([
     supabase
       .from("jobs")
@@ -78,28 +66,26 @@ export async function employerApplicationStatsService() {
       .from("applicants")
       .select("*", { count: "exact", head: true })
       .eq("employer_id", userId)
-      .gte("applied_at", weekStart.toISOString()),
+      .gte("applied_at", weekStart),
 
     supabase
       .from("profile_views")
       .select("*", { count: "exact", head: true })
       .eq("target_id", userId)
       .eq("target_type", "employer")
-      .gte("viewed_at", weekStart.toISOString()),
+      .gte("viewed_at", weekStart),
 
-    jobIds.length
-      ? supabase
-          .from("job_views")
-          .select("*", { count: "exact", head: true })
-          .in("job_id", jobIds)
-          .gte("viewed_at", weekStart.toISOString())
-      : Promise.resolve({ count: 0 }),
+    supabase
+      .from("job_views")
+      .select("*", { count: "exact", head: true })
+      .eq("employer_id", userId)
+      .gte("viewed_at", weekStart),
   ]);
 
   return {
-    totalActiveJobs,
-    weeklyApplicants,
-    totalProfileViews,
-    weeklyJobViews: jobViews?.count ?? 0,
+    totalActiveJobs: totalActiveJobs ?? 0,
+    weeklyApplicants: weeklyApplicants ?? 0,
+    totalProfileViews: totalProfileViews ?? 0,
+    weeklyJobViews: weeklyJobViews ?? 0,
   };
 }

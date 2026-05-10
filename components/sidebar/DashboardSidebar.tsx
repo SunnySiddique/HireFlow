@@ -1,6 +1,5 @@
 "use client";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,7 +9,6 @@ import {
   Zap,
 } from "lucide-react";
 
-import { AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,8 +26,7 @@ import {
 import { FREE_LINKS, jobSeekerLinks } from "@/constants";
 import { employerLinks } from "@/constants/employerData";
 import { signOut } from "@/lib/action/auth/auth.actions";
-import { getInitials, hasAccess } from "@/lib/utils";
-import { randomImage } from "@/lib/utils/randomImage";
+import { hasAccess } from "@/lib/utils";
 import { UserSubscription } from "@/types";
 import { Employer } from "@/types/employer";
 import { JobSeekerProfile } from "@/types/job-seeker";
@@ -38,7 +35,7 @@ import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import toast from "react-hot-toast";
+import SidebarAvatar from "./SidebarAvatar";
 
 interface DashboardSidebarProps {
   sidebarOpen: boolean;
@@ -74,9 +71,8 @@ const DashboardSidebar = ({
 
   const handleLogout = () => {
     startTransition(async () => {
-      await signOut();
-      toast.success("Signed out successfully");
       router.push("/auth/signin");
+      await signOut();
     });
   };
   const isActive = (href: string) => pathname === href;
@@ -144,23 +140,6 @@ const DashboardSidebar = ({
     role === "job-seeker"
       ? (seekerProfile?.full_name ?? "User Profile")
       : (employerProfile?.company_name ?? "Company Profile");
-
-  const AvatarUI = (size: "sm" | "lg" = "lg") => (
-    <Avatar
-      className={`${size === "lg" ? "h-10 w-10" : "h-8 w-8"} flex-shrink-0`}
-    >
-      {avatarSrc ? (
-        <AvatarImage
-          src={avatarSrc || randomImage(displayName)}
-          alt={avatarAlt}
-        />
-      ) : (
-        <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-          {getInitials(displayName)}
-        </AvatarFallback>
-      )}
-    </Avatar>
-  );
 
   return (
     <>
@@ -241,16 +220,46 @@ const DashboardSidebar = ({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
+                disabled={isPending}
                 className={`w-full h-auto py-2 rounded-lg transition-colors hover:bg-sidebar-accent ${
                   isCollapsed ? "px-0 justify-center" : "px-3 justify-start"
                 }`}
               >
-                {AvatarUI()}
+                {isPending ? (
+                  <svg
+                    className="w-5 h-5 animate-spin text-muted-foreground flex-shrink-0"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
+                  </svg>
+                ) : (
+                  <SidebarAvatar
+                    src={avatarSrc}
+                    alt={avatarAlt}
+                    displayName={displayName}
+                    size="lg"
+                  />
+                )}
+
                 {!isCollapsed && (
                   <>
                     <div className="flex-1 text-left ml-3 min-w-0">
                       <p className="text-sm font-semibold text-foreground truncate">
-                        {displayName}
+                        {isPending ? "Signing out..." : displayName}
                       </p>
                       <p className="text-xs text-muted-foreground truncate">
                         {role === "job-seeker" ? "Job Seeker" : "Employer"}
@@ -268,7 +277,12 @@ const DashboardSidebar = ({
                 className="flex items-center gap-3 px-2 py-3 cursor-pointer"
                 onClick={() => router.push(`/${role}/profile/${profileSlug}`)}
               >
-                {AvatarUI()}
+                <SidebarAvatar
+                  src={avatarSrc}
+                  alt={avatarAlt}
+                  displayName={displayName}
+                  size="sm"
+                />
                 <p className="text-sm font-semibold text-foreground">
                   {displayName}
                 </p>

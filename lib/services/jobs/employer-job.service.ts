@@ -6,8 +6,10 @@ import {
   sendNotification,
 } from "@/lib/services/notification/notifications.helper";
 import { createClient } from "@/lib/supabase/server";
+import { serviceClient } from "@/lib/supabase/service";
 import { createSlug } from "@/lib/utils";
 import { jobFormData, JobFormValues, jobUpdateFormData } from "@/types/jobs";
+import { startOfWeek } from "date-fns";
 
 export async function employerJobsService(filters: {
   page: number;
@@ -236,69 +238,58 @@ export async function deleteJobPostService(jobId: string) {
 }
 
 // active jobs
-export async function activeJobsService() {
-  const { supabase, user } = await getServerUser();
-
-  if (!user) throw new Error("Unauthorized: Please login to continue");
+export const activeJobsService = async (userId: string) => {
+  const supabase = await serviceClient;
 
   const { data, error } = await supabase
     .from("jobs")
     .select(
       `
-        id,
-        job_title,
-        status,
-        created_at,
-        job_slug,
-        employment_type,
-        remote_option,
-        applicants(count)  
-        `,
+      id, job_title, status, created_at,
+      job_slug, employment_type, remote_option,
+      applicants(count)
+    `,
     )
-    .eq("employer_id", user.id)
+    .eq("employer_id", userId)
     .eq("status", "open")
     .limit(5);
 
   if (error) throw error;
   return data;
-}
+};
 
-// recent jobs
-export async function recentJobsService() {
-  const { supabase, user } = await getServerUser();
-
-  if (!user) throw new Error("Unauthorized: Please login to continue");
+export const recentJobsService = async (userId: string) => {
+  const supabase = await serviceClient;
 
   const { data, error } = await supabase
     .from("applicants")
     .select(
       `
-          id,
-          applied_at,
-          seeker:user_id(full_name, profile_url),
-          job:job_id(job_title)
-          `,
+      id, applied_at,
+      seeker:user_id(full_name, profile_url),
+      job:job_id(job_title)
+    `,
     )
-    .eq("employer_id", user.id)
+    .eq("employer_id", userId)
     .order("created_at", { ascending: false })
     .limit(5);
 
   if (error) throw error;
-
   return data;
-}
+};
 
 // chart applicants jobs
-export async function chartApplicantsService() {
-  const { supabase, user } = await getServerUser();
+export async function chartApplicantsService(userId: string) {
+  const supabase = await serviceClient;
 
-  if (!user) throw new Error("Unauthorized: Please login to continue");
+  const weekStart = startOfWeek(new Date(), { weekStartsOn: 0 }).toISOString();
 
   // 3. Get all applicants for this employer
   const { data, error } = await supabase
     .from("applicants")
     .select("applied_at")
-    .eq("employer_id", user.id);
+    .eq("employer_id", userId)
+    .gte("applied_at", weekStart);
 
   if (error) throw new Error(error.message);
 

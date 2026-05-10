@@ -4,13 +4,16 @@ import {
   PRICE_IDS,
 } from "@/constants/billingData";
 import { getServerUser } from "@/lib/action/auth/serverAuth";
+import { serviceClient } from "@/lib/supabase/service";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SK!);
 
 // current user
-export async function getMySubscriptionService() {
+
+export const getMySubscriptionService = cache(async () => {
   const { supabase, user } = await getServerUser();
   if (!user) throw new Error("UNAUTHORIZED");
 
@@ -22,11 +25,11 @@ export async function getMySubscriptionService() {
   if (error) throw error;
 
   return data;
-}
+});
 
 // any user
 export async function getUserSubscription(userId: string) {
-  const { supabase } = await getServerUser();
+  const supabase = await serviceClient;
 
   const { data } = await supabase
     .from("subscriptions")
