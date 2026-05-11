@@ -1,5 +1,3 @@
-"use client";
-
 import CTA from "@/app/(landing)/_components/CTA";
 import FeaturedJobs from "@/app/(landing)/_components/FeaturedJobs";
 import Footer from "@/app/(landing)/_components/Footer";

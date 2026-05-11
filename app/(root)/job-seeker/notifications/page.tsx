@@ -1,5 +1,3 @@
-"use client";
-
 import NotificationsPage from "@/components/notifications/NotificationsPage";
 
 const JobSeekerNotificationsPage = () => {

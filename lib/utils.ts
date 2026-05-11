@@ -61,7 +61,11 @@ export const formatLabel = (value: string): string => {
 
 // formate Date
 export const formatDeadline = (dateStr: string) => {
-  return format(parseISO(dateStr), "MMM d, yyyy");
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(new Date(dateStr));
 };
 
 // time diff
