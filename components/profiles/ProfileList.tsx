@@ -7,11 +7,11 @@ import { Employer } from "@/types/employer";
 import { JobSeekerProfile } from "@/types/job-seeker";
 import { Search, Star } from "lucide-react";
 import { useState } from "react";
-import Loader from "../Loader";
 import { Input } from "../ui/input";
 import EmployerCard from "./EmployerCard";
 import { FeaturedEmployerCard } from "./FeaturedEmployerCard";
 
+import CardSkeleton from "../skeletons/CardSkeleton";
 import FeaturedTalentCard from "./FeaturedTalentCard";
 import { TalentCard } from "./TalentCard";
 
@@ -25,12 +25,17 @@ const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
   const [search, setSearch] = useState("");
   const debounceSearch = useDebounce(search, 650);
 
-  const { data: seekerData, isLoading: seekerLoading } = useSeekerProfiles(
-    !isJobSeeker ? debounceSearch : undefined,
-  );
+  const {
+    data: seekerData,
+    isLoading: isSeekerLoading,
+    isFetching: isSeekerFetching,
+  } = useSeekerProfiles(!isJobSeeker ? debounceSearch : undefined);
 
-  const { data: employerData, isLoading: employerLoading } =
-    useEmployerProfiles(isJobSeeker ? debounceSearch : undefined);
+  const {
+    data: employerData,
+    isLoading: isEmployerLoading,
+    isFetching: isEmployerFetching,
+  } = useEmployerProfiles(isJobSeeker ? debounceSearch : undefined);
 
   const isEmployer = (p: Profile): p is Employer => "company_name" in p;
 
@@ -58,9 +63,10 @@ const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
       <TalentCard key={profile.id} talent={profile} />
     );
   };
-
-  if (seekerLoading || employerLoading) return <Loader mode="inline" />;
-
+  const isLoading = role === "job-seeker" ? isEmployerLoading : isSeekerLoading;
+  const isFetching =
+    role === "job-seeker" ? isEmployerFetching : isSeekerFetching;
+  const showSkeleton = isLoading || (isFetching && !profileData);
   return (
     <main>
       {/* Header */}
@@ -141,8 +147,16 @@ const ProfileList = ({ role }: { role: "employer" | "job-seeker" }) => {
       </div>
 
       {/* Cards Grid */}
-      {activeProfiles.length > 0 ? (
+      {showSkeleton ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <CardSkeleton rows={3} variant="interview" />
+        </div>
+      ) : activeProfiles.length > 0 ? (
+        <div
+          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity ${
+            isFetching ? "opacity-50 pointer-events-none" : "opacity-100"
+          }`}
+        >
           {activeProfiles.map(renderCard)}
         </div>
       ) : (

@@ -1,5 +1,3 @@
-"use client";
-
 import { cn, formatDate, formatLabel, formatSalary } from "@/lib/utils";
 import { SavedJob } from "@/types/jobs";
 import {
@@ -62,7 +60,7 @@ export const SavedJobCard = ({
 }) => {
   const statusConfig = getStatusConfig(job.status || "open");
   const isClosed = (job.status || "").toLowerCase() === "closed";
-
+  console.log("job:", job);
   return (
     <div
       className={cn(
@@ -102,8 +100,8 @@ export const SavedJobCard = ({
           <div className="w-14 h-14 rounded-2xl border-2 border-background bg-card shadow-md overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-500">
             <Image
               src={
-                job?.employer?.company_logo_url ||
-                randomImage(job?.employer?.company_name || "C")
+                job?.employer?.company_logo_url ??
+                randomImage(job?.employer?.company_name as string)
               }
               alt={job?.employer?.company_name || "Company Logo"}
               width={56}

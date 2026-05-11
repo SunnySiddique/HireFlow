@@ -1,6 +1,5 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import {
   getNotificationLink,
@@ -14,12 +13,13 @@ import {
 } from "@/hooks/notification/useNotifications";
 import { useSeekerProfile } from "@/hooks/seeker-profile/useSeeker";
 import { createClient } from "@/lib/supabase/client";
-import { getInitials, timeAgo } from "@/lib/utils";
+import { timeAgo } from "@/lib/utils";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { Bell, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import SidebarAvatar from "../sidebar/SidebarAvatar";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { ScrollArea } from "../ui/scroll-area";
@@ -64,6 +64,11 @@ const DashboardNavbar = ({
     role === "job-seeker"
       ? jobSeekerProfile?.profile_url
       : employerProfile?.company_logo_url;
+
+  const avatarAlt =
+    role === "job-seeker"
+      ? (jobSeekerProfile?.full_name ?? "User Profile")
+      : (employerProfile?.company_name ?? "Company Profile");
 
   const profileHref =
     role === "job-seeker"
@@ -247,22 +252,14 @@ const DashboardNavbar = ({
           {/* Avatar */}
           <div className="hidden sm:block">
             {isLoading ? (
-              // ← skeleton circle while profile loads
               <Skeleton className="h-10 w-10 lg:h-12 lg:w-12 rounded-full" />
             ) : (
               <Link href={profileHref}>
-                <Avatar className="h-10 w-10 lg:h-12 lg:w-12 border-2 border-primary cursor-pointer hover:scale-105 transition-transform shadow-sm">
-                  {avatarSrc ? (
-                    <AvatarImage
-                      src={avatarSrc}
-                      alt={displayName ?? "Profile"}
-                    />
-                  ) : (
-                    <AvatarFallback className="bg-primary text-primary-foreground font-bold">
-                      {getInitials(displayName ?? "U")}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
+                <SidebarAvatar
+                  alt={avatarAlt}
+                  src={avatarSrc}
+                  displayName={displayName as string}
+                />
               </Link>
             )}
           </div>
