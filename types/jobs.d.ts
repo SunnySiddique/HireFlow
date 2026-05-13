@@ -194,3 +194,17 @@ export interface JobListingsType {
     count: number;
   }[];
 }
+
+// ai recommended jobs
+export interface RecommendedJobPayload {
+  job_id: string;
+  fit_score: number;
+  why_this_match: string;
+}
+
+export interface JobRecommendationRow {
+  user_id?: string;
+  job_id: string;
+  fit_score: number;
+  why_this_match: string;
+}

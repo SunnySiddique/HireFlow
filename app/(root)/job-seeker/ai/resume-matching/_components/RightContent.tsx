@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import { useSaveRecommendedJobs } from "@/hooks/jobs/useAiRecommendedJobs";
 import { cn } from "@/lib/utils";
 import { AICareerAnalysisResult, JobMatch } from "@/types/aiJobseeker";
 import { motion } from "framer-motion";
@@ -6,11 +8,12 @@ import {
   BookOpen,
   Briefcase,
   CheckCircle2,
+  Loader2,
   MapPin,
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const CircularFitScore = ({
   score,
@@ -72,8 +75,8 @@ function getScoreColors(score: number) {
 }
 
 const RightContent = ({ result }: { result: AICareerAnalysisResult }) => {
-  const [activeFilter, setActiveFilter] = useState("All");
-  const filters = ["All", "≥80%", "≥60%", "<60%"];
+  const { mutate: savedJobs, isPending, isSuccess } = useSaveRecommendedJobs();
+  const router = useRouter();
 
   const jobs = result.job_matches.map((job: JobMatch) => ({
     id: job.job_id,
@@ -95,12 +98,14 @@ const RightContent = ({ result }: { result: AICareerAnalysisResult }) => {
     ...getScoreColors(job.fit_score),
   }));
 
-  const filteredJobs = jobs.filter((job) => {
-    if (activeFilter === "≥80%") return job.score >= 80;
-    if (activeFilter === "≥60%") return job.score >= 60 && job.score < 80;
-    if (activeFilter === "<60%") return job.score < 60;
-    return true;
-  });
+  const handleSavedJobs = () => {
+    const trimmedJobs = result.job_matches.map((job: JobMatch) => ({
+      job_id: job.job_id,
+      fit_score: job.fit_score,
+      why_this_match: job.why_this_match,
+    }));
+    savedJobs(trimmedJobs);
+  };
 
   return (
     <>
@@ -115,27 +120,10 @@ const RightContent = ({ result }: { result: AICareerAnalysisResult }) => {
             </p>
           </div>
         </div>
-
-        <div className="flex flex-wrap gap-2 mt-2">
-          {filters.map((filter) => (
-            <button
-              key={filter}
-              onClick={() => setActiveFilter(filter)}
-              className={cn(
-                "px-4 py-1.5 rounded-full text-xs font-mono font-medium border transition-all",
-                activeFilter === filter
-                  ? "bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/20"
-                  : "bg-card border-border text-muted-foreground hover:border-primary/50 hover:text-foreground",
-              )}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
       </div>
 
       <div className="flex flex-col gap-4 mt-2">
-        {filteredJobs.map((job, index: number) => (
+        {jobs.map((job, index: number) => (
           <motion.div
             key={job.id}
             initial={{ opacity: 0, y: 20 }}
@@ -335,6 +323,36 @@ const RightContent = ({ result }: { result: AICareerAnalysisResult }) => {
             </div>
           </motion.div>
         ))}
+        <div className="flex justify-end">
+          {isSuccess ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-12 rounded-xl font-bold border-primary text-primary hover:bg-primary/10 transition-all duration-300 flex items-center justify-center gap-2"
+              onClick={() => router.push("/job-seeker/ai/matched-jobs")}
+            >
+              <CheckCircle2 className="w-5 h-5" />
+              View Saved Jobs
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              onClick={handleSavedJobs}
+              disabled={isPending}
+              className="w-full h-12 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 transition-all duration-300"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save All Jobs"
+              )}
+            </Button>
+          )}
+        </div>
       </div>
     </>
   );

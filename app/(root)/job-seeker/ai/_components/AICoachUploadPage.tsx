@@ -204,7 +204,7 @@ const AICoachUploadPage = () => {
                       AI is scanning your resume...
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      This takes about 6-10 seconds
+                      This takes about 10-20 seconds
                     </p>
                   </div>
                 ) : (

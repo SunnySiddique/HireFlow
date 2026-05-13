@@ -203,10 +203,5 @@ export const FREE_LINKS = {
   employer: ["Dashboard", "Billing", "Profile"],
   "job-seeker": ["Dashboard", "Billing", "Profile", "Browse Jobs"],
 };
-// <---  JOB SEEKER PROFILE  ---> //
-
-// <---  EMPLOYER PROFILE  ---> //
-
-// <--- EMPLOYER PROFILE ---> //
 
 // protected route links

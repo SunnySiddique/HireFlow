@@ -24,7 +24,8 @@ export default function JobSeekerLayoutClient({
   const isJobs =
     pathname === `/${role}/jobs` ||
     /^\/job-seeker\/jobs\/[^/]+$/.test(pathname) ||
-    pathname === `/${role}/ai/resume-matching`;
+    pathname === `/${role}/ai/resume-matching` ||
+    pathname === `/${role}/ai/matched-jobs`;
 
   const isInterviewDetail = /^\/job-seeker\/interviews\/[^/]+$/.test(pathname);
 
@@ -44,7 +45,7 @@ export default function JobSeekerLayoutClient({
       )}
       <div className="flex flex-col flex-1">
         {isJobs ? (
-          <JobNavbar role="job-seeker" isAiResume={true} />
+          <JobNavbar role="job-seeker" />
         ) : (
           <DashboardNavbar
             role="job-seeker"

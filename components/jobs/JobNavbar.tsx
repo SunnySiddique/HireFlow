@@ -22,13 +22,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
 import toast from "react-hot-toast";
 
-const JobsNavbar = ({
-  role,
-  isAiResume,
-}: {
-  role: "job-seeker" | "employer";
-  isAiResume: boolean;
-}) => {
+const JobsNavbar = ({ role }: { role: "job-seeker" | "employer" }) => {
   const pathname = usePathname();
   const { data: seeker } = useSeekerProfile();
   const { data: employer } = useEmployerProfile();
@@ -37,9 +31,11 @@ const JobsNavbar = ({
   const router = useRouter();
 
   const isText =
-    isAiResume && pathname === "/job-seeker/ai/resume-matching"
-      ? "AI Resume Matching"
-      : "Browse Jobs";
+    pathname === "/job-seeker/ai/matched-jobs"
+      ? "AI Matched Jobs"
+      : pathname === "/job-seeker/ai/resume-matching"
+        ? "AI Resume Matching"
+        : "Browse Jobs";
 
   const userName =
     role === "job-seeker" ? seeker?.full_name : employer?.company_name;
@@ -47,8 +43,13 @@ const JobsNavbar = ({
     role === "job-seeker" ? seeker?.profile_url : employer?.company_logo_url;
   const userSlug = role === "job-seeker" ? seeker?.slug : employer?.slug;
 
-  const redirectUrl =
-    role === "job-seeker" ? "/job-seeker/dashboard" : "/employer/jobs";
+  const redirectSeekerUrl =
+    pathname === "/job-seeker/ai/matched-jobs" ||
+    pathname === "/job-seeker/ai/resume-matching" ||
+    pathname === "/job-seeker/ai/resume-matching"
+      ? "/job-seeker/ai"
+      : "/job-seeker/dashboard";
+  const redirectEmployerUrl = "/employer/jobs";
 
   const handleLogout = () => {
     startTransition(async () => {
@@ -57,12 +58,14 @@ const JobsNavbar = ({
       router.push("/auth/signin");
     });
   };
-  console.log(isText);
+
   return (
     <header className="sticky top-0 z-30 bg-background/80 backdrop-blur border-b border-border">
       <div className="flex items-center justify-between px-4 md:px-14 h-14">
         {/* LEFT */}
-        <Link href={redirectUrl}>
+        <Link
+          href={role === "job-seeker" ? redirectSeekerUrl : redirectEmployerUrl}
+        >
           <Button
             variant="ghost"
             size="sm"

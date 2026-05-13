@@ -69,7 +69,7 @@ export async function updateSession(request: NextRequest) {
   );
 
   // if logged in user tries to access the auth page they redirect to the dashboard based on the role
-  if (user && userRole && isAuthRedirectRoute) {
+  if ((user && userRole && isAuthRedirectRoute) || pathname === "/") {
     const url = request.nextUrl.clone();
     url.pathname =
       userRole === "job-seeker"

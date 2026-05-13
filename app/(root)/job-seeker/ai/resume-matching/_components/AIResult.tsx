@@ -10,6 +10,7 @@ const AIResult = ({ jobs }: { jobs: any }) => {
           summary={jobs?.resume_summary}
           extractedSkills={jobs?.extracted_skills}
         />
+
         {/* Right Main Content (70%) */}
         <section className="w-full lg:w-[70%] flex flex-col gap-6">
           <RightContent result={jobs} />

@@ -41,7 +41,7 @@ export default function EmployerLayoutClient({
       )}
       <div className="flex flex-col flex-1">
         {isJobDetail ? (
-          <JobsNavbar role="employer" isAiResume={false} />
+          <JobsNavbar role="employer" />
         ) : (
           <DashboardNavbar
             role="employer"
