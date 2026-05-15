@@ -2,9 +2,17 @@
 
 import { cn } from "@/lib/utils";
 import { extractPdfText } from "@/lib/utils/pdfExatact";
+import { StreamEvent } from "@/types";
 import { AICareerAnalysisResult } from "@/types/aiJobseeker";
-import { motion } from "framer-motion";
-import { ShieldCheck, Sparkles, UploadCloud, Zap } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  CheckCircle2,
+  Loader2,
+  ShieldCheck,
+  Sparkles,
+  UploadCloud,
+  Zap,
+} from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
@@ -20,7 +28,6 @@ const MiniCircularFitScore = ({
   const radius = 16;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (score / 100) * circumference;
-
   return (
     <div className="relative flex items-center justify-center w-10 h-10 shrink-0">
       <svg className="transform -rotate-90 w-10 h-10">
@@ -55,69 +62,147 @@ const MiniCircularFitScore = ({
   );
 };
 
+const STEPS = [
+  { icon: "📄", label: "Reading resume" },
+  { icon: "🗄️", label: "Fetching live jobs" },
+  { icon: "🤖", label: "AI analysis" },
+  { icon: "✨", label: "Building report" },
+];
+
+const AnalyzingPanel = ({
+  currentStep,
+  statusMessage,
+  totalSteps,
+}: {
+  currentStep: number;
+  statusMessage: string;
+  totalSteps: number;
+}) => (
+  <div className="flex flex-col items-center justify-center py-10 text-center gap-8 w-full">
+    {/* Animated GIF */}
+    <Image
+      src="/resume-scan.gif"
+      alt="AI Analyzing Resume"
+      width={260}
+      height={195}
+      unoptimized
+      className="opacity-90"
+    />
+
+    <div className="flex flex-wrap justify-center gap-2">
+      {STEPS.map((step, i) => {
+        const stepNum = i + 1;
+        const isDone = currentStep > stepNum;
+        const isActive = currentStep === stepNum;
+        return (
+          <motion.div
+            key={step.label}
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: i * 0.08 }}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-300",
+              isDone
+                ? "bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400"
+                : isActive
+                  ? "bg-primary/10 border-primary/40 text-primary scale-105 shadow-sm shadow-primary/20"
+                  : "bg-muted/40 border-border text-muted-foreground opacity-50",
+            )}
+          >
+            {isDone ? (
+              <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+            ) : isActive ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <span className="w-3.5 h-3.5 flex items-center justify-center text-[10px]">
+                {step.icon}
+              </span>
+            )}
+            {step.label}
+          </motion.div>
+        );
+      })}
+    </div>
+
+    {/* Progress bar */}
+    <div className="w-full max-w-xs">
+      <div className="h-1 rounded-full bg-muted overflow-hidden">
+        <motion.div
+          className="h-full bg-primary rounded-full"
+          initial={{ width: "0%" }}
+          animate={{
+            width: `${Math.max(8, (currentStep / totalSteps) * 100)}%`,
+          }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        />
+      </div>
+    </div>
+
+    {/* Live message */}
+    <AnimatePresence mode="wait">
+      <motion.p
+        key={statusMessage}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -6 }}
+        transition={{ duration: 0.25 }}
+        className="text-sm text-muted-foreground font-medium"
+      >
+        {statusMessage}
+      </motion.p>
+    </AnimatePresence>
+
+    <p className="text-xs text-muted-foreground">
+      This takes about 10–20 seconds
+    </p>
+  </div>
+);
+
 const AICoachUploadPage = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [result, setResult] = useState<AICareerAnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [statusMessage, setStatusMessage] = useState("");
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
   };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
+  const handleDragLeave = () => setIsDragging(false);
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files[0];
     if (!file) return;
-
-    let text = "";
-
-    if (file.type === "application/pdf") {
-      text = await extractPdfText(file);
-    } else {
-      text = await file.text();
-    }
-
-    if (!text || text.trim().length < 50) {
-      toast.error("Resume too small or unreadable");
-      return;
-    }
-
+    const text =
+      file.type === "application/pdf"
+        ? await extractPdfText(file)
+        : await file.text();
+    if (!text || text.trim().length < 50)
+      return toast.error("Resume too small or unreadable");
     await analyzeResume(text);
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    let text = "";
-
-    if (file.type === "application/pdf") {
-      text = await extractPdfText(file);
-    } else {
-      text = await file.text();
-    }
-
-    if (!text || text.trim().length < 50) {
-      toast.error("Resume too small or unreadable");
-      return;
-    }
-
+    const text =
+      file.type === "application/pdf"
+        ? await extractPdfText(file)
+        : await file.text();
+    if (!text || text.trim().length < 50)
+      return toast.error("Resume too small or unreadable");
     await analyzeResume(text);
   };
 
-  const analyzeResume = async (text?: string) => {
-    if (!text || text.trim().length < 50) {
-      toast.error("Please upload a valid resume (minimum 50 characters)");
-      return;
-    }
+  const analyzeResume = async (text: string) => {
     setIsAnalyzing(true);
     setResult(null);
+    setCurrentStep(0);
+    setStatusMessage("Starting analysis...");
+
     try {
       const res = await fetch("/api/match-jobs", {
         method: "POST",
@@ -125,28 +210,59 @@ const AICoachUploadPage = () => {
         body: JSON.stringify({ resume: text }),
       });
 
-      const json = await res.json();
+      if (!res.ok || !res.body) throw new Error("Request failed");
 
-      if (!json.success) throw new Error(json.error || "Analysis failed");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
 
-      setResult(json.data);
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split("\n\n");
+
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          const raw = line.replace(/^data:\s*/, "").trim();
+
+          if (!raw) continue;
+
+          let event: StreamEvent;
+          try {
+            event = JSON.parse(raw);
+          } catch {
+            continue;
+          }
+
+          if (event.type === "status") {
+            setCurrentStep(event.step);
+            setStatusMessage(event.message);
+          } else if (event.type === "result") {
+            setResult(event.data);
+          } else if (event.type === "error") {
+            throw new Error(event.message);
+          }
+        }
+      }
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Something went wrong";
-      toast.error(message);
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setIsAnalyzing(false);
+      setCurrentStep(0);
     }
   };
 
   return (
     <>
-      {/* Main Content */}
       {!result ? (
         <main className="flex flex-col lg:flex-row gap-12 lg:gap-8 items-center lg:items-start justify-between min-h-screen">
-          {/* Left Column: Hero & Upload (approx 55%) */}
+          {/* Left Column */}
           <div className="w-full lg:w-[55%] flex flex-col gap-8 max-w-2xl">
-            {/* Hero Text */}
+            {/* Hero */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -168,12 +284,11 @@ const AICoachUploadPage = () => {
               </p>
             </motion.div>
 
-            {/* Big Central Upload Area */}
+            {/* Upload area */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="w-full"
             >
               <div
                 onDragOver={handleDragOver}
@@ -186,28 +301,17 @@ const AICoachUploadPage = () => {
                     : "border-border hover:border-primary/50 bg-card/40 hover:bg-card/80 backdrop-blur-xl shadow-lg",
                 )}
               >
-                {/* Background Glow */}
                 <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
+                {/* ── Loading state ── */}
                 {isAnalyzing ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-center">
-                    {/* FIXED GIF */}
-                    <Image
-                      src="/resume-scan.gif"
-                      alt="AI Analyzing Resume"
-                      width={320}
-                      height={240}
-                      unoptimized
-                    />
-
-                    <p className="mt-6 text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      AI is scanning your resume...
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      This takes about 10-20 seconds
-                    </p>
-                  </div>
+                  <AnalyzingPanel
+                    currentStep={currentStep}
+                    statusMessage={statusMessage}
+                    totalSteps={4}
+                  />
                 ) : (
+                  /* ── Upload idle state ── */
                   <div className="flex flex-col items-center text-center z-10">
                     <div className="relative mb-6">
                       <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary/20 transition-all duration-500 shadow-[0_0_40px_rgba(231,138,83,0.15)]">
@@ -215,14 +319,12 @@ const AICoachUploadPage = () => {
                       </div>
                       <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-primary animate-pulse" />
                     </div>
-
                     <h3 className="text-2xl font-bold text-foreground mb-3">
                       Drop your resume here or click to upload
                     </h3>
                     <p className="text-muted-foreground mb-8">
                       Supported formats: PDF, DOCX, TXT (max 5MB)
                     </p>
-
                     <label className="cursor-pointer">
                       <div className="px-8 py-3.5 rounded-xl bg-primary text-primary-foreground font-bold hover:bg-primary/90 shadow-md shadow-primary/20 transition-all">
                         Browse Files
@@ -239,7 +341,7 @@ const AICoachUploadPage = () => {
               </div>
             </motion.div>
 
-            {/* Footer Note */}
+            {/* Footer */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -255,20 +357,16 @@ const AICoachUploadPage = () => {
             </motion.div>
           </div>
 
-          {/* Right Column: Preview Panel (approx 45%) */}
+          {/* Right Column: preview panel (unchanged) */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
             className="w-full lg:w-[45%] relative hidden md:block"
           >
-            {/* Decorative Background Elements */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-primary/5 rounded-full blur-[100px] -z-10" />
             <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/10 rounded-full blur-[80px] -z-10" />
-
-            {/* The Teaser Panel */}
             <div className="relative w-full max-w-md mx-auto bg-card/60 backdrop-blur-2xl border border-border/80 rounded-[2rem] shadow-2xl shadow-black/50 overflow-hidden flex flex-col">
-              {/* Panel Header */}
               <div className="p-6 border-b border-border/50 bg-muted/20">
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles className="w-4 h-4 text-primary" />
@@ -276,8 +374,6 @@ const AICoachUploadPage = () => {
                     What you&apos;ll get
                   </h3>
                 </div>
-
-                {/* Mini Resume Summary */}
                 <div className="space-y-3">
                   <div className="h-2 w-16 bg-primary/20 rounded-full" />
                   <p className="text-xs text-muted-foreground italic border-l-2 border-primary/50 pl-3 py-0.5">
@@ -297,10 +393,7 @@ const AICoachUploadPage = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Mini Job Matches */}
               <div className="p-6 flex flex-col gap-3 relative">
-                {/* Match 1 */}
                 <div className="p-3 rounded-xl bg-background border border-border/50 flex items-center justify-between shadow-sm">
                   <div>
                     <h4 className="font-bold text-sm text-foreground">
@@ -315,8 +408,6 @@ const AICoachUploadPage = () => {
                     colorClass="text-green-500"
                   />
                 </div>
-
-                {/* Match 2 */}
                 <div className="p-3 rounded-xl bg-background border border-border/50 flex items-center justify-between shadow-sm">
                   <div>
                     <h4 className="font-bold text-sm text-foreground">
@@ -328,8 +419,6 @@ const AICoachUploadPage = () => {
                   </div>
                   <MiniCircularFitScore score={78} colorClass="text-primary" />
                 </div>
-
-                {/* Match 3 */}
                 <div className="p-3 rounded-xl bg-background border border-border/50 flex items-center justify-between shadow-sm">
                   <div>
                     <h4 className="font-bold text-sm text-foreground">
@@ -344,8 +433,6 @@ const AICoachUploadPage = () => {
                     colorClass="text-secondary"
                   />
                 </div>
-
-                {/* Gradient Overlay to fade out bottom */}
                 <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-card/60 via-card/40 to-transparent backdrop-blur-[2px] flex items-end justify-center pb-6">
                   <span className="px-4 py-1.5 rounded-full bg-background/80 border border-border text-xs font-bold shadow-lg backdrop-blur-md">
                     Preview Analysis

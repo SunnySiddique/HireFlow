@@ -77,37 +77,42 @@ ${
     .join("\n");
 }
 
-export async function analyzeResumeAndJobMatchService(resume: any) {
+type StatusCallback = (step: number, message: string) => void;
+
+export async function analyzeResumeAndJobMatchService(
+  resume: any,
+  onStatus?: StatusCallback,
+) {
+  onStatus?.(1, "Reading and extracting your resume...");
+
   const jobs = await getFilteredJobsForAIQuery();
+
+  onStatus?.(
+    2,
+    `Fetching live jobs from the database... (${jobs.length} found)`,
+  );
 
   const jobsText = formatJobsForAI(jobs);
 
-  const userMessage = `
-Here is the candidate's resume:
-${resume}
-
-Here are the most relevant job postings to analyze (only these ones):
-${jobsText}
-`;
+  onStatus?.(3, "AI is analyzing your profile against job listings...");
 
   const completion = await openrouter.chat.completions.create({
     model: "meta-llama/llama-3-8b-instruct",
     temperature: 0.1,
     response_format: { type: "json_object" },
     messages: [
-      {
-        role: "system",
-        content: SYSTEM_PROMPT,
-      },
+      { role: "system", content: SYSTEM_PROMPT },
       {
         role: "user",
-        content: userMessage,
+        content: `Here is the candidate's resume:\n${resume}\n\nHere are the most relevant job postings to analyze (only these ones):\n${jobsText}`,
       },
     ],
   });
 
   const rawContent = completion.choices[0]?.message?.content;
   if (!rawContent) throw new Error("No response from AI");
+
+  onStatus?.(4, "Ranking matches and building your report...");
 
   let parsed;
   try {

@@ -34,7 +34,7 @@ import { Check, MonitorIcon, Moon, PaletteIcon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import SidebarAvatar from "./SidebarAvatar";
 
 interface DashboardSidebarProps {
@@ -56,90 +56,119 @@ const DashboardSidebar = ({
 }: DashboardSidebarProps) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-
-  // state
   const [isCollapsed, setIsCollapsed] = useState(false);
-
   const [isOpen, setIsOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
 
-  const isSubscribed = hasAccess(
-    subscription?.subscription_status as string,
-    subscription?.plan_expires_at as string,
+  const isSubscribed = useMemo(
+    () =>
+      hasAccess(
+        subscription?.subscription_status as string,
+        subscription?.plan_expires_at as string,
+      ),
+    [subscription?.subscription_status, subscription?.plan_expires_at],
   );
 
-  const handleLogout = () => {
+  const isActive = useCallback((href: string) => pathname === href, [pathname]);
+
+  const handleLogout = useCallback(() => {
     startTransition(async () => {
       router.push("/auth/signin");
       await signOut();
     });
-  };
-  const isActive = (href: string) => pathname === href;
+  }, [router]);
 
-  const links = role === "employer" ? employerLinks : jobSeekerLinks;
+  const { mainLinks, manageLinks } = useMemo(() => {
+    const links = role === "employer" ? employerLinks : jobSeekerLinks;
 
-  const filteredLinks = links.filter((link) => {
-    if (!isSubscribed) {
-      return FREE_LINKS[role].includes(link.label);
-    }
-    if (!link.plan) return true;
+    const filtered = links.filter((link) => {
+      if (!isSubscribed) return FREE_LINKS[role].includes(link.label);
+      if (!link.plan) return true;
+      return (
+        subscription?.plan === link.plan ||
+        link?.plan === "starter" ||
+        link?.plan === "explorer"
+      );
+    });
 
-    return (
-      subscription?.plan === link.plan ||
-      link?.plan === "starter" ||
-      link?.plan === "explorer"
-    );
-  });
+    return {
+      mainLinks: filtered.filter((l) => l.section === "main"),
+      manageLinks: filtered.filter((l) => l.section === "manage"),
+    };
+  }, [role, isSubscribed, subscription?.plan]);
 
-  const mainLinks = filteredLinks.filter((l) => l.section === "main");
-  const manageLinks = filteredLinks.filter((l) => l.section === "manage");
+  const { profileSlug, displayName, avatarSrc, avatarAlt } = useMemo(
+    () => ({
+      profileSlug:
+        role === "job-seeker" ? seekerProfile?.slug : employerProfile?.slug,
+      displayName:
+        role === "job-seeker"
+          ? (seekerProfile?.full_name ?? "User")
+          : (employerProfile?.company_name ?? "Company"),
+      avatarSrc:
+        role === "job-seeker"
+          ? seekerProfile?.profile_url
+          : employerProfile?.company_logo_url,
+      avatarAlt:
+        role === "job-seeker"
+          ? (seekerProfile?.full_name ?? "User Profile")
+          : (employerProfile?.company_name ?? "Company Profile"),
+    }),
+    [role, seekerProfile, employerProfile],
+  );
 
-  const renderLink = (link: any) => {
-    const href =
-      typeof link.href === "function"
-        ? link.href(
-            role === "job-seeker"
-              ? (seekerProfile?.slug ?? "")
-              : (employerProfile?.slug ?? ""),
-          )
-        : link.href;
+  const renderLink = useCallback(
+    (link: any) => {
+      const href =
+        typeof link.href === "function"
+          ? link.href(
+              role === "job-seeker"
+                ? (seekerProfile?.slug ?? "")
+                : (employerProfile?.slug ?? ""),
+            )
+          : link.href;
 
-    return (
-      <Link
-        key={link.label}
-        href={href}
-        className={`${
-          isActive(href)
-            ? "bg-sidebar border-l-4 border-sidebar-primary text-sidebar-primary"
-            : "hover:bg-muted-foreground/10"
-        } flex items-center gap-3 px-4 py-3 rounded-md cursor-pointer ${
-          isCollapsed ? "justify-center p-5" : ""
-        }`}
-        onClick={() => setSidebarOpen(false)}
-      >
-        {link.icon && <link.icon className="w-4 h-4" />}
-        {!isCollapsed && (
-          <span className="text-sm font-medium">{link.label}</span>
-        )}{" "}
-      </Link>
-    );
-  };
+      const active = isActive(href);
 
-  const profileSlug =
-    role === "job-seeker" ? seekerProfile?.slug : employerProfile?.slug;
-  const displayName =
-    role === "job-seeker"
-      ? (seekerProfile?.full_name ?? "User")
-      : (employerProfile?.company_name ?? "Company");
-  const avatarSrc =
-    role === "job-seeker"
-      ? seekerProfile?.profile_url
-      : employerProfile?.company_logo_url;
-  const avatarAlt =
-    role === "job-seeker"
-      ? (seekerProfile?.full_name ?? "User Profile")
-      : (employerProfile?.company_name ?? "Company Profile");
+      return (
+        <Link
+          key={link.label}
+          href={href}
+          prefetch={true} // ✅ FIX 6: Explicit prefetch ensures routes are preloaded on hover
+          // ✅ FIX 7: Close sidebar AFTER navigation starts, not before — eliminates the
+          //    re-render that was racing with the router and causing perceived delay.
+          //    Using startTransition here keeps the UI responsive during the state update.
+          onClick={() => {
+            if (sidebarOpen) {
+              startTransition(() => setSidebarOpen(false));
+            }
+          }}
+          className={`${
+            active
+              ? "bg-sidebar border-l-4 border-sidebar-primary text-sidebar-primary"
+              : "hover:bg-muted-foreground/10"
+          } flex items-center gap-3 px-4 py-3 rounded-md cursor-pointer ${
+            isCollapsed ? "justify-center p-5" : ""
+          }`}
+        >
+          {link.icon && <link.icon className="w-4 h-4" />}
+          {!isCollapsed && (
+            <span className="text-sm font-medium">{link.label}</span>
+          )}
+        </Link>
+      );
+    },
+    [
+      role,
+      seekerProfile?.slug,
+      employerProfile?.slug,
+      isActive,
+      isCollapsed,
+      sidebarOpen,
+      setSidebarOpen,
+    ],
+  );
 
   return (
     <>

@@ -60,7 +60,7 @@ export const SavedJobCard = ({
 }) => {
   const statusConfig = getStatusConfig(job.status || "open");
   const isClosed = (job.status || "").toLowerCase() === "closed";
-  console.log("job:", job);
+
   return (
     <div
       className={cn(

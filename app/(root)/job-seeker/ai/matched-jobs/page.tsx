@@ -9,10 +9,12 @@ import {
   useDeleteRecommendedJob,
   useGetAllSaveRecommendedJobs,
 } from "@/hooks/jobs/useAiRecommendedJobs";
+import { useSavedJob, useSeekerSavedJobs } from "@/hooks/jobs/useSeekerJob";
 import { cn, formatSalary } from "@/lib/utils";
 import { motion } from "framer-motion";
 import {
   Bookmark,
+  BookmarkCheck,
   Briefcase,
   Building2,
   DollarSign,
@@ -32,10 +34,23 @@ export default function AIMatchedJobsPage() {
     useDeleteAllRecommendedJobs();
   const { mutate: deleteJob, isPending: isDeletingJob } =
     useDeleteRecommendedJob();
-
+  const { mutate: saveJob, isPending: isSaving } = useSavedJob();
+  const { data } = useSeekerSavedJobs();
+  const savedJobs = data?.saved_jobs ?? [];
+  console.log("savedJobs", savedJobs);
   const router = useRouter();
 
   const [jobId, setJobId] = useState<string | null>(null);
+
+  const handleSave = (jobId: string) => {
+    setJobId(jobId);
+
+    saveJob(jobId, {
+      onSettled: () => {
+        setJobId(null);
+      },
+    });
+  };
 
   const handleDelete = (jobId: string) => {
     setJobId(jobId);
@@ -76,7 +91,8 @@ export default function AIMatchedJobsPage() {
               job.salary_min && job.salary_max
                 ? formatSalary(job.salary_min, job.salary_max, job.currency)
                 : "Not specified";
-
+            const isSaved = savedJobs?.some((s) => s.job_id === job.id);
+            console.log("jobId:", job.id);
             return (
               <motion.div
                 key={item.id}
@@ -199,8 +215,19 @@ export default function AIMatchedJobsPage() {
                       variant="outline"
                       size="icon"
                       className="w-11 h-11 rounded-xl bg-card hover:bg-muted border-border text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleSave(job.id);
+                      }}
                     >
-                      <Bookmark className="w-[18px] h-[18px]" />
+                      {isSaving && jobId === job.id ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : isSaved ? (
+                        <BookmarkCheck className="w-4.5 h-4.5" />
+                      ) : (
+                        <Bookmark className="w-4.5 h-4.5" />
+                      )}
                     </Button>
                   </div>
                 </Card>

@@ -1,3 +1,5 @@
+import { AICareerAnalysisResult } from "./aiJobseeker";
+
 // Auth
 export type TabItem = {
   value: string;
@@ -45,3 +47,20 @@ export interface NotificationPayload {
 export type ServiceResult<T = void> =
   | { success: true; data: T }
   | { success: false; code: string };
+
+// stream
+
+export type StreamEvent =
+  | {
+      type: "status";
+      step: number;
+      message: string;
+    }
+  | {
+      type: "result";
+      data: AICareerAnalysisResult;
+    }
+  | {
+      type: "error";
+      message: string;
+    };
